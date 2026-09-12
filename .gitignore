@@ -1,0 +1,7 @@
+# Ham veri ASLA GitHub'a gitmesin
+*.xlsx
+*.xls
+*.xlsm
+*.csv
+__pycache__/
+*.pyc

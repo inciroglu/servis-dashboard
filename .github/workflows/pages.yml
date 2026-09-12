@@ -1,0 +1,33 @@
+name: Dashboard Yayınla
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Site klasörü hazırla
+        run: |
+          mkdir -p site
+          [ -f robots.txt ] && cp robots.txt site/robots.txt
+          if [ -f index.html ]; then cp index.html site/index.html;
+          elif [ -f dashboard.html ]; then cp dashboard.html site/index.html;
+          else echo "index.html yok"; exit 1; fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4
