@@ -18,6 +18,7 @@ Veri yenileme akışı:
 """
 
 import sys
+import os
 import hashlib
 
 # ================================================================== #
@@ -184,6 +185,108 @@ def is_gunu_hesapla(yil, ay, kesim_gun):
 # Marka sayfaları (Konsolide + 10 marka). Sıra dashboard'daki seçici sırası.
 MARKA_SAYFALARI = ["Servis Konsolide Rapor", "Peugeot", "Opel", "Citroen", "Fiat",
                    "Arj", "Honda", "Bmw", "Motorrad", "Tesla", "Jaecoo"]
+
+# Fatura Detay'daki "Marka" değerini marka sayfa anahtarına çevir
+FATURA_MARKA_ESLEME = {
+    "peugeot": "Peugeot", "opel": "Opel", "citroen": "Citroen", "citroën": "Citroen",
+    "fiat": "Fiat", "arj": "Arj", "alfa": "Arj", "jeep": "Arj",
+    "honda": "Honda", "bmw": "Bmw", "bmw motorrad": "Motorrad", "motorrad": "Motorrad",
+    "tesla": "Tesla", "jaecoo": "Jaecoo", "omoda": "Jaecoo",
+}
+
+# Ek satış sayılan Stok Özel Kod (G sütunu) kuralları
+def _ek_satis_mi(g):
+    if not g:
+        return False
+    g = str(g).strip().upper()
+    return g.startswith("AKSAT") or g in ("MOTOR YAĞI", "MOTOR YAĞI2", "CAR CARE", "AKSAT- CAR CARE")
+
+
+def ek_satis_oku(dosya):
+    """
+    Ham 'Fatura Detay Liste' sayfasından kişi (servis danışmanı) bazında ek satış
+    özetini çıkarır. Streaming okur (dev sayfa), yalnızca ÖZET döner — ham fatura
+    (müşteri, fatura no, şase) DIŞARI ÇIKMAZ.
+    Dönüş: { marka_key: { danisman: { ay_no: [ciro, adet] } } }
+    """
+    import zipfile as _zip
+    import xml.etree.ElementTree as _ET
+    NS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
+    SHEET = "Fatura Detay Liste"
+
+    z = _zip.ZipFile(dosya)
+    # sayfa hedefini bul
+    wbxml = z.read("xl/workbook.xml").decode("utf-8")
+    rels = z.read("xl/_rels/workbook.xml.rels").decode("utf-8")
+    relmap = dict(re.findall(r'Id="(rId\d+)"[^>]*Target="([^"]+)"', rels))
+    tgt = None
+    for m in re.finditer(r'<sheet\b[^>]*/>', wbxml):
+        tag = m.group(0)
+        nm = re.search(r'name="([^"]+)"', tag)
+        rid = re.search(r'r:id="(rId\d+)"', tag)
+        if nm and nm.group(1) == SHEET and rid:
+            t = relmap.get(rid.group(1), "").lstrip("/")
+            tgt = t if t.startswith("xl/") else "xl/" + t
+            break
+    if not tgt:
+        print("  ⚠ 'Fatura Detay Liste' bulunamadı — ek satış atlanıyor.")
+        z.close()
+        return {}
+
+    # shared strings (streaming)
+    shared = []
+    for ev, el in _ET.iterparse(z.open("xl/sharedStrings.xml")):
+        if el.tag == NS + "si":
+            shared.append("".join(t.text or "" for t in el.iter(NS + "t")))
+            el.clear()
+
+    def val(c):
+        t = c.get("t"); v = c.find(NS + "v")
+        if v is None or v.text is None:
+            return None
+        return shared[int(v.text)] if t == "s" else v.text
+
+    from collections import defaultdict
+    data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: [0.0, 0])))
+    satir = 0
+    for ev, el in _ET.iterparse(z.open(tgt)):
+        if el.tag == NS + "row":
+            rw = int(el.get("r", "0"))
+            if rw >= 4:  # başlıklar 3. satırda
+                cells = {}
+                for c in el.iter(NS + "c"):
+                    ref = c.get("r"); mm = re.match(r"([A-Z]+)", ref)
+                    if mm:
+                        cells[mm.group(1)] = val(c)
+                g = cells.get("G")
+                if _ek_satis_mi(g):
+                    dan = (cells.get("H") or "DANIŞMANSIZ").strip()
+                    mk_raw = (cells.get("K") or "").strip().lower()
+                    mk = FATURA_MARKA_ESLEME.get(mk_raw, cells.get("K") or "Bilinmiyor")
+                    ay = cells.get("P")
+                    try:
+                        ay = int(float(ay))
+                    except Exception:
+                        ay = 0
+                    try:
+                        f = float(cells.get("F") or 0)
+                    except Exception:
+                        f = 0.0
+                    try:
+                        q = int(float(cells.get("I") or 0))
+                    except Exception:
+                        q = 0
+                    data[mk][dan][ay][0] += f
+                    data[mk][dan][ay][1] += q
+                satir += 1
+            el.clear()
+    z.close()
+    print(f"  ✓ Ek satış: {satir:,} fatura satırı tarandı, {sum(len(v) for v in data.values())} danışman kaydı")
+    # defaultdict -> normal dict
+    return {mk: {dan: {str(ay): v for ay, v in aylar.items()} for dan, aylar in dans.items()}
+            for mk, dans in data.items()}
+
+
 MARKA_ETIKET = {
     "Servis Konsolide Rapor": "TÜM MARKALAR (Konsolide)",
     "Peugeot": "Peugeot", "Opel": "Opel", "Citroen": "Citroën", "Fiat": "Fiat",
@@ -415,12 +518,16 @@ def veriyi_topla(dosya):
             "yp":      {"butce": _bol(mek_yp_b, mek_adet_b),  "fiili": _bol(mek_yp_f, mek_adet_f),  "g2025": _bol(mek_yp_25, mek_adet_25)},
         }
 
+    # Ek satış özelliği kaldırıldı (ham fatura okunmuyor — hızlı build)
+    ek_satis = {}
+
     return {
         "ust": ust,
         "aylar": AYLAR,
         "kategoriler": KATEGORILER,
         "marka_sirasi": [s for s in MARKA_SAYFALARI if s in markalar],
         "markalar": markalar,
+        "ek_satis": ek_satis,
         "uretim": _dt.datetime.now().strftime("%d.%m.%Y %H:%M"),
     }
 
@@ -451,47 +558,48 @@ HTML_SABLON = r"""<!DOCTYPE html>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root{
-    --bg:#0f1420; --panel:#1a2233; --panel2:#212b40; --line:#2c3852;
-    --ink:#eef2fb; --muted:#93a1bd; --brand:#d4111e; --brand2:#b30d18;
-    --ok:#2fbf71; --warn:#f0a020; --bad:#e5484d; --acc:#4f8cff;
+    --bg:#f2ede3; --panel:#ffffff; --panel2:#f6f1e7; --line:#ddd3c0;
+    --ink:#1a2c4e; --muted:#6b7280; --brand:#1a2c4e; --brand2:#14213d;
+    --ok:#2f7d54; --warn:#b8860b; --bad:#b23b3b; --acc:#3a5a8c;
+    --gold:#b8945a;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:Arial,'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);
        -webkit-font-smoothing:antialiased;padding:0 0 60px}
   .wrap{max-width:1340px;margin:0 auto;padding:0 24px}
 
-  header{background:linear-gradient(135deg,#141b2b,#0d1220);border-bottom:3px solid var(--brand);
-         padding:22px 0 18px;position:sticky;top:0;z-index:20;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+  header{background:linear-gradient(135deg,#1a2c4e,#14213d);border-bottom:3px solid var(--gold);
+         padding:22px 0 18px;position:sticky;top:0;z-index:20;box-shadow:0 4px 18px rgba(26,44,78,.25)}
   .hd{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
   .logo{display:flex;align-items:center;gap:14px}
-  .mark{width:46px;height:46px;border-radius:10px;background:var(--brand);
+  .mark{width:46px;height:46px;border-radius:10px;background:var(--gold);
         display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;
-        color:#fff;letter-spacing:-1px;box-shadow:0 4px 14px rgba(212,17,30,.4)}
-  .logo h1{font-size:19px;letter-spacing:.3px;line-height:1.1}
-  .logo p{font-size:11px;color:var(--muted);letter-spacing:2px;margin-top:2px}
-  .meta{margin-left:auto;text-align:right;font-size:12px;color:var(--muted);line-height:1.7}
-  .meta b{color:var(--ink);font-weight:700}
+        color:#1a2c4e;letter-spacing:-1px;box-shadow:0 4px 14px rgba(184,148,90,.4)}
+  .logo h1{font-size:19px;letter-spacing:.3px;line-height:1.1;color:#fff}
+  .logo p{font-size:11px;color:#c9d4e8;letter-spacing:2px;margin-top:2px}
+  .meta{margin-left:auto;text-align:right;font-size:12px;color:#c9d4e8;line-height:1.7}
+  .meta b{color:#fff;font-weight:700}
 
   .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:22px 0 6px}
   .controls label{font-size:12px;color:var(--muted);margin-right:2px}
-  select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);
+  select{background:var(--panel);color:var(--ink);border:1px solid var(--line);
          border-radius:9px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;min-width:210px}
   select:focus{outline:2px solid var(--brand)}
-  .seg{display:inline-flex;background:var(--panel2);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .seg{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:9px;overflow:hidden}
   .seg button{background:transparent;color:var(--muted);border:0;padding:10px 16px;font-size:13px;
              font-weight:700;cursor:pointer;font-family:inherit}
   .seg button.on{background:var(--brand);color:#fff}
   .spacer{flex:1}
-  .tag{font-size:12px;color:var(--muted);background:var(--panel2);border:1px solid var(--line);
+  .tag{font-size:12px;color:var(--ink);background:var(--panel2);border:1px solid var(--line);
        padding:8px 12px;border-radius:9px}
 
   .period-bar{display:flex;gap:20px;flex-wrap:wrap;align-items:center;background:var(--panel);
-              border:1px solid var(--line);border-radius:12px;padding:14px 20px;margin:14px 0 4px}
+              border:1px solid var(--line);border-radius:12px;padding:14px 20px;margin:14px 0 4px;box-shadow:0 1px 3px rgba(26,44,78,.06)}
   .period-bar .pi{font-size:12px;color:var(--muted)}
   .period-bar .pi b{display:block;font-size:16px;color:var(--ink);margin-top:2px}
   .prog{flex:1;min-width:180px}
   .prog .bar{height:8px;background:var(--panel2);border-radius:99px;overflow:hidden;margin-top:6px}
-  .prog .fill{height:100%;background:linear-gradient(90deg,var(--brand),#ff5964)}
+  .prog .fill{height:100%;background:linear-gradient(90deg,var(--brand),var(--gold))}
 
   h2.sec{font-size:13px;letter-spacing:2px;color:var(--muted);margin:30px 0 12px;font-weight:700;
          display:flex;align-items:center;gap:12px}
@@ -502,22 +610,22 @@ HTML_SABLON = r"""<!DOCTYPE html>
   @media(max-width:1050px){.cards{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:560px){.cards{grid-template-columns:1fr}}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;
-        position:relative;overflow:hidden}
+        position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(26,44,78,.06)}
   .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--brand)}
-  .card.alt::before{background:var(--acc)}
+  .card.alt::before{background:var(--gold)}
   .card .t{font-size:12px;color:var(--muted);letter-spacing:.5px;font-weight:700}
   .card .v{font-size:26px;font-weight:800;margin:8px 0 2px;letter-spacing:-.5px}
   .card .sub{font-size:12px;color:var(--muted);line-height:1.7}
   .pill{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:99px;margin-top:8px}
-  .pill.up{background:rgba(47,191,113,.15);color:var(--ok)}
-  .pill.dn{background:rgba(229,72,77,.15);color:var(--bad)}
-  .pill.nt{background:rgba(147,161,189,.15);color:var(--muted)}
+  .pill.up{background:rgba(47,125,84,.13);color:var(--ok)}
+  .pill.dn{background:rgba(178,59,59,.13);color:var(--bad)}
+  .pill.nt{background:rgba(107,114,128,.13);color:var(--muted)}
   .kv{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:5px}
   .kv b{color:var(--ink);font-weight:700}
 
   .grid2{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
   @media(max-width:980px){.grid2{grid-template-columns:1fr}}
-  .box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:0 1px 3px rgba(26,44,78,.06)}
   .box h3{font-size:14px;margin-bottom:14px;font-weight:700}
   .box h3 span{color:var(--muted);font-weight:400;font-size:12px}
 
@@ -527,30 +635,61 @@ HTML_SABLON = r"""<!DOCTYPE html>
   thead th{color:var(--muted);font-size:11px;letter-spacing:.4px;font-weight:700;border-bottom:2px solid var(--line)}
   tbody tr:hover{background:var(--panel2)}
   tr.tot{font-weight:800}
-  tr.tot td{border-top:2px solid var(--line);border-bottom:0}
+  tr.tot td{border-top:2px solid var(--brand);border-bottom:0}
   .mini{font-size:11px;font-weight:800;padding:2px 7px;border-radius:99px}
-  .mini.up{background:rgba(47,191,113,.15);color:var(--ok)}
-  .mini.dn{background:rgba(229,72,77,.15);color:var(--bad)}
+  .mini.up{background:rgba(47,125,84,.15);color:var(--ok)}
+  .mini.dn{background:rgba(178,59,59,.15);color:var(--bad)}
   .mini.nt{color:var(--muted)}
   .barcell{position:relative}
-  .barcell .b{position:absolute;left:0;top:0;bottom:0;background:rgba(79,140,255,.14);border-radius:4px}
+  .barcell .b{position:absolute;left:0;top:0;bottom:0;background:rgba(58,90,140,.14);border-radius:4px}
   .barcell span{position:relative}
 
   canvas{max-height:300px}
   .foot{margin-top:34px;font-size:11px;color:var(--muted);text-align:center;line-height:1.8}
   .foot b{color:var(--muted)}
 
+  /* ---- SOL MENÜLÜ LAYOUT ---- */
+  .layout{display:flex;min-height:100vh}
+  .sidebar{width:225px;flex-shrink:0;background:linear-gradient(180deg,#1a2c4e,#14213d);color:#fff;
+           position:sticky;top:0;height:100vh;overflow-y:auto}
+  .sb-logo{display:flex;align-items:center;gap:11px;padding:20px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+  .sb-mark{width:38px;height:38px;border-radius:9px;background:var(--gold);display:flex;align-items:center;
+           justify-content:center;font-weight:800;font-size:19px;color:#1a2c4e}
+  .sb-logo h1{font-size:15px;line-height:1.1;color:#fff}
+  .sb-logo p{font-size:9px;color:#c9d4e8;letter-spacing:1.5px;margin-top:2px}
+  .sb-sec{font-size:10px;letter-spacing:1.5px;color:#8a9bc0;padding:16px 18px 7px;font-weight:700}
+  .sb-item{display:flex;align-items:center;gap:10px;padding:10px 18px;font-size:13px;color:#dbe3f0;
+           cursor:pointer;border-left:3px solid transparent}
+  .sb-item:hover{background:rgba(255,255,255,.06)}
+  .sb-item.on{background:rgba(184,148,90,.16);border-left-color:var(--gold);color:#fff;font-weight:700}
+  .sb-item .ic{width:16px;text-align:center;opacity:.9;font-size:12px}
+  .main{flex:1;min-width:0}
+  .topbar{background:#fff;border-bottom:1px solid var(--line);padding:13px 26px;display:flex;
+          align-items:center;gap:14px;position:sticky;top:0;z-index:10;flex-wrap:wrap}
+  .topbar .meta{font-size:12px;color:var(--muted);text-align:right;line-height:1.6}
+  .topbar .meta b{color:var(--ink)}
+  .content{padding:20px 26px 50px;max-width:1400px}
+  .selbar{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 18px;margin-bottom:18px;
+          box-shadow:0 1px 3px rgba(26,44,78,.06)}
+  .selrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .sellbl{font-size:12px;color:var(--muted);font-weight:700;min-width:42px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .mchip{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:20px;padding:6px 12px;
+         font-size:12px;cursor:pointer;font-weight:600;user-select:none}
+  .mchip.on{background:var(--gold);color:#1a2c4e;border-color:var(--gold);font-weight:800}
+  .selhint{font-size:11px;color:var(--muted);margin-top:9px}
+
   /* ---- Giriş ekranı ---- */
   #app{display:none}
-  #login{position:fixed;inset:0;z-index:100;background:radial-gradient(1200px 600px at 50% -10%,#1a2436,#0d1220);
+  #login{position:fixed;inset:0;z-index:100;background:radial-gradient(1200px 600px at 50% -10%,#22375f,#14213d);
          display:flex;align-items:center;justify-content:center;padding:20px}
   .login-card{width:100%;max-width:380px;background:var(--panel);border:1px solid var(--line);
-              border-top:3px solid var(--brand);border-radius:16px;padding:34px 30px;
-              box-shadow:0 20px 60px rgba(0,0,0,.5)}
+              border-top:3px solid var(--gold);border-radius:16px;padding:34px 30px;
+              box-shadow:0 20px 60px rgba(0,0,0,.35)}
   .login-card .brandrow{display:flex;align-items:center;gap:13px;margin-bottom:6px}
   .login-card .mark{width:44px;height:44px;border-radius:10px;background:var(--brand);
-        display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;color:#fff}
-  .login-card h1{font-size:17px;letter-spacing:.3px}
+        display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;color:var(--gold)}
+  .login-card h1{font-size:17px;letter-spacing:.3px;color:var(--ink)}
   .login-card p.sub{font-size:11px;color:var(--muted);letter-spacing:2px;margin-top:2px}
   .login-card h2{font-size:14px;color:var(--muted);font-weight:600;margin:22px 0 16px;text-align:center}
   .login-card label{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px}
@@ -592,77 +731,119 @@ HTML_SABLON = r"""<!DOCTYPE html>
 
 <!-- ================= DASHBOARD (giriş sonrası) ================= -->
 <div id="app">
-<header>
-  <div class="wrap hd">
-    <div class="logo">
-      <div class="mark">İ</div>
-      <div>
-        <h1>İNCİROĞLU OTOMOTİV</h1>
-        <p>SERVİS GİDİŞAT DASHBOARD · 2026</p>
+<div class="layout">
+  <!-- SOL MENÜ -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-mark">İ</div>
+      <div><h1>İNCİROĞLU</h1><p>SERVİS PANELİ</p></div>
+    </div>
+    <div class="sb-sec">RAPORLAR</div>
+    <div id="sbBolum">
+      <div class="sb-item on" data-b="servis"><span class="ic">▮</span> Servis Gidişat</div>
+      <div class="sb-item" data-b="yedekparca"><span class="ic">◫</span> Yedek Parça</div>
+      <div class="sb-item" data-b="tahmin"><span class="ic">◈</span> Kapanış Tahmini</div>
+      <div class="sb-item" data-b="homer"><span class="ic">✚</span> HOMER / Hasar</div>
+      <div class="sb-item" data-b="ozet"><span class="ic">▤</span> Yönetici Özet</div>
+    </div>
+    <div class="sb-sec">MARKA</div>
+    <div id="sbMarka"></div>
+    <div style="padding:16px 18px;margin-top:10px">
+      <div class="logout" id="logoutBtn" title="Çıkış yap">Çıkış Yap</div>
+    </div>
+  </aside>
+
+  <!-- İÇERİK -->
+  <div class="main">
+    <div class="topbar">
+      <div class="tag" id="donemTag"></div>
+      <div class="spacer"></div>
+      <div class="meta" id="meta"></div>
+    </div>
+
+    <div class="content">
+      <!-- ORTAK: AY / ÇEYREK SEÇİCİ -->
+      <div class="selbar">
+        <div class="selrow" style="margin-bottom:10px">
+          <span class="sellbl">Hızlı:</span>
+          <div class="seg" id="hizliSeg">
+            <button data-k="buay">Bu Ay</button>
+            <button data-k="ytd">YTD</button>
+            <button data-k="Q1">Q1</button>
+            <button data-k="Q2">Q2</button>
+            <button data-k="Q3">Q3</button>
+            <button data-k="Q4">Q4</button>
+          </div>
+        </div>
+        <div class="selrow">
+          <span class="sellbl">Aylar:</span>
+          <div id="ayChips" class="chips"></div>
+        </div>
+        <div class="selhint">Birden çok ay seçebilirsin (örn. Şubat + Mart) — seçilenler toplanır. YTD: Ocak'tan son seçili aya kadar.</div>
+      </div>
+
+      <!-- ===== BÖLÜM: SERVİS GİDİŞAT ===== -->
+      <div id="bolum-servis" class="bolum">
+        <div class="period-bar" id="periodBar"></div>
+
+        <h2 class="sec">DÖNEM ÖZETİ · CİRO & İŞ EMRİ</h2>
+        <div class="cards" id="kpiCards"></div>
+
+        <h2 class="sec">ARAÇ BAŞI CİRO <span style="font-weight:400;letter-spacing:0;text-transform:none;font-size:12px;color:var(--muted)">· Mekanik işçilik + Mekanik YP ÷ Mekanik araç adedi</span></h2>
+        <div class="cards" id="aracCards"></div>
+
+        <h2 class="sec">GÜNLÜK TEMPO & BÜTÇE HEDEFİ <span id="tempoSub" style="font-weight:400;letter-spacing:0;text-transform:none;font-size:12px;color:var(--muted)"></span></h2>
+        <div class="cards" id="tempoCards"></div>
+
+        <h2 class="sec">DETAY
+          <div class="seg metric-seg" id="metricSeg">
+            <button data-m="toplam" class="on">Toplam Ciro</button>
+            <button data-m="iscilik">İşçilik</button>
+            <button data-m="yp">Yedek Parça</button>
+            <button data-m="adet">İş Emri Adet</button>
+          </div>
+        </h2>
+
+        <div class="grid2">
+          <div class="box">
+            <h3>Aylık Trend <span id="trendSub">· bütçe vs fiili</span></h3>
+            <canvas id="trendChart"></canvas>
+          </div>
+          <div class="box">
+            <h3>Kategori Payı <span id="katSub">· seçili dönem</span></h3>
+            <canvas id="katChart"></canvas>
+          </div>
+        </div>
+
+        <div class="box" style="margin-top:16px">
+          <h3>Kategori Kırılımı <span id="katTblSub">· toplam ciro</span></h3>
+          <div style="overflow-x:auto"><table id="katTable"></table></div>
+        </div>
+
+        <div class="box" style="margin-top:16px">
+          <h3>Marka Karşılaştırma <span id="mkSub">· seçili dönem</span></h3>
+          <div style="overflow-x:auto"><table id="markaTable"></table></div>
+        </div>
+      </div>
+
+      <!-- ===== DİĞER BÖLÜMLER (yakında) ===== -->
+      <div id="bolum-yedekparca" class="bolum" style="display:none">
+        <div class="box"><h3>Yedek Parça</h3><p style="color:var(--muted);font-size:13px;margin-top:8px">Bu bölüm hazırlanıyor.</p></div>
+      </div>
+      <div id="bolum-tahmin" class="bolum" style="display:none">
+        <div class="box"><h3>Kapanış Tahmini</h3><p style="color:var(--muted);font-size:13px;margin-top:8px">Bu bölüm hazırlanıyor.</p></div>
+      </div>
+      <div id="bolum-homer" class="bolum" style="display:none">
+        <div class="box"><h3>HOMER / Hasar</h3><p style="color:var(--muted);font-size:13px;margin-top:8px">Bu bölüm hazırlanıyor.</p></div>
+      </div>
+      <div id="bolum-ozet" class="bolum" style="display:none">
+        <div class="box"><h3>Yönetici Özet</h3><p style="color:var(--muted);font-size:13px;margin-top:8px">Bu bölüm hazırlanıyor.</p></div>
+      </div>
+
+      <div class="foot">
+        <b>İnciroğlu Otomotiv</b> · Servis Paneli · Üretim: <span id="uretim"></span>
       </div>
     </div>
-    <div class="meta" id="meta"></div>
-  </div>
-</header>
-
-<div class="wrap">
-  <div class="controls">
-    <label>Marka</label>
-    <select id="markaSel"></select>
-    <label>Ay</label>
-    <select id="aySel" style="min-width:140px"></select>
-    <div class="seg" id="donemSeg">
-      <button data-mode="ay" class="on">Seçili Ay</button>
-      <button data-mode="ytd">YTD (Yıl Başından)</button>
-    </div>
-    <div class="spacer"></div>
-    <div class="tag" id="donemTag"></div>
-    <div class="logout" id="logoutBtn" title="Çıkış yap">Çıkış</div>
-  </div>
-
-  <div class="period-bar" id="periodBar"></div>
-
-  <h2 class="sec">DÖNEM ÖZETİ · CİRO & İŞ EMRİ</h2>
-  <div class="cards" id="kpiCards"></div>
-
-  <h2 class="sec">ARAÇ BAŞI CİRO <span style="font-weight:400;letter-spacing:0;text-transform:none;font-size:12px;color:var(--muted)">· Mekanik işçilik + Mekanik YP ÷ Mekanik araç adedi</span></h2>
-  <div class="cards" id="aracCards"></div>
-
-  <h2 class="sec">GÜNLÜK TEMPO & BÜTÇE HEDEFİ <span id="tempoSub" style="font-weight:400;letter-spacing:0;text-transform:none;font-size:12px;color:var(--muted)"></span></h2>
-  <div class="cards" id="tempoCards"></div>
-
-  <h2 class="sec">DETAY
-    <div class="seg metric-seg" id="metricSeg">
-      <button data-m="toplam" class="on">Toplam Ciro</button>
-      <button data-m="iscilik">İşçilik</button>
-      <button data-m="yp">Yedek Parça</button>
-      <button data-m="adet">İş Emri Adet</button>
-    </div>
-  </h2>
-
-  <div class="grid2">
-    <div class="box">
-      <h3>Aylık Trend <span id="trendSub">· bütçe vs fiili</span></h3>
-      <canvas id="trendChart"></canvas>
-    </div>
-    <div class="box">
-      <h3>Kategori Payı <span id="katSub">· seçili dönem</span></h3>
-      <canvas id="katChart"></canvas>
-    </div>
-  </div>
-
-  <div class="box" style="margin-top:16px">
-    <h3>Kategori Kırılımı <span id="katTblSub">· toplam ciro</span></h3>
-    <div style="overflow-x:auto"><table id="katTable"></table></div>
-  </div>
-
-  <div class="box" style="margin-top:16px">
-    <h3>Marka Karşılaştırma <span id="mkSub">· seçili dönem</span></h3>
-    <div style="overflow-x:auto"><table id="markaTable"></table></div>
-  </div>
-
-  <div class="foot">
-    <b>İnciroğlu Otomotiv</b> · Servis Gidişat Dashboard · Üretim: <span id="uretim"></span>
   </div>
 </div>
 
@@ -713,34 +894,46 @@ const METRIK_AD = {toplam:'Toplam Ciro', iscilik:'İşçilik', yp:'Yedek Parça'
 const isAdet = m => m==='adet';
 const fmt = (m,v) => isAdet(m)? ADET(v) : TL(v)+' ₺';
 
-let state = { marka: DATA.marka_sirasi[0], mode:'ay', metric:'toplam', ay:(DATA.ust.secili_ay||'TEMMUZ').toUpperCase() };
+// Çoklu ay: state.aylar = seçili ay adları dizisi. mode: 'aylar' (seçili aylar toplanır) | 'ytd' (Ocak→son seçili ay)
+let state = {
+  bolum: 'servis',
+  marka: DATA.marka_sirasi[0],
+  metric: 'toplam',
+  mode: 'aylar',
+  aylar: [ (DATA.ust.secili_ay||'TEMMUZ').toUpperCase() ]
+};
 let charts = {};
 
 const AYLAR_JS = ['OCAK','ŞUBAT','MART','NİSAN','MAYIS','HAZİRAN','TEMMUZ','AĞUSTOS','EYLÜL','EKİM','KASIM','ARALIK'];
+const AYK = {OCAK:'Oca',ŞUBAT:'Şub',MART:'Mar','NİSAN':'Nis',MAYIS:'May',HAZİRAN:'Haz',TEMMUZ:'Tem','AĞUSTOS':'Ağu','EYLÜL':'Eyl',EKİM:'Eki',KASIM:'Kas',ARALIK:'Ara'};
 
-// YTD'yi Ocak'tan seçili aya kadar aylık bloklardan toplar.
-function ytdTopla(markaKey, sonAy){
+// Aktif ay listesini döndürür (mode'a göre)
+function aktifAylar(){
+  if(state.mode==='ytd'){
+    // Ocak'tan, seçili ayların EN SONuncusuna kadar
+    let maxIdx = 0;
+    state.aylar.forEach(a=>{ maxIdx = Math.max(maxIdx, AYLAR_JS.indexOf(a)); });
+    return AYLAR_JS.slice(0, maxIdx+1);
+  }
+  // seçili aylar (kronolojik sırada)
+  return AYLAR_JS.filter(a=>state.aylar.includes(a));
+}
+
+// Verilen ay listesini toplayan blok üretir
+function aylariTopla(markaKey, ayListesi){
   const v = DATA.markalar[markaKey].veri;
-  const idx = AYLAR_JS.indexOf(sonAy);
-  const aylar = AYLAR_JS.slice(0, idx+1);
   const metrikler = ['adet','iscilik','yp','toplam'];
   const alanlar = ['butce','fiili','g2025'];
-  // toplam bloğu + her kategori
-  function bosBlok(){
-    const o={toplam:{}}; metrikler.forEach(m=>{o.toplam[m]={butce:0,fiili:0,g2025:0};});
-    o.kategoriler={};
-    DATA.kategoriler.forEach(k=>{o.kategoriler[k]={}; metrikler.forEach(m=>{o.kategoriler[k][m]={butce:0,fiili:0,g2025:0};});});
-    return o;
-  }
-  const acc = bosBlok();
-  aylar.forEach(ay=>{
+  const acc = {toplam:{}, kategoriler:{}};
+  metrikler.forEach(m=>{acc.toplam[m]={butce:0,fiili:0,g2025:0};});
+  DATA.kategoriler.forEach(k=>{acc.kategoriler[k]={}; metrikler.forEach(m=>{acc.kategoriler[k][m]={butce:0,fiili:0,g2025:0};});});
+  ayListesi.forEach(ay=>{
     const b = v.aylar[ay]; if(!b) return;
     metrikler.forEach(m=>alanlar.forEach(a=>{ acc.toplam[m][a]+=b.toplam[m][a]||0; }));
     DATA.kategoriler.forEach(k=>metrikler.forEach(m=>alanlar.forEach(a=>{
       acc.kategoriler[k][m][a]+=(b.kategoriler[k]?b.kategoriler[k][m][a]:0)||0;
     })));
   });
-  // delta (2025'e göre) yeniden hesapla: fiili/g2025 - 1
   metrikler.forEach(m=>{
     const t=acc.toplam[m]; t.delta = t.g2025>0? t.fiili/t.g2025-1 : 0;
     DATA.kategoriler.forEach(k=>{const c=acc.kategoriler[k][m]; c.delta=c.g2025>0?c.fiili/c.g2025-1:0;});
@@ -748,43 +941,43 @@ function ytdTopla(markaKey, sonAy){
   return acc;
 }
 
-function blok(markaKey, mode){
-  const v = DATA.markalar[markaKey].veri;
-  if(mode==='ytd') return ytdTopla(markaKey, state.ay);
-  return v.aylar[state.ay] || v.ytd;
+function blok(markaKey){
+  return aylariTopla(markaKey, aktifAylar());
+}
+
+// Aktif dönemin iş günü toplamı {donem,gecen,kalan}
+function aktifIsGunu(){
+  const ag = DATA.ust.ay_is_gunu || {};
+  let d=0,g=0,k=0;
+  aktifAylar().forEach(ay=>{ const x=ag[ay]; if(x){d+=x.donem;g+=x.gecen;k+=x.kalan;} });
+  return {donem:d,gecen:g,kalan:k};
+}
+
+// Aktif dönem etiketi (örn "Şubat+Mart" veya "Ocak–Ağustos (YTD)")
+function donemEtiket(){
+  const aylar = aktifAylar();
+  if(state.mode==='ytd') return 'Ocak – '+(AYK[aylar[aylar.length-1]]||'');
+  if(state.aylar.length===1) return state.aylar[0].charAt(0)+state.aylar[0].slice(1).toLowerCase();
+  return state.aylar.map(a=>AYK[a]).join(' + ');
 }
 
 function renderMeta(){
   const u = DATA.ust;
   document.getElementById('meta').innerHTML =
-    `Dönem: <b>${u.donem_tarihleri||u.secili_ay||'-'}</b><br>Veri kesim: <b>${u.veri_kesim||'-'}</b>`;
+    `Dönem: <b>${donemEtiket()}</b><br>Veri kesim: <b>${u.veri_kesim||'-'}</b>`;
   document.getElementById('uretim').textContent = DATA.uretim;
-  const ytd = (state.mode==='ytd');
-  const ag = (DATA.ust.ay_is_gunu && DATA.ust.ay_is_gunu[state.ay]) || null;
-  // YTD iş günü: Ocak'tan seçili aya kadar topla
-  let ytdD=0, ytdG=0, ytdK=0;
-  if(ytd && DATA.ust.ay_is_gunu){
-    const idx = AYLAR_JS.indexOf(state.ay);
-    for(let i=0;i<=idx;i++){
-      const x = DATA.ust.ay_is_gunu[AYLAR_JS[i]];
-      if(x){ ytdD+=x.donem; ytdG+=x.gecen; ytdK+=x.kalan; }
-    }
-  }
-  const donem = ytd ? ytdD : (ag ? ag.donem : u.donem_is_gunu);
-  const gecen = ytd ? ytdG : (ag ? ag.gecen : u.gecen_is_gunu);
-  const kalan = ytd ? ytdK : (ag ? ag.kalan : u.kalan_is_gunu);
+  const ig = aktifIsGunu();
+  const donem=ig.donem, gecen=ig.gecen, kalan=ig.kalan;
   const y = donem>0 ? (gecen/donem):0;
-  const AYK = {OCAK:'Oca',ŞUBAT:'Şub',MART:'Mar','NİSAN':'Nis',MAYIS:'May',HAZİRAN:'Haz',TEMMUZ:'Tem','AĞUSTOS':'Ağu','EYLÜL':'Eyl',EKİM:'Eki',KASIM:'Kas',ARALIK:'Ara'};
-  const ytdEtiket = 'Ocak – ' + (AYK[state.ay]||state.ay);
   document.getElementById('periodBar').innerHTML = `
-    <div class="pi">Seçili Dönem<b>${ytd?ytdEtiket:state.ay}</b></div>
-    <div class="pi">${ytd?'Toplam İş Günü':'Dönem İş Günü'}<b>${ADET(donem)}</b></div>
+    <div class="pi">Seçili Dönem<b>${donemEtiket()}</b></div>
+    <div class="pi">${state.mode==='ytd'?'Toplam İş Günü':'Dönem İş Günü'}<b>${ADET(donem)}</b></div>
     <div class="pi">Geçen<b>${ADET(gecen)}</b></div>
     <div class="pi">Kalan<b>${ADET(kalan)}</b></div>
     <div class="prog"><div style="font-size:12px;color:var(--muted)">Dönem ilerlemesi · ${PCT(y)}</div>
       <div class="bar"><div class="fill" style="width:${(y*100).toFixed(0)}%"></div></div></div>`;
   document.getElementById('donemTag').textContent =
-    DATA.markalar[state.marka].etiket + ' · ' + (state.mode==='ytd'?'YTD':state.ay);
+    DATA.markalar[state.marka].etiket + ' · ' + donemEtiket();
 }
 
 function kartCiro(title, m, unit, alt){
@@ -801,7 +994,7 @@ function kartCiro(title, m, unit, alt){
   </div>`;
 }
 function renderCards(){
-  const bl = blok(state.marka, state.mode).toplam;
+  const bl = blok(state.marka).toplam;
   document.getElementById('kpiCards').innerHTML =
     kartCiro('TOPLAM CİRO', bl.toplam,'tl') +
     kartCiro('İŞÇİLİK CİROSU', bl.iscilik,'tl') +
@@ -821,7 +1014,7 @@ function kartAracV(title, perF, per25){
   </div>`;
 }
 function renderArac(){
-  const b = blok(state.marka, state.mode);
+  const b = blok(state.marka);
   const mek = b.kategoriler['Mekanik'];
   const mAdet = mek.adet.fiili, mAdet25 = mek.adet.g2025;
   const toplamAdet = b.toplam.adet.fiili;
@@ -856,13 +1049,10 @@ function renderArac(){
 function renderTempo(){
   const u = DATA.ust;
   // Seçili ayın KENDİ iş günü (her ay farklı)
-  const ag = (u.ay_is_gunu && u.ay_is_gunu[state.ay]) || null;
-  const gecen = ag ? ag.gecen : u.gecen_is_gunu;
-  const kalan = ag ? ag.kalan : u.kalan_is_gunu;
-  const donem = ag ? ag.donem : u.donem_is_gunu;
-  // seçili markanın seçili ay bloğu (YTD modunda da aylık tempo mantıklı olduğundan ay verisi)
-  const ayblok = DATA.markalar[state.marka].veri.aylar[state.ay] || blok(state.marka,'ay');
-  const t = ayblok.toplam;
+  const ig = aktifIsGunu();
+  const gecen = ig.gecen, kalan = ig.kalan, donem = ig.donem;
+  // aktif dönem toplamı
+  const t = blok(state.marka).toplam;
 
   function tempoKart(baslik, metrikBlok, birim){
     const butce = metrikBlok.butce, fiili = metrikBlok.fiili;
@@ -896,11 +1086,11 @@ function renderTempo(){
     tempoKart('GÜNLÜK YEDEK PARÇA', t.yp, 'tl');
 
   document.getElementById('tempoSub').textContent =
-    `· ${state.ay} · ${ADET(donem)} iş günü (Cmt dahil, resmi tatil hariç) · ${ADET(gecen)} geçti, ${ADET(kalan)} kaldı`;
+    `· ${donemEtiket()} · ${ADET(donem)} iş günü (Cmt dahil, resmi tatil hariç) · ${ADET(gecen)} geçti, ${ADET(kalan)} kaldı`;
 }
 
 function renderKatTable(){
-  const m = state.metric, bl = blok(state.marka, state.mode);
+  const m = state.metric, bl = blok(state.marka);
   let max=0;
   DATA.kategoriler.forEach(k=>{ max=Math.max(max, bl.kategoriler[k][m].fiili); });
   let rows = DATA.kategoriler.map(k=>{
@@ -928,7 +1118,7 @@ function renderMarkaTable(){
   const others = DATA.marka_sirasi.filter(s=>s!=='Servis Konsolide Rapor');
   let toplamFiili=0;
   const rows0 = others.map(s=>{
-    const t = blok(s, state.mode).toplam[m];
+    const t = blok(s).toplam[m];
     toplamFiili += t.fiili;
     return {s, etiket:DATA.markalar[s].etiket, t};
   }).sort((a,b)=>b.t.fiili-a.t.fiili);
@@ -953,66 +1143,117 @@ function renderTrend(){
   const labels = DATA.aylar.map(a=>a.substring(0,3));
   const butce = DATA.aylar.map(a=>v.aylar[a].toplam[m].butce);
   const fiili = DATA.aylar.map(a=>v.aylar[a].toplam[m].fiili);
-  const sel = state.ay;
+  const selSet = new Set(aktifAylar());
   if(charts.trend) charts.trend.destroy();
   charts.trend = new Chart(document.getElementById('trendChart'),{
     data:{labels,datasets:[
-      {type:'bar',label:'Fiili',data:fiili,backgroundColor:DATA.aylar.map(a=>a===sel?'#d4111e':'#39456a'),borderRadius:4,order:2},
-      {type:'line',label:'Bütçe',data:butce,borderColor:'#4f8cff',backgroundColor:'#4f8cff',borderWidth:2,pointRadius:2,tension:.3,order:1}
+      {type:'bar',label:'Fiili',data:fiili,backgroundColor:DATA.aylar.map(a=>selSet.has(a)?'#b8945a':'#c9d0dc'),borderRadius:4,order:2},
+      {type:'line',label:'Bütçe',data:butce,borderColor:'#1a2c4e',backgroundColor:'#1a2c4e',borderWidth:2,pointRadius:2,tension:.3,order:1}
     ]},
-    options:{responsive:true,plugins:{legend:{labels:{color:'#93a1bd',boxWidth:12}},
+    options:{responsive:true,plugins:{legend:{labels:{color:'#6b7280',boxWidth:12}},
       tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmt(m,c.raw)}}},
-      scales:{x:{ticks:{color:'#93a1bd'},grid:{display:false}},
-              y:{ticks:{color:'#93a1bd',callback:v=>isAdet(m)?ADET(v):TL(v/1e6)+'M'},grid:{color:'#2c3852'}}}}
+      scales:{x:{ticks:{color:'#6b7280'},grid:{display:false}},
+              y:{ticks:{color:'#6b7280',callback:v=>isAdet(m)?ADET(v):TL(v/1e6)+'M'},grid:{color:'#ddd3c0'}}}}
   });
   document.getElementById('trendSub').textContent='· bütçe vs fiili · '+METRIK_AD[m].toLowerCase();
 }
 
 function renderKatChart(){
-  const m = state.metric, bl = blok(state.marka, state.mode);
+  const m = state.metric, bl = blok(state.marka);
   const data = DATA.kategoriler.map(k=>bl.kategoriler[k][m].fiili);
-  const pal = ['#d4111e','#4f8cff','#2fbf71','#f0a020','#a06cff','#39c0c8','#e57ec0'];
+  const pal = ['#1a2c4e','#b8945a','#3a5a8c','#8a9bb5','#c2a878','#5a6d8c','#d9cbb0'];
   if(charts.kat) charts.kat.destroy();
   charts.kat = new Chart(document.getElementById('katChart'),{
     type:'doughnut',
-    data:{labels:DATA.kategoriler,datasets:[{data,backgroundColor:pal,borderColor:'#1a2233',borderWidth:2}]},
-    options:{responsive:true,cutout:'58%',plugins:{legend:{position:'right',labels:{color:'#93a1bd',boxWidth:12,padding:8,font:{size:11}}},
+    data:{labels:DATA.kategoriler,datasets:[{data,backgroundColor:pal,borderColor:'#ffffff',borderWidth:2}]},
+    options:{responsive:true,cutout:'58%',plugins:{legend:{position:'right',labels:{color:'#6b7280',boxWidth:12,padding:8,font:{size:11}}},
       tooltip:{callbacks:{label:c=>c.label+': '+fmt(m,c.raw)}}}}
   });
   document.getElementById('katSub').textContent='· seçili dönem · '+METRIK_AD[m].toLowerCase();
 }
 
+
 function renderAll(){
-  renderMeta(); renderCards(); renderArac(); renderTempo();
-  renderKatTable(); renderMarkaTable(); renderTrend(); renderKatChart();
+  // Aktif bölümü göster, diğerlerini gizle
+  ['servis','yedekparca','tahmin','homer','ozet'].forEach(b=>{
+    const el=document.getElementById('bolum-'+b);
+    if(el) el.style.display = (b===state.bolum)?'block':'none';
+  });
+  // Metrik seçici sadece servis bölümünde görünür
+  document.getElementById('uretim').textContent = DATA.uretim;
+  document.getElementById('donemTag').textContent = DATA.markalar[state.marka].etiket + ' · ' + donemEtiket();
+
+  if(state.bolum==='servis'){
+    const fns=[renderMeta,renderCards,renderArac,renderTempo,renderKatTable,renderMarkaTable,renderTrend,renderKatChart];
+    fns.forEach(fn=>{ try{ fn(); }catch(e){ console.error(fn.name,e); } });
+  }
+  // diğer bölümler yakında
+}
+
+const QCEYREK = { Q1:['OCAK','ŞUBAT','MART'], Q2:['NİSAN','MAYIS','HAZİRAN'], Q3:['TEMMUZ','AĞUSTOS','EYLÜL'], Q4:['EKİM','KASIM','ARALIK'] };
+
+function ayChipleriCiz(){
+  const box = document.getElementById('ayChips');
+  box.innerHTML = AYLAR_JS.map(a=>{
+    const on = state.aylar.includes(a) ? ' on' : '';
+    return `<span class="mchip${on}" data-ay="${a}">${AYK[a]}</span>`;
+  }).join('');
+  box.querySelectorAll('.mchip').forEach(c=>c.addEventListener('click',()=>{
+    const ay=c.dataset.ay;
+    if(state.aylar.includes(ay)){
+      if(state.aylar.length>1) state.aylar=state.aylar.filter(x=>x!==ay); // en az 1 kalsın
+    } else {
+      state.aylar=[...state.aylar, ay];
+    }
+    state.mode='aylar';
+    guncelleSeciciler(); renderAll();
+  }));
+}
+
+function guncelleSeciciler(){
+  ayChipleriCiz();
+  // Q ve mod butonlarının aktifliği
+  document.querySelectorAll('#hizliSeg button').forEach(b=>{
+    const k=b.dataset.k; let aktif=false;
+    if(k==='ytd') aktif = (state.mode==='ytd');
+    else if(QCEYREK[k]) aktif = (state.mode==='aylar' && state.aylar.length===3 && QCEYREK[k].every(a=>state.aylar.includes(a)));
+    b.classList.toggle('on', aktif);
+  });
 }
 
 function initControls(){
-  const sel = document.getElementById('markaSel');
-  DATA.marka_sirasi.forEach(s=>{
-    const o=document.createElement('option'); o.value=s; o.textContent=DATA.markalar[s].etiket; sel.appendChild(o);
-  });
-  sel.value=state.marka;
-  sel.addEventListener('change',e=>{state.marka=e.target.value; renderAll();});
-
-  const aySel = document.getElementById('aySel');
-  DATA.aylar.forEach(a=>{
-    const o=document.createElement('option'); o.value=a;
-    o.textContent=a.charAt(0)+a.slice(1).toLowerCase(); aySel.appendChild(o);
-  });
-  aySel.value=state.ay;
-  aySel.addEventListener('change',e=>{state.ay=e.target.value; renderAll();});
-  function ayDurum(){ aySel.disabled = false; aySel.style.opacity = 1; }
-  ayDurum();
-  window.__ayDurum = ayDurum;
-  document.querySelectorAll('#donemSeg button').forEach(b=>b.addEventListener('click',()=>{
-    document.querySelectorAll('#donemSeg button').forEach(x=>x.classList.remove('on'));
-    b.classList.add('on'); state.mode=b.dataset.mode; if(window.__ayDurum) window.__ayDurum(); renderAll();
+  // Sol menü — bölümler
+  document.querySelectorAll('#sbBolum .sb-item').forEach(it=>it.addEventListener('click',()=>{
+    document.querySelectorAll('#sbBolum .sb-item').forEach(x=>x.classList.remove('on'));
+    it.classList.add('on'); state.bolum=it.dataset.b; renderAll();
   }));
+  // Sol menü — markalar
+  const mbox = document.getElementById('sbMarka');
+  mbox.innerHTML = DATA.marka_sirasi.map((s,i)=>{
+    const on = s===state.marka ? ' on' : '';
+    return `<div class="sb-item${on}" data-mk="${s}"><span class="ic">${s==='Servis Konsolide Rapor'?'●':'○'}</span> ${DATA.markalar[s].etiket}</div>`;
+  }).join('');
+  mbox.querySelectorAll('.sb-item').forEach(it=>it.addEventListener('click',()=>{
+    mbox.querySelectorAll('.sb-item').forEach(x=>x.classList.remove('on'));
+    it.classList.add('on'); state.marka=it.dataset.mk; renderAll();
+  }));
+
+  // Hızlı seçim: Bu Ay / YTD / Q1-Q4
+  document.querySelectorAll('#hizliSeg button').forEach(b=>b.addEventListener('click',()=>{
+    const k=b.dataset.k;
+    if(k==='buay'){ state.mode='aylar'; state.aylar=[ (DATA.ust.secili_ay||'AĞUSTOS').toUpperCase() ]; }
+    else if(k==='ytd'){ state.mode='ytd'; if(state.aylar.length===0) state.aylar=[(DATA.ust.secili_ay||'AĞUSTOS').toUpperCase()]; }
+    else if(QCEYREK[k]){ state.mode='aylar'; state.aylar=[...QCEYREK[k]]; }
+    guncelleSeciciler(); renderAll();
+  }));
+
+  // Metrik seçici
   document.querySelectorAll('#metricSeg button').forEach(b=>b.addEventListener('click',()=>{
     document.querySelectorAll('#metricSeg button').forEach(x=>x.classList.remove('on'));
-    b.classList.add('on'); state.metric=b.dataset.m; renderKatTable(); renderMarkaTable(); renderTrend(); renderKatChart();
+    b.classList.add('on'); state.metric=b.dataset.m; renderAll();
   }));
+
+  guncelleSeciciler();
 }
 // Dashboard'u giriş başarılı olunca başlat (giriş öncesi çizim yapma)
 window.__dashboardInit = function(){
@@ -1028,11 +1269,33 @@ window.__dashboardInit = function(){
 </html>"""
 
 
+def panel_uret(data, sablon_yolu, cikti_yolu):
+    """Yeni paneli (panel_sablon.html) Excel verisiyle doldurur.
+    Sadece servis DATA bloğu yenilenir; EXTRA_DATA ve STOCKS şablondaki haliyle kalır.
+    Mevcut index.html'deki şifre (SIFRE_HASH) korunur."""
+    html = open(sablon_yolu, encoding="utf-8").read()
+    js = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+    html, n = re.subn(r"const DATA=\{.*?\};\n", lambda m: "const DATA=" + js + ";\n", html, count=1, flags=re.S)
+    if n != 1:
+        raise SystemExit("HATA: panel_sablon.html içinde veri alanı bulunamadı.")
+    if os.path.exists(cikti_yolu):
+        eski = open(cikti_yolu, encoding="utf-8").read()
+        m = re.search(r"const SIFRE_HASH='([0-9a-f]{64})';", eski)
+        if m:
+            html = re.sub(r"const SIFRE_HASH='[0-9a-f]{64}';", "const SIFRE_HASH='" + m.group(1) + "';", html, count=1)
+    print("  ✓ Yeni panel şablonu kullanıldı (panel_sablon.html)")
+    return html
+
+
 def main():
     girdi = sys.argv[1] if len(sys.argv) > 1 else "servis_rapor.xlsx"
     cikti = sys.argv[2] if len(sys.argv) > 2 else "dashboard.html"
     data = veriyi_topla(girdi)
-    html = html_uret(data)
+    sablon = os.path.join(os.path.dirname(os.path.abspath(__file__)), "panel_sablon.html")
+    if os.path.exists(sablon):
+        html = panel_uret(data, sablon, cikti)
+    else:
+        html = html_uret(data)
     with open(cikti, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"\n✓ Dashboard üretildi: {cikti}")
