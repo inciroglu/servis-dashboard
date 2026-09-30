@@ -415,6 +415,12 @@ def veriyi_topla(dosya):
     mevcut = set(wb.sheetnames)
 
     ust = dashboard_ust_bilgi(wb.read_sheet("Dashboard")) if "Dashboard" in mevcut else {}
+    if not ust.get("veri_kesim"):
+        sft = son_fatura_tarihi(dosya)
+        if sft:
+            ust["veri_kesim"] = sft.strftime("%d.%m.%Y")
+            ust.setdefault("kesim_yil", sft.year)
+            print(f"  ✓ Kesim tarihi son faturadan alındı: {ust['veri_kesim']}")
 
     markalar = {}
     for sheet in MARKA_SAYFALARI:
@@ -1269,15 +1275,188 @@ window.__dashboardInit = function(){
 </html>"""
 
 
+# ==================================================================== #
+#  Akışlı sayfa okuyucu (büyük sayfalar için, belleği şişirmez)
+# ==================================================================== #
+def _sayfa_akis(dosya, sayfa_adi, sutunlar=None):
+    """Bir sayfayı satır satır okur -> (satir_no, {sütun: değer}). Sayfa yoksa hiçbir şey döndürmez."""
+    import zipfile as _zip
+    import xml.etree.ElementTree as _ET
+    NS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
+    z = _zip.ZipFile(dosya)
+    wbx = z.read("xl/workbook.xml").decode("utf-8")
+    rels = dict(re.findall(r'Id="(rId\d+)"[^>]*Target="([^"]+)"', z.read("xl/_rels/workbook.xml.rels").decode("utf-8")))
+    hedef = None
+    for t in re.findall(r"<sheet\b[^>]*/>", wbx):
+        nm = re.search(r'name="([^"]+)"', t); rid = re.search(r'r:id="(rId\d+)"', t)
+        if nm and rid and nm.group(1) == sayfa_adi:
+            yol = rels.get(rid.group(1), "").lstrip("/")
+            hedef = yol if yol.startswith("xl/") else "xl/" + yol
+    if not hedef:
+        z.close(); return
+    ortak = []
+    if "xl/sharedStrings.xml" in z.namelist():
+        for ev, el in _ET.iterparse(z.open("xl/sharedStrings.xml")):
+            if el.tag == NS + "si":
+                ortak.append("".join(t.text or "" for t in el.iter(NS + "t"))); el.clear()
+    for ev, el in _ET.iterparse(z.open(hedef)):
+        if el.tag == NS + "row":
+            satir = {}
+            for c in el.iter(NS + "c"):
+                sut = re.match(r"[A-Z]+", c.get("r", "")).group(0)
+                if sutunlar and sut not in sutunlar:
+                    continue
+                v = c.find(NS + "v")
+                if v is None or v.text is None:
+                    ist = c.find(NS + "is")
+                    deger = "".join(t.text or "" for t in ist.iter(NS + "t")) if ist is not None else None
+                else:
+                    deger = ortak[int(v.text)] if c.get("t") == "s" else v.text
+                satir[sut] = deger
+            yield int(el.get("r", "0")), satir
+            el.clear()
+    z.close()
+
+
+def son_fatura_tarihi(dosya):
+    """Fatura Listesi'ndeki en son fatura tarihi (F sütunu, 4. satırdan itibaren). Yoksa None."""
+    en_buyuk = 0
+    for no, r in _sayfa_akis(dosya, "Fatura Listesi", {"F"}):
+        if no < 4:
+            continue
+        try:
+            en_buyuk = max(en_buyuk, float(r.get("F") or 0))
+        except ValueError:
+            pass
+    if en_buyuk <= 0:
+        return None
+    return _dt.date(1899, 12, 30) + _dt.timedelta(days=int(en_buyuk))
+
+
+# ==================================================================== #
+#  Ek satış (danışman bazında) — "Ek Satış Ham" sayfasından
+# ==================================================================== #
+EK_HAVUZ = {"ARJ SERVIS": "ARJ Servis Ortak Havuz",
+            "FIAT SERVIS": "Fiat Servis Ortak Havuz",
+            "DANISMANI BELIRLE": "Danışmanı Belirlenmemiş"}
+EK_MARKA = {"bmw motorrad": "Motorrad", "motorrad": "Motorrad"}
+EK_BUTCE_TURLERI = ["Aksesuar", "Lastik"]   # servis kategori bütçelerinden gelir
+AY_ADLARI = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
+             "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+
+def _tr_ust(s):
+    return s.replace("i", "İ").replace("ı", "I").upper()
+
+def _isim_anahtar(s):
+    return _tr_ust(" ".join(s.split())).translate(str.maketrans("ÇĞİÖŞÜ", "CGIOSU"))
+
+def _tr_baslik(s):
+    kelimeler = []
+    for w in " ".join(s.split()).split(" "):
+        k = "".join({"I": "ı", "İ": "i"}.get(c, c.lower()) for c in w)
+        kelimeler.append(({"i": "İ", "ı": "I"}.get(k[0], k[0].upper()) + k[1:]) if k else k)
+    return " ".join(kelimeler)
+
+
+def ek_satis_uret(dosya, data):
+    """Paneldeki EXTRA_DATA yapısını üretir. 'Ek Satış Ham' yoksa None döner."""
+    from collections import Counter, defaultdict
+    yazimlar = defaultdict(Counter)
+    ham = []
+    for no, r in _sayfa_akis(dosya, "Ek Satış Ham", {"A", "B", "C", "D", "E", "F"}):
+        if no == 1:
+            continue
+        try:
+            y, m, v = int(float(r["C"])), int(float(r["D"])), float(r.get("F") or 0)
+        except (KeyError, TypeError, ValueError):
+            continue
+        ad = " ".join((r.get("A") or "").split()) or "DANIŞMANI BELİRLE"
+        marka = (r.get("B") or "").strip()
+        marka = EK_MARKA.get(marka.lower(), marka)
+        tur = (r.get("E") or "").strip()
+        anahtar = _isim_anahtar(ad)
+        yazimlar[anahtar][ad] += 1
+        ham.append((y, m, marka, anahtar, tur, v))
+    if not ham:
+        return None
+
+    def gorunen(anahtar):
+        if anahtar in EK_HAVUZ:
+            return EK_HAVUZ[anahtar]
+        en_cok = yazimlar[anahtar].most_common(1)[0][0]
+        # Türkçe karakterli yazımı tercih et (AKÇA > AKCA)
+        for yazim, _ in yazimlar[anahtar].most_common():
+            if any(c in yazim for c in "ÇĞİÖŞÜçğıöşü"):
+                en_cok = yazim; break
+        return _tr_baslik(en_cok)
+
+    ad_map = {a: gorunen(a) for a in yazimlar}
+    havuzlar = set(EK_HAVUZ.values())
+    top = defaultdict(float)
+    for y, m, marka, a, tur, v in ham:
+        top[(y, m, marka, ad_map[a], tur)] += v
+    actual = [{"y": y, "m": m, "brand": b, "consultant": c, "type": t, "value": round(v, 2)}
+              for (y, m, b, c, t), v in sorted(top.items()) if abs(v) > 0.004]
+
+    yil = data["ust"].get("kesim_yil", _dt.date.today().year)
+    aktif = defaultdict(set)
+    for r in actual:
+        if r["y"] == yil:
+            aktif[(r["m"], r["brand"])].add(r["consultant"])
+    marka_havuz = {"Arj": "ARJ Servis Ortak Havuz", "Fiat": "Fiat Servis Ortak Havuz"}
+
+    def kadro(m, marka):
+        if (m, marka) in aktif:                       # fiilisi olan ay: o ay çalışanlar
+            k = aktif[(m, marka)] - havuzlar
+        else:                                          # gelecek ay: yıl içinde çalışan herkes
+            k = set().union(*[s for (mm, b), s in aktif.items() if b == marka] or [set()]) - havuzlar
+        return k or {marka_havuz.get(marka, "Danışmanı Belirlenmemiş")}
+
+    budgets, targets = [], []
+    for marka, bilgi in data["markalar"].items():
+        if marka == "Servis Konsolide Rapor":
+            continue
+        for mi, ay in enumerate(data["aylar"], start=1):
+            kat = bilgi["veri"]["aylar"][ay]["kategoriler"]
+            for tur in EK_BUTCE_TURLERI:
+                b = kat.get(tur, {}).get("toplam", {}).get("butce", 0) or 0
+                if b <= 0:
+                    continue
+                budgets.append({"y": yil, "m": mi, "brand": marka, "type": tur, "value": round(b, 2)})
+                kisiler = sorted(kadro(mi, marka))
+                for k in kisiler:
+                    targets.append({"y": yil, "m": mi, "brand": marka, "consultant": k,
+                                    "type": tur, "value": round(b / len(kisiler), 2)})
+
+    return {
+        "meta": {"sourceRows": len(ham), "sourceYear": yil, "sourceMonth": data["ust"].get("kesim_ay"),
+                 "sourceHasDate": False,
+                 "allocationMethod": "Eşit dağıtım · aynı marka ve ayda aktif danışmanlar",
+                 "note": "Ham kaynakta yalnızca Yıl ve Ay bulunuyor; gerçek günlük işlem trendi için Fatura Tarihi eklenmeli."},
+        "months": AY_ADLARI,
+        "brands": sorted({r["brand"] for r in actual}),
+        "types": sorted({r["type"] for r in actual}),
+        "poolNames": sorted(havuzlar & {r["consultant"] for r in actual} | havuzlar & {t["consultant"] for t in targets}),
+        "actual": actual, "budgets": budgets, "targets": targets,
+    }
+
+
 def panel_uret(data, sablon_yolu, cikti_yolu):
     """Yeni paneli (panel_sablon.html) Excel verisiyle doldurur.
     Sadece servis DATA bloğu yenilenir; EXTRA_DATA ve STOCKS şablondaki haliyle kalır.
     Mevcut index.html'deki şifre (SIFRE_HASH) korunur."""
     html = open(sablon_yolu, encoding="utf-8").read()
-    js = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+    js = json.dumps({k: v for k, v in data.items() if not k.startswith("_")}, ensure_ascii=False, separators=(",", ":"))
     html, n = re.subn(r"const DATA=\{.*?\};\n", lambda m: "const DATA=" + js + ";\n", html, count=1, flags=re.S)
     if n != 1:
         raise SystemExit("HATA: panel_sablon.html içinde veri alanı bulunamadı.")
+    ek = data.get("_ek_satis")
+    if ek:
+        ej = json.dumps(ek, ensure_ascii=False, separators=(",", ":"))
+        html, n2 = re.subn(r"const EXTRA_DATA=\{.*?\};\n", lambda m: "const EXTRA_DATA=" + ej + ";\n", html, count=1, flags=re.S)
+        print(f"  ✓ Ek satış güncellendi ({ek['meta']['sourceRows']:,} satır, {len(ek['actual'])} kayıt)" if n2 else "  ⚠ Ek satış alanı şablonda bulunamadı")
+    else:
+        print("  ⚠ 'Ek Satış Ham' sayfası bulunamadı — ek satış verisi şablondaki haliyle kaldı")
     if os.path.exists(cikti_yolu):
         eski = open(cikti_yolu, encoding="utf-8").read()
         m = re.search(r"const SIFRE_HASH='([0-9a-f]{64})';", eski)
@@ -1293,6 +1472,7 @@ def main():
     data = veriyi_topla(girdi)
     sablon = os.path.join(os.path.dirname(os.path.abspath(__file__)), "panel_sablon.html")
     if os.path.exists(sablon):
+        data["_ek_satis"] = ek_satis_uret(girdi, data)
         html = panel_uret(data, sablon, cikti)
     else:
         html = html_uret(data)
