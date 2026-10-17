@@ -324,31 +324,106 @@ def _oku_metrik_bloku(cells, satir):
     return out
 
 
+def _harf_no(h):
+    n = 0
+    for ch in h:
+        n = n * 26 + ord(ch) - 64
+    return n
+
+
+def _no_harf(n):
+    s = ""
+    while n:
+        n, r = divmod(n - 1, 26)
+        s = chr(65 + r) + s
+    return s
+
+
+def _etiket(v):
+    """Etiketleri karşılaştırmak için: büyük harf, Türkçe karakter ve boşluk farkı yok."""
+    t = str(v or "").strip().upper().replace("İ", "I").replace("Ş", "S").replace("Ğ", "G").replace("Ü", "U").replace("Ö", "O").replace("Ç", "C")
+    return " ".join(t.split())
+
+
+_AY_ETIKET = {_etiket(a): a for a in AYLAR}
+_KAT_ETIKET = {_etiket(k): k for k in KATEGORILER}
+_KAT_ETIKET.update({"CARCARE": "Car Care", "CAR-CARE": "Car Care", "KAPORTA-BOYA": "Kaporta Boya", "KAPORTA": "Kaporta Boya", "HASAR": "Kaporta Boya"})
+
+
 def marka_sayfasini_oku(cells):
-    """Bir marka sayfasının hücrelerinden YTD + 12 aylık + kategori kırılımını çıkarır."""
+    """Bir marka sayfasının hücrelerinden YTD + 12 aylık + kategori kırılımını çıkarır.
+    Satır numarasına değil ETİKETLERE göre okur: 'Dön.' sütununda YTD/ay adı, 'Kategori' sütununda
+    Toplam/Mekanik/... yazan satırlar bulunur. Excel'e satır eklenip çıkarılsa ya da kırılım sırası
+    değişse de doğru okunur."""
+    import re as _re
+    # 1) Kategori sütununu bul: değeri 'TOPLAM' olan ve solundaki hücrede YTD / ay adı yazan hücreler
+    bloklar = {}            # dönem -> (toplam satırı, kategori sütunu no)
+    for ref, v in cells.items():
+        if _etiket(v) != "TOPLAM":
+            continue
+        m = _re.fullmatch(r"([A-Z]+)(\d+)", ref)
+        if not m:
+            continue
+        col, row = _harf_no(m.group(1)), int(m.group(2))
+        sol = _etiket(cells.get(f"{_no_harf(col - 1)}{row}")) if col > 1 else ""
+        if sol == "YTD":
+            bloklar["YTD"] = (row, col)
+        elif sol in _AY_ETIKET:
+            bloklar[_AY_ETIKET[sol]] = (row, col)
+
+    def oku(row, col):
+        kay = col - _harf_no("J")         # metrik sütunları kategori sütununun hemen sağında (J → K..AD)
+        out = {}
+        for mt, cols in METRIK_SUTUN.items():
+            out[mt] = {alan: _num(cells.get(f"{_no_harf(_harf_no(h) + kay)}{row}")) for alan, h in cols.items()}
+        return out
+
+    def blok(row, col):
+        b = {"toplam": oku(row, col), "kategoriler": {}, "_satir": {}}
+        r = row + 1
+        while r < row + 20:
+            et = _etiket(cells.get(f"{_no_harf(col)}{r}"))
+            if et == "TOPLAM":
+                break
+            if not et:                    # ara boş satırlar atlanır
+                r += 1
+                continue
+            k = _KAT_ETIKET.get(et) or _KAT_ETIKET.get(et.replace(" ", ""))
+            if k and k not in b["kategoriler"]:
+                b["kategoriler"][k] = oku(r, col)
+                b["_satir"][k] = r
+            r += 1
+        bos = {mt: {"butce": 0.0, "fiili": 0.0, "yuzde": 0.0, "g2025": 0.0, "delta": 0.0} for mt in METRIK_SUTUN}
+        for k in KATEGORILER:
+            b["kategoriler"].setdefault(k, {mt: dict(v) for mt, v in bos.items()})
+        return b
+
     veri = {"ytd": {}, "aylar": {}}
-
-    # --- YTD bloğu (satır 4 = Toplam, 5..11 = kategoriler) ---
-    veri["ytd"]["toplam"] = _oku_metrik_bloku(cells, 4)
-    veri["ytd"]["kategoriler"] = {}
-    for i, kat in enumerate(KATEGORILER):
-        veri["ytd"]["kategoriler"][kat] = _oku_metrik_bloku(cells, 5 + i)
-
-    # --- YTD araç başı (Excel'in hazır bloğu, Mekanik = satır 5) ---
-    # İşçilik: AH=bütçe, AI=2026 fiili, AJ=2025 fiili
-    # YP     : AM=bütçe, AN=2026 fiili, AO=2025 fiili
+    if "YTD" in bloklar:
+        yb = blok(*bloklar["YTD"])
+        veri["ytd"] = {"toplam": yb["toplam"], "kategoriler": yb["kategoriler"]}
+        mr, col = yb["_satir"].get("Mekanik", bloklar["YTD"][0] + 1), bloklar["YTD"][1]
+    else:                                   # eski sabit düzen (yedek)
+        veri["ytd"]["toplam"] = _oku_metrik_bloku(cells, 4)
+        veri["ytd"]["kategoriler"] = {kat: _oku_metrik_bloku(cells, 5 + i) for i, kat in enumerate(KATEGORILER)}
+        mr, col = 5, _harf_no("J")
+    kay = col - _harf_no("J")
+    g = lambda h: _num(cells.get(f"{_no_harf(_harf_no(h) + kay)}{mr}"))
     veri["ytd"]["arac_basi"] = {
-        "iscilik": {"butce": _num(cells.get("AH5")), "fiili": _num(cells.get("AI5")), "g2025": _num(cells.get("AJ5"))},
-        "yp":      {"butce": _num(cells.get("AM5")), "fiili": _num(cells.get("AN5")), "g2025": _num(cells.get("AO5"))},
+        "iscilik": {"butce": g("AH"), "fiili": g("AI"), "g2025": g("AJ")},
+        "yp":      {"butce": g("AM"), "fiili": g("AN"), "g2025": g("AO")},
     }
-
-    # --- 12 aylık bloklar ---
-    for idx, bas in enumerate(AY_BASLIK_SATIRLARI):
-        ay = AYLAR[idx]
-        blok = {"toplam": _oku_metrik_bloku(cells, bas), "kategoriler": {}}
-        for i, kat in enumerate(KATEGORILER):
-            blok["kategoriler"][kat] = _oku_metrik_bloku(cells, bas + 1 + i)
-        veri["aylar"][ay] = blok
+    for idx, ay in enumerate(AYLAR):
+        if ay in bloklar:
+            b = blok(*bloklar[ay])
+            veri["aylar"][ay] = {"toplam": b["toplam"], "kategoriler": b["kategoriler"]}
+        else:                               # etiket bulunamazsa eski sabit satır
+            bas = AY_BASLIK_SATIRLARI[idx]
+            veri["aylar"][ay] = {"toplam": _oku_metrik_bloku(cells, bas),
+                                 "kategoriler": {kat: _oku_metrik_bloku(cells, bas + 1 + i) for i, kat in enumerate(KATEGORILER)}}
+    eksik = [a for a in AYLAR if a not in bloklar]
+    veri["_uyari"] = (("etiketle bulunamayan aylar: " + ", ".join(eksik)) if eksik and len(eksik) < 12 else
+                      ("etiketler bulunamadı, sabit satırlar kullanıldı" if len(eksik) == 12 else ""))
     return veri
 
 
@@ -435,7 +510,8 @@ def veriyi_topla(dosya):
             "etiket": MARKA_ETIKET.get(sheet, sheet),
             "veri": marka_sayfasini_oku(cells),
         }
-        print(f"  ✓ {MARKA_ETIKET.get(sheet, sheet)}")
+        u = markalar[sheet]["veri"].pop("_uyari", "")
+        print(f"  ✓ {MARKA_ETIKET.get(sheet, sheet)}" + (f"  ⚠ {u}" if u else ""))
 
     wb.close()
 
