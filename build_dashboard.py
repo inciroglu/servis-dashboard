@@ -393,6 +393,10 @@ def marka_sayfasini_oku(cells):
                 b["kategoriler"][k] = oku(r, col)
                 b["_satir"][k] = r
             r += 1
+        if not b["kategoriler"]:            # kırılım etiketleri bulunamadı: Toplam'ın altındaki sabit sıraya dön
+            for i, k in enumerate(KATEGORILER):
+                b["kategoriler"][k] = oku(row + 1 + i, col)
+            b["_sabit"] = True
         bos = {mt: {"butce": 0.0, "fiili": 0.0, "yuzde": 0.0, "g2025": 0.0, "delta": 0.0} for mt in METRIK_SUTUN}
         for k in KATEGORILER:
             b["kategoriler"].setdefault(k, {mt: dict(v) for mt, v in bos.items()})
@@ -422,6 +426,8 @@ def marka_sayfasini_oku(cells):
             veri["aylar"][ay] = {"toplam": _oku_metrik_bloku(cells, bas),
                                  "kategoriler": {kat: _oku_metrik_bloku(cells, bas + 1 + i) for i, kat in enumerate(KATEGORILER)}}
     eksik = [a for a in AYLAR if a not in bloklar]
+    _ilk = blok(*bloklar[next(iter(bloklar))]) if bloklar else None
+    veri["_kirilim"] = (", ".join(k for k in KATEGORILER if k in (_ilk or {}).get("_satir", {})) or "bulunamadı") if _ilk else "—"
     veri["_uyari"] = (("etiketle bulunamayan aylar: " + ", ".join(eksik)) if eksik and len(eksik) < 12 else
                       ("etiketler bulunamadı, sabit satırlar kullanıldı" if len(eksik) == 12 else ""))
     return veri
@@ -511,7 +517,8 @@ def veriyi_topla(dosya):
             "veri": marka_sayfasini_oku(cells),
         }
         u = markalar[sheet]["veri"].pop("_uyari", "")
-        print(f"  ✓ {MARKA_ETIKET.get(sheet, sheet)}" + (f"  ⚠ {u}" if u else ""))
+        kk = markalar[sheet]["veri"].pop("_kirilim", "")
+        print(f"  ✓ {MARKA_ETIKET.get(sheet, sheet)} · kırılımlar: {kk}" + (f"  ⚠ {u}" if u else ""))
 
     wb.close()
 
