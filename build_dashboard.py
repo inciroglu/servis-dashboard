@@ -179,7 +179,7 @@ def is_gunu_hesapla(yil, ay, kesim_gun):
     """Dönem / geçen (kesim günü hariç) / kalan iş günü sayılarını döner."""
     gunler = _ay_is_gunleri(yil, ay)
     donem = len(gunler)
-    gecen = sum(1 for d in gunler if d < kesim_gun)   # bugün (kesim) hariç
+    gecen = sum(1 for d in gunler if d <= kesim_gun)  # kesim günü dahil (takvimdeki iş günü sayısı)
     return donem, gecen, donem - gecen
 
 # Marka sayfaları (Konsolide + 10 marka). Sıra dashboard'daki seçici sırası.
