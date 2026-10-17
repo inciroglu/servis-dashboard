@@ -1466,16 +1466,74 @@ def panel_uret(data, sablon_yolu, cikti_yolu):
     return html
 
 
+# ------------------------------------------------------------------ #
+#  Yeni panel (Ekim 2026): panel_sablon.html içinde "const D=__DATA__;"
+#  Servis verisi + haftalık (Fatura Listesi) + Ek Satış Q4 tek blokta.
+# ------------------------------------------------------------------ #
+def _yuvarla(x):
+    if isinstance(x, dict):
+        if "butce" in x and "fiili" in x:
+            return {k: round(x[k], 2) for k in ("butce", "fiili", "g2025") if k in x}
+        return {k: _yuvarla(v) for k, v in x.items()}
+    return x
+
+
+def _eski_eks(cikti_yolu):
+    """Ek satış dosyası yoksa mevcut index.html'deki ek satış verisini korur."""
+    if not os.path.exists(cikti_yolu):
+        return None
+    m = re.search(r"const D=(\{.*?\});\n", open(cikti_yolu, encoding="utf-8").read(), re.S)
+    if not m:
+        return None
+    try:
+        return json.loads(m.group(1)).get("eks")
+    except ValueError:
+        return None
+
+
+def panel_v7_uret(girdi, ek_yolu, sablon_yolu, cikti_yolu):
+    import ek_veri
+    data = veriyi_topla(girdi)
+    D = {k: v for k, v in data.items() if not k.startswith("_")}
+    D["markalar"] = {k: {"etiket": v["etiket"], "aylar": _yuvarla(v["veri"]["aylar"])} for k, v in data["markalar"].items()}
+    g, a, y = map(int, D["ust"]["veri_kesim"].split("."))
+    print("→ Haftalık veri (Fatura Listesi) okunuyor...")
+    D["hafta"] = ek_veri.haftalik_uret(girdi, y, a, g)
+    print(f"  ✓ {len(D['hafta']):,} haftalık satır")
+    if ek_yolu and os.path.exists(ek_yolu):
+        print(f"→ Ek satış okunuyor: {ek_yolu} (Konsolide Hedef)")
+        D["eks"] = ek_veri.ek_panel_uret(ek_yolu)
+        print(f"  ✓ Ek satış {D['eks']['meta']['donem']} · {len(D['eks']['brands'])} marka")
+    else:
+        D["eks"] = _eski_eks(cikti_yolu)
+        print(f"  ⚠ {ek_yolu or 'ek_satis.xlsx'} bulunamadı — ek satış " + ("önceki haliyle korundu" if D["eks"] else "sayfası boş kaldı"))
+    html = open(sablon_yolu, encoding="utf-8").read()
+    js = json.dumps(D, ensure_ascii=False, separators=(",", ":"))
+    if html.count("const D=__DATA__;") != 1:
+        raise SystemExit("HATA: panel_sablon.html içinde veri alanı (const D=__DATA__;) bulunamadı.")
+    html = html.replace("const D=__DATA__;", "const D=" + js + ";", 1)
+    if os.path.exists(cikti_yolu):   # şifre korunur
+        m = re.search(r"const SIFRE_HASH='([0-9a-f]{64})';", open(cikti_yolu, encoding="utf-8").read())
+        if m:
+            html = re.sub(r"const SIFRE_HASH='[0-9a-f]{64}';", "const SIFRE_HASH='" + m.group(1) + "';", html, count=1)
+            print("  ✓ Mevcut giriş şifresi korundu")
+    return html
+
+
 def main():
     girdi = sys.argv[1] if len(sys.argv) > 1 else "servis_rapor.xlsx"
     cikti = sys.argv[2] if len(sys.argv) > 2 else "dashboard.html"
-    data = veriyi_topla(girdi)
+    ek = sys.argv[3] if len(sys.argv) > 3 else "ek_satis.xlsx"
     sablon = os.path.join(os.path.dirname(os.path.abspath(__file__)), "panel_sablon.html")
-    if os.path.exists(sablon):
-        data["_ek_satis"] = ek_satis_uret(girdi, data)
-        html = panel_uret(data, sablon, cikti)
+    if os.path.exists(sablon) and "const D=__DATA__;" in open(sablon, encoding="utf-8").read():
+        html = panel_v7_uret(girdi, ek, sablon, cikti)
     else:
-        html = html_uret(data)
+        data = veriyi_topla(girdi)
+        if os.path.exists(sablon):
+            data["_ek_satis"] = ek_satis_uret(girdi, data)
+            html = panel_uret(data, sablon, cikti)
+        else:
+            html = html_uret(data)
     with open(cikti, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"\n✓ Dashboard üretildi: {cikti}")
