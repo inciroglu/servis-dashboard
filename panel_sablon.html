@@ -477,6 +477,11 @@ ul.yorum .yg{color:var(--green);font-weight:650}ul.yorum .yr{color:var(--red);fo
 @media print{.hmb td.hmc b{font-size:9px}.hmb td.hmc small{font-size:7.5px}}
 nav .sec2{padding-top:26px}nav .soonm{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px;padding:10px 12px;border:1px dashed #cfd9e5;border-radius:9px;color:#8a98aa;font-size:14px;font-weight:600;cursor:default}nav .soonm em{font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.06em;color:#9a6f2e;background:#f6efe2;border-radius:10px;padding:2px 8px}
 @media (max-width:1050px){nav .soonm{display:none}}
+.krt tr.cur td.kn{font-weight:700;color:var(--navy)}.krt tr.cur td{background:#fbf7ef}.krt tr.plan td{color:#9aa7b7}
+.hmb table{font-size:12px}
+.hay td,.hay th{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.box.krt.hay table>thead>tr:first-child>th:nth-child(n){width:auto}.hay table{font-size:10.5px}
+.hgrbar{display:flex;align-items:center;gap:10px;margin:18px 0 10px}.hgrbar>span{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.hgrbar small{opacity:.7;font-weight:500;margin-left:4px}
+@media print{.hgrbar .seg button:not(.on){display:none}}
 /* ---------- giriş (açık zemin, sade kart · ek satış paneliyle aynı aile) + hoş geldiniz ---------- */
 #gt{position:fixed;inset:0;z-index:200;overflow:auto;font-family:"Segoe UI",Inter,system-ui,sans-serif;color:#192c44;background:#f4f6f9 radial-gradient(900px 520px at 50% -5%,#e3eaf4,transparent)}
 #gt[hidden],#gw[hidden]{display:none!important}
@@ -637,7 +642,7 @@ const ACT=ms=>ms.filter(m=>m<=CUT);
 const YM=()=>Array.from({length:Math.min(Math.max(...MS()),CUT)},(_,i)=>i+1);
 const isYtdSel=()=>MS().join(',')===YM().join(',');
 const PMS=()=>MS();
-const AYAY=()=>PMS().length>1&&(st.cmp||'ay')==='ay';   // çok ay seçiliyse ay ay karşılaştırma
+const AYAY=()=>PMS().length>1&&(st.page==='homer'||(st.cmp||'ay')==='ay');   // çok ay seçiliyse ay ay karşılaştırma
 const TWO=()=>true;   // her zaman seçili dönem | YTD yan yana (sabit yapı)                         // seçili dönem YTD değilse YTD yanına eklenir
 const ayk=mi=>D.aylar[mi-1];
 const gun=mi=>D.ust.ay_is_gunu[ayk(mi)]||{donem:0,gecen:0,kalan:0};
@@ -846,7 +851,7 @@ function markaTablo(bs,tip,id,fixKat){
     :(kat?kat+' kırılımı':'İş emri adedi ve cirolar tüm kırılımların toplamı · araç girişi (mekanik) için Kırılım: Mekanik')+(NA?' · bu kırılımda iş emri adedi yok':'');
   const note=(pm.includes(CUT)||ym.includes(CUT))?' · bütçe ay tamamı, 2025 fiili geçen iş günü oranında ('+gun(CUT).gecen+'/'+gun(CUT).donem+')':'';
   if(!rows0.length)return box(title,sub,'<div class="empty">Bu kırılımda seçili markalar için veri yok.</div>',kSel);
-  return box2('dense krt mtb'+(tip==='ab'?' krab':''),title,sub+note,tbl(hd,body).replace(/min-width:\d+px/,'min-width:'+(tip==='ab'?1000:G.length*250+130)+'px'),kSel+sSel);
+  return box2('dense krt mtb'+(tip==='ab'?' krab':''),title,sub+note,tbl(hd,body).replace(/min-width:\d+px/,'min-width:'+(tip==='ab'?1000:G.length*262+130)+'px'),kSel+sSel);
 }
 /* çok ay seçiliyse: marka × ay ısı haritası (bütçe gerçekleşmesi); tek marka seçiliyse kırılım × ay */
 const HMK=[['toplam','Toplam ciro (işçilik + YP)'],['iscilik','İşçilik cirosu'],['yp','Yedek parça cirosu'],['adet','Araç girişi (mekanik)']];
@@ -1032,11 +1037,54 @@ function hsumB(y,m,blocks,kat,brs){const o=[0,0,0];
   return {adet:o[0],iscilik:o[1],yp:o[2],toplam:o[1]+o[2]};}
 // markalar alt alta: seçili ayın haftaları, ağırlıklı gölge ve 2025'e göre değişim
 /* ---------- 04 · HOMER ---------- */
+/* HOMER: kaporta-boya · marka karşılaştırması, ay ay seyir (12 ay) ve marka × ay ısı haritası */
+function homerAy(S,K,GL){
+  const G=[['adet','İş emri adedi','ax'],['iscilik','İşçilik cirosu · Mn ₺','m2'],['yp','Yedek parça cirosu · Mn ₺','m2'],['toplam','Toplam ciro · Mn ₺','m2']];
+  const H='<th class="sep">Bütçe</th><th>Fiili</th><th>Gerç. %</th><th>2025 Fiili</th><th>Δ %</th>';
+  const hd='<tr class="per"><th></th>'+G.map(g=>'<th colspan="5" class="cur sep">'+g[1]+'</th>').join('')+'</tr><tr><th class="kn">Ay</th>'+G.map(()=>H).join('')+'</tr>';
+  const pm=PMS();
+  const row=(lab,ms,c)=>{const v=G.map(([m,,f])=>{const q=val(S,ms,m,K);return std(q.x,f,q.plan);}).join('');return '<tr class="'+c+'"><td class="kn">'+lab+'</td>'+v+'</tr>';};
+  const multi=pm.length>1;let body='';if(multi)for(const m of pm)body+=row(MONTHS[m-1]+(m===CUT?' · devam':m>CUT?' · plan':''),[m],m>CUT?'plan':'');else for(let m=1;m<=12;m++)body+=row(MONTHS[m-1]+(m===CUT?' · devam':m>CUT?' · plan':''),[m],(m>CUT?'plan ':'')+(pm.includes(m)?'cur':''));
+  const all=Array.from({length:CUT},(_,i)=>i+1);
+  return box2('dense krt hay','HOMER · ay ay seyir'+(GL?' · '+GL:''),(GL||esc(brandLabel()))+' · '+YEAR+' · kaporta-boya iş emri adedi, işçilik, yedek parça ve toplam ciro '+(PMS().length>1?' · seçili aylar':' · seçili dönem ayları vurgulu'),
+    tbl(hd,body,multi?row('<b>Seçim toplamı</b>',pm,'main tot'):row('<b>YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+'</b>',all,'main tot')).replace(/min-width:\d+px/,'min-width:1240px;table-layout:fixed').replace('<thead>','<colgroup><col style="width:120px">'+'<col>'.repeat(20)+'</colgroup><thead>'));
+}
+function homerIsi(bs,K,GL){
+  const multi=PMS().length>1, ms=multi?PMS():Array.from({length:CUT},(_,i)=>i+1), k=st.sort.hhm||'adet';
+  const HK=[['adet','İş emri adedi'],['toplam','Toplam ciro'],['iscilik','İşçilik cirosu'],['yp','Yedek parça cirosu']];
+  const cell=(x,plan)=>{const p=bud(x);if(plan||!ok(p))return '<td class="hm0">'+(!plan&&x.fiili?'<b>bütçe yok</b><small>'+(k==='adet'?FM.ad(x.fiili):FM.mn(x.fiili))+'</small>':'–')+'</td>';
+    const a=Math.min(1,Math.abs(p-1)/.4),bg=p>=1?'rgba(8,117,101,'+(.08+.5*a).toFixed(2)+')':'rgba(180,73,72,'+(.08+.5*a).toFixed(2)+')';
+    return '<td class="hmc" style="background:'+bg+'" data-v="'+p+'" data-f="p"><b>'+fmt(p,'p')+'</b><small>'+(k==='adet'?FM.ad(x.fiili):FM.mn(x.fiili))+'</small></td>';};
+  const rows=bs.filter(b=>{const t=val([b],ms,k,K).x;return t.fiili||t.butce;}).map(b=>'<tr><td class="bn" data-tip="'+b+'|'+k+'|'+K+'|'+(k==='adet'?'ad':'mn')+'"><b>'+esc(lab(b))+'</b></td>'+ms.map(m=>{const q=val([b],[m],k,K);return cell(q.x,q.plan);}).join('')+(()=>{const q=val([b],ms,k,K);return cell(q.x,q.plan);})()+'</tr>').join('');
+  const tot='<tr class="tot"><td><b>Toplam</b></td>'+ms.map(m=>{const q=val(bs,[m],k,K);return cell(q.x,q.plan);}).join('')+(()=>{const q=val(bs,ms,k,K);return cell(q.x,q.plan);})()+'</tr>';
+  const sel='<label class="srt">Gösterge <select data-sort="hhm">'+HK.map(([x,t])=>'<option value="'+x+'"'+(x===k?' selected':'')+'>'+t+'</option>').join('')+'</select></label>';
+  return box2('hmb','HOMER · marka × ay'+(GL?' · '+GL:''),(HK.find(x=>x[0]===k)||HK[0])[1]+' · kaporta-boya · bütçe gerçekleşmesi ve fiili · '+(multi?esc(monthLabel()):'Oca–'+MONTHS[CUT-1].slice(0,3)+' '+YEAR),
+    tbl('<tr><th>Marka</th>'+ms.map(m=>'<th>'+MONTHS[m-1].slice(0,3)+(m===CUT?' · devam':'')+'</th>').join('')+'<th class="sep">'+(multi?'Seçim toplamı':'YTD')+'</th></tr>',rows,tot).replace(/min-width:\d+px/,'min-width:'+(150+ms.length*84)+'px'),sel);
+}
+const HPREM=['Bmw','Motorrad','Tesla'];
+const HGR=[['diger','Diğer markalar',b=>!HPREM.includes(b)],['prem','BMW & MINI · Tesla',b=>HPREM.includes(b)]];
+function homerGrupOzet(K,gs){
+  const G=[['adet','İş emri adedi','ax'],['iscilik','İşçilik cirosu · Mn ₺','m2'],['yp','Yedek parça cirosu · Mn ₺','m2'],['toplam','Toplam ciro · Mn ₺','m2']];
+  const H='<th class="sep">Bütçe</th><th>Fiili</th><th>Gerç. %</th><th>2025 Fiili</th><th>Δ %</th>';
+  const hd='<tr class="per"><th class="kd"></th><th></th>'+G.map(g=>'<th colspan="5" class="cur sep">'+g[1]+'</th>').join('')+'</tr><tr><th class="kd"></th><th class="kn">Grup</th>'+G.map(()=>H).join('')+'</tr>';
+  const all=gs.flatMap(g=>g[3]);
+  const blk=(ms,pl)=>{const R=[...gs.map(g=>[g[1],g[3],'']),...(gs.length>1?[['HOMER toplam',all,'main tot']]:[])];
+    return R.map((r,i)=>'<tr class="'+(i?r[2]:'kt')+'">'+(i?'':'<td class="kd" rowspan="'+R.length+'"><span>'+pl+'</span></td>')+'<td class="kn"><b>'+r[0]+'</b></td>'+G.map(([m,,f])=>{const q=val(r[1],ms,m,K);return std(q.x,f,q.plan);}).join('')+'</tr>').join('');};
+  const pm=PMS(), ym=YM(), same=pm.join()===ym.join();
+  const body=AYAY()?pm.map(m=>blk([m],MONTHS[m-1].slice(0,3)+(m===CUT?' · devam':''))).join('')+blk(pm,'Seçim'):blk(pm,esc(monthLabel(pm)))+(same?'':blk(ym,'YTD'));
+  return box2('dense krt mtb','HOMER · grup özeti','Kaporta-boya · BMW & MINI · Tesla ile diğer markalar ayrı gruplar',tbl(hd,body).replace(/min-width:\d+px/,'min-width:1130px'));
+}
 function pHomer(){
-  const K='Kaporta Boya';
-  return head('Servis Performans Yönetimi','HOMER · hasar onarım','Kaporta-boya · '+PL())+'<div class="grid2">'+
-    brandBlock('h_adet','Araç girişi','','adet',K,'ad')+brandBlock('h_top','Toplam ciro','','toplam',K,'mn')+brandBlock('h_isc','İşçilik cirosu','','iscilik',K,'mn')+brandBlock('h_yp','Yedek parça cirosu','','yp',K,'mn')+'</div><div class="pb"></div>'+
-    '<div class="grid2">'+brandBlock('h_ab','Kaporta-boya AB ciro','Kaporta-boya işçilik + YP ÷ kaporta-boya araç girişi','abT',K,'ab')+monthBlock('Toplam ciro · 12 ay','toplam',K,'mn')+'</div>'+notes();
+  const K='Kaporta Boya', S=SEL(), bs=rowsOf();
+  const has=b=>{const x=val([b],Array.from({length:12},(_,i)=>i+1),'toplam',K).x;return x.fiili||x.butce;};
+  const gs=HGR.map(g=>[...g,bs.filter(b=>g[2](b)&&has(b))]).filter(g=>g[3].length);
+  if(!gs.length)return head('Servis Performans Yönetimi','HOMER · hasar onarım','Kaporta-boya · '+PL())+'<div class="empty">Seçili markalar için kaporta-boya verisi yok.</div>';
+  let cur=gs.find(g=>g[0]===(st.hgr||'diger'))||gs[0];
+  const seg='<div class="hgrbar"><span>Grup</span><div class="seg" id="hgr">'+gs.map(g=>'<button type="button" data-k="'+g[0]+'" class="'+(g===cur?'on':'')+'">'+g[1]+' <small>'+g[3].length+' marka</small></button>').join('')+'</div></div>';
+  const gb=cur[3], GL=cur[1];
+  return head('Servis Performans Yönetimi','HOMER · hasar onarım','Kaporta-boya · '+PL())+homerGrupOzet(K,gs)+seg+
+    markaTablo(gb,'ciro','h_mt',K).replace('Marka karşılaştırması · Kaporta Boya','HOMER · '+GL)+markaTablo(gb,'ab','h_ab',K).replace('Marka karşılaştırması · Kaporta Boya','HOMER · '+GL)+
+    '<div class="pb"></div>'+homerAy(gb,K,GL)+'<div class="pb"></div>'+homerIsi(gb,K,GL)+notes();
 }
 /* ---------- 05 · Car Care ---------- */
 function pCar(){
@@ -1180,7 +1228,7 @@ function scopeRender(){
   $('ddB').querySelector('.msb span').textContent=st.brands.length?brandLabel():'Tüm markalar ('+BR.length+')';
   $('ddM').querySelector('.msb span').textContent=monthLabel();
   $('ddK').querySelector('.msb span').textContent=st.kpis.map(k=>KP[k][1].replace(' cirosu','').replace('Yedek parça','YP').replace(' (iş emri)','')).join(' · ');
-  $('ddK').style.display='none';const cm=$('cmpT');cm.style.display=PMS().length>1&&st.page!=='ek'&&st.page!=='veri'?'':'none';cm.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.cmp===(st.cmp||'ay')));$('ddB').style.display=$('ddM').style.display=st.page==='ek'?'none':'';
+  $('ddK').style.display='none';const cm=$('cmpT');cm.style.display=PMS().length>1&&st.page!=='ek'&&st.page!=='veri'&&st.page!=='homer'?'':'none';cm.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.cmp===(st.cmp||'ay')));$('ddB').style.display=$('ddM').style.display=st.page==='ek'?'none':'';
 }
 
 /* ---------- ipucu (hover) ---------- */
@@ -1207,6 +1255,7 @@ $('app').addEventListener('mouseout',e=>{const el=e.target.closest('[data-tip],[
 $('app').addEventListener('click',e=>{
   const bh=e.target.closest('.boxhead h2');if(bh){bh.closest('.box').classList.toggle('fold');return;}
   const r=e.target.closest('tr[data-open]');if(r){const k=r.dataset.open;OPEN.has(k)?OPEN.delete(k):OPEN.add(k);TIP.hidden=true;render();return;}
+  const hg=e.target.closest('#hgr button');if(hg){st.hgr=hg.dataset.k;render();return;}
   const h=e.target.closest('#hkat button');if(h){st.hkat=h.dataset.k;render();}
   const q=e.target.closest('#ekkat button');if(q){st.ekKat=q.dataset.k;render();}
   const hm2=e.target.closest('#hmet button');if(hm2){st.hmet=hm2.dataset.k;render();}
