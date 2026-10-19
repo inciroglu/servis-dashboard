@@ -11,7 +11,7 @@
 <meta property="og:title" content="İnciroğlu Otomotiv · Servis Performans Yönetimi">
 <meta property="og:site_name" content="İnciroğlu Otomotiv">
 <meta name="application-name" content="İnciroğlu Otomotiv">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js" defer></script>
 <style>
 :root{--navy:#122f59;--navy2:#183e6d;--blue:#254d7b;--ink:#192c44;--muted:#64758a;--line:#e1e7ed;--bg:#f4f6f9;--green:#087565;--red:#b44948;--gold:#b78d4c;--soft:#eaf0f7;--amber:#8a601e;--beige:#f7f2e8}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -1646,22 +1646,61 @@ $('app').addEventListener('change',e=>{const s=e.target.closest('select[data-sor
 
 /* ---------- Excel ---------- */
 const XZ={ab:'#,##0 "₺"',a1:'#,##0 "₺"',tl:'#,##0 "₺"',mn:'#,##0 "₺"',ad:'#,##0',ad1:'#,##0.0',p:'0.0%',p0:'0.0%',mx:'#,##0 "₺"',m2:'#,##0 "₺"',ax:'#,##0',d:'+0.0%;-0.0%;0.0%'};
+// Excel: panel tablolarını biçimli sayfaya çevirir (başlık lacivert, toplamlar kalın, yüzdeler yeşil/kırmızı, rowspan/colspan korunur)
 function sheetFrom(root,title){
-  const aoa=[['İnciroğlu Otomotiv · Servis Performans Yönetimi'],[title],['Kapsam: '+brandLabel()+' · '+PL()],['Veri kesimi: '+D.ust.veri_kesim],[]], fmts={}, merges=[];
+  const NAVY='0B2545',NAVY2='1F3B63',GOLD='B08D57',SAND='F4EAD9',LINE='D5DCE5',GREY='5B6B7F';
+  const bd=c=>({style:'thin',color:{rgb:c||LINE}});
+  const S={
+    t1:{font:{bold:true,sz:15,color:{rgb:NAVY}}},
+    t2:{font:{bold:true,sz:12,color:{rgb:NAVY}}},
+    t3:{font:{sz:10,color:{rgb:GREY}}},
+    box:{font:{bold:true,sz:12,color:{rgb:NAVY}},fill:{fgColor:{rgb:SAND}},border:{bottom:{style:'medium',color:{rgb:GOLD}}}},
+    h:{font:{bold:true,sz:10,color:{rgb:'FFFFFF'}},fill:{fgColor:{rgb:NAVY}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border:{top:bd(NAVY),bottom:bd(NAVY),left:bd('3A5478'),right:bd('3A5478')}},
+    hp:{font:{bold:true,sz:10,color:{rgb:'FFFFFF'}},fill:{fgColor:{rgb:NAVY2}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border:{top:bd(NAVY2),bottom:{style:'medium',color:{rgb:GOLD}},left:bd('3A5478'),right:bd('3A5478')}},
+    foot:{font:{italic:true,sz:9,color:{rgb:'8A97A8'}}}};
+  const cellSt=(cls,first,tot,plan,f)=>{const st={font:{sz:10,color:{rgb:plan?'9AA7B7':'1D2B3A'},bold:!!(tot||first)},border:{top:bd(),bottom:bd(),left:bd(),right:bd()},alignment:{vertical:'center',horizontal:first?'left':'right'}};
+    if(tot){st.fill={fgColor:{rgb:'EEF2F7'}};st.border.top={style:'medium',color:{rgb:NAVY}};}
+    if(/\bpp\b/.test(cls)&&/\bg\b/.test(cls)){st.fill={fgColor:{rgb:'E3F3EE'}};st.font.color={rgb:'087565'};st.font.bold=true;}
+    else if(/\bpp\b/.test(cls)&&/\br\b/.test(cls)){st.fill={fgColor:{rgb:'FBE5E4'}};st.font.color={rgb:'B44948'};st.font.bold=true;}
+    else if(/\bdl\b/.test(cls))st.font.color={rgb:/\bg\b/.test(cls)?'087565':'B44948'};
+    if(/\bkd\b/.test(cls)){st.fill={fgColor:{rgb:SAND}};st.font={bold:true,sz:10,color:{rgb:NAVY}};st.alignment={horizontal:'center',vertical:'center',textRotation:90,wrapText:true};}
+    if(/\bv\b/.test(cls))st.font.bold=true;
+    return st;};
+  const aoa=[['İnciroğlu Otomotiv · Servis Performans Yönetimi'],[title],['Kapsam: '+brandLabel()+' · '+PL()],['Veri kesimi: '+D.ust.veri_kesim],[]], fmts={}, merges=[], styles={};
+  const put=(r,c,st)=>{styles[r+','+c]=st;};
+  put(0,0,S.t1);put(1,0,S.t2);put(2,0,S.t3);put(3,0,S.t3);
+  let maxc=1;const W={};const wnote=(c,v,f)=>{const L=v==null?0:(typeof v==='number'?(f&&/%/.test(f)?7:String(Math.round(v)).length*1.35+3):String(v).length+2);W[c]=Math.max(W[c]||0,Math.min(L,36));};
   root.querySelectorAll('.box').forEach(bx=>{
     const tb=bx.querySelector('table');if(!tb)return;
     const h=bx.querySelector('.boxhead h2')?.textContent||'', s=bx.querySelector('.boxhead span')?.textContent||'';
-    aoa.push([h+(s?' — '+s:'')]);
-    tb.querySelectorAll(':scope > thead > tr, :scope > tbody > tr:not(.det), :scope > tfoot > tr').forEach(tr=>{const row=[];let c=0;const r=aoa.length;
-      tr.querySelectorAll(':scope > th, :scope > td').forEach(cell=>{const span=+cell.getAttribute('colspan')||1;
-        if(cell.dataset.v!==undefined){row[c]=+cell.dataset.v;fmts[r+','+c]=XZ[cell.dataset.f];}else row[c]=cell.textContent.replace('▸','').trim();
-        if(span>1)merges.push({s:{r,c},e:{r,c:c+span-1}});c+=span;});
-      aoa.push(row);});
-    aoa.push([]);});
-  aoa.push([],['© '+YEAR+' İnciroğlu Otomotiv · CEO Ofis · İş Geliştirme ve Strateji']);
+    const br=aoa.length;aoa.push([h+(s?' — '+s:'')]);put(br,0,S.box);const boxRow=br;
+    const occ={};   // rowspan ile dolu hücreler: 'r,c'
+    let ncol=1;
+    tb.querySelectorAll(':scope > thead > tr, :scope > tbody > tr:not(.det), :scope > tfoot > tr').forEach(tr=>{
+      const r=aoa.length,row=[],head=tr.parentNode.tagName==='THEAD',per=tr.classList.contains('per'),tot=/\b(tot|main)\b/.test(tr.className)&&!head,plan=tr.classList.contains('plan');
+      let c=0,firstData=true;
+      tr.querySelectorAll(':scope > th, :scope > td').forEach(cell=>{
+        while(occ[r+','+c])c++;
+        const cs=+cell.getAttribute('colspan')||1, rs=+cell.getAttribute('rowspan')||1, cls=cell.className||'';
+        const inp=cell.querySelector('input');
+        if(cell.dataset.v!==undefined){row[c]=+cell.dataset.v;fmts[r+','+c]=XZ[cell.dataset.f];}
+        else{const t=inp?inp.value:cell.textContent.replace('▸','').trim();row[c]=t;}
+        const isKd=/\bkd\b/.test(cls);if(!isKd&&cs===1)wnote(c,row[c],fmts[r+','+c]);
+        put(r,c,head?(per?S.hp:S.h):cellSt(cls,firstData&&!isKd,tot,plan));
+        if(!head&&!isKd)firstData=false;
+        if(cs>1||rs>1)merges.push({s:{r,c},e:{r:r+rs-1,c:c+cs-1}});
+        for(let i=0;i<rs;i++)for(let j=0;j<cs;j++){if(i||j)occ[(r+i)+','+(c+j)]=1;if(head||i||j)put(r+i,c+j,styles[r+','+c]);}
+        c+=cs;});
+      ncol=Math.max(ncol,c);aoa.push(row);});
+    for(let c=1;c<ncol;c++)put(boxRow,c,S.box);
+    maxc=Math.max(maxc,ncol);aoa.push([]);});
+  const fr=aoa.length+1;aoa.push([],['© '+YEAR+' İnciroğlu Otomotiv · CEO Ofis · İş Geliştirme ve Strateji']);put(fr,0,S.foot);
   const ws=XLSX.utils.aoa_to_sheet(aoa);
-  for(const k in fmts){const [r,c]=k.split(',').map(Number),a=XLSX.utils.encode_cell({r,c});if(ws[a])ws[a].z=fmts[k];}
-  ws['!merges']=merges;ws['!cols']=[{wch:30}].concat(Array(24).fill({wch:15}));
+  for(const k in styles){const [r,c]=k.split(',').map(Number),a=XLSX.utils.encode_cell({r,c});if(!ws[a])ws[a]={t:'s',v:''};ws[a].s=styles[k];}
+  for(const k in fmts){const [r,c]=k.split(',').map(Number),a=XLSX.utils.encode_cell({r,c});if(ws[a]){ws[a].z=fmts[k];if(ws[a].s)ws[a].s.numFmt=fmts[k];}}
+  ws['!merges']=merges;ws['!cols']=Array.from({length:Math.max(maxc,1)},(_,c)=>({wch:Math.max(c===0?(W[0]?Math.min(W[0],30):8):9,Math.ceil(W[c]||9))}));
+  ws['!ref']=XLSX.utils.encode_range({s:{r:0,c:0},e:{r:aoa.length-1,c:Math.max(maxc-1,0)}});
+  ws['!rows']=aoa.map((r,i)=>i===0?{hpt:22}:{});
   return ws;
 }
 const sname=s=>s.replace(/[\\\/\?\*\[\]:]/g,'-').slice(0,31);
