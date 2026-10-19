@@ -496,6 +496,29 @@ nav .sec2{padding-top:26px}nav .soonm{display:flex;align-items:center;justify-co
 .garg td.gin input:disabled{background:#f3f5f8;color:#aab4c0}
 .garg td.gin.chg input{background:#fff7e6;border-color:#d9b97c;font-weight:700}
 @media print{.kul,.garbar{display:none}}
+.gnt td,.gnt th{padding-left:3px!important;padding-right:5px!important}.gnt td.kn{white-space:nowrap}.gnt thead tr:last-child th{white-space:normal;line-height:1.15}
+.ypt td.kn small{color:var(--muted);font-weight:500}.ypt tr.ypsep td{height:6px;padding:0!important;background:#0b2545}
+.ypt tr.ypr td{font-size:.92em;color:#5b6b7f;font-style:italic;background:#fafbfd}.ypt tr.ypz td{font-size:.88em;color:#8a97a8}
+.ypt td.gin input{min-width:74px}.ypt td.kn{min-width:215px;white-space:nowrap}
+.ktbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 12px}
+.ktt-box td.ktt b{font-weight:750;color:var(--navy)}.ktt-box td.kt-up{background:#fff1dc}.ktt-box td.kt-dn{background:#e6f0fb}.ktt-box td.ktg{color:#5b6b7f;font-style:italic}
+td.kn small.tz{display:block;font-size:9.5px;font-weight:600;color:#8a97a8;margin-top:1px}td.kn small.tz.a{color:#b7791f}td.kn small.tz.r{color:#b44948}
+.ktt-box th,.ktt-box td{padding-left:4px!important;padding-right:5px!important;font-size:11.5px}.ktt-box td.kn{white-space:nowrap;min-width:118px}.ktt-box thead tr:last-child th{font-size:10px}
+.ktt-box small.ktn{display:block;font-size:9px;color:#8a97a8;font-weight:600}
+.ktt-box td.gin input{min-width:92px;font-size:12px}
+.sdt small.oto{display:block;font-size:9px;color:#8a97a8}.sdt td.g{color:var(--green,#087565);font-weight:650}.sdt td.r{color:#b44948;font-weight:650}
+.aiet td.ait{background:#f6f8fb}.aiet td.g{color:#087565;font-weight:650}.aiet td.r{color:#b44948;font-weight:650}
+.dzt th small{display:block;font-size:9.5px;font-weight:500;color:#8a97a8;text-transform:none;letter-spacing:0}
+.dzt th.sep{text-align:center!important}.dzt td.dz{text-align:center!important;line-height:1.25}.dzt td.dz b{display:block;font-size:12.5px}.dzt td.dz small{display:block;font-size:10px;color:#5b6b7f}
+.dzt td.d1{background:#e3f3ee}.dzt td.d1 b{color:#087565}.dzt td.d2{background:#fff3db}.dzt td.d2 b{color:#9a6a12}.dzt td.d3{background:#fbe5e4}.dzt td.d3 b{color:#b44948}
+.dzt td.d0{color:#b44948;font-size:11.5px;font-weight:600;background:#fafbfd}.dzt td.na{color:#8a97a8;font-size:11px;font-style:italic;background:#fafbfd}
+.dzl{display:flex;gap:16px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:11.5px;color:#5b6b7f}.dzl span::before{content:'';display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.dzl .d1::before{background:#bfe5d8}.dzl .d2::before{background:#f6dca3}.dzl .d3::before{background:#f1c0bd}.dzl .d0::before{background:#fafbfd;border:1px solid #e3b0ae}
+.ypt small.ypd{display:block;font-size:9.5px;color:#8a97a8;font-weight:500}
+.pko{font-size:.85em;color:#8a97a8}.sbo{display:block;margin-top:10px;font-size:10.5px;color:#9aa7b7}
+.pfoot{display:none}
+@media print{.pfoot{display:block;position:fixed;right:0;bottom:0;font-size:7.5px;letter-spacing:.03em;color:#8a97a8;padding-top:3px;border-top:.6px solid #c9b48c}
+ .pfoot i{display:inline-block;width:3px;height:3px;border-radius:50%;background:#b08d57;margin:0 5px;vertical-align:1.5px}}
 /* ---------- giriş (açık zemin, sade kart · ek satış paneliyle aynı aile) + hoş geldiniz ---------- */
 #gt{position:fixed;inset:0;z-index:200;overflow:auto;font-family:"Segoe UI",Inter,system-ui,sans-serif;color:#192c44;background:#f4f6f9 radial-gradient(900px 520px at 50% -5%,#e3eaf4,transparent)}
 #gt[hidden],#gw[hidden]{display:none!important}
@@ -583,22 +606,26 @@ nav .sec2{padding-top:26px}nav .soonm{display:flex;align-items:center;justify-co
 .gt-kural li::before{content:'○ '}.gt-kural li.ok{color:#087565}.gt-kural li.ok::before{content:'● '}
 .gt-btn[disabled]{opacity:.6;cursor:progress}
 .gt-link[hidden]{display:none}
+#gt .gt-foot{display:flex;flex-direction:column;align-items:center;gap:3px}#gt .gt-imza{font-size:11px;color:#9aa7b7;letter-spacing:normal}
+#gt .gt-soon .gt-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#b08d57;margin-right:6px;vertical-align:1px;animation:gtDot 2.4s ease-in-out infinite}
+@keyframes gtDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.8)}}
+@media (prefers-reduced-motion:reduce){#gt .gt-soon .gt-dot{animation:none}}
 </style>
 </head>
 <body>
-<script>window.addEventListener("error",function(e){var n=document.getElementById("gtnj");if(n)n.textContent="Sayfa hatası: "+(e.message||"bilinmiyor")+" — bu ekranın görüntüsünü iletin.";});</script>
+<script>window.addEventListener("error",function(e){if(/sablon-bos/.test(e.message||""))return;var n=document.getElementById("gtnj");if(n)n.textContent="Sayfa hatası: "+(e.message||"bilinmiyor")+" — bu ekranın görüntüsünü iletin.";});</script>
 <section id="gt" aria-label="Platform girişi">
  <div class="gt-bg" aria-hidden="true"><i></i><i></i><i></i></div>
  <div class="gt-c">
   <form class="gt-card" id="gtf" autocomplete="on" novalidate>
    <div class="gt-logo"><svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="60 383 490 76" role="img" aria-label="İnciroğlu Otomotiv"><path fill="currentColor" d="M 61.92 398.42 L 71.32 398.42 L 71.32 443.6 L 61.92 443.6 Z M 66.68 394.76 C 64.85 394.76 63.54 394.38 62.75 393.6 C 61.95 392.83 61.55 391.55 61.55 389.75 C 61.55 387.96 61.95 386.68 62.75 385.91 C 63.54 385.13 64.85 384.75 66.68 384.75 C 68.48 384.75 69.79 385.14 70.62 385.94 C 71.46 386.73 71.88 388 71.88 389.75 C 71.88 391.5 71.46 392.78 70.62 393.57 C 69.79 394.36 68.48 394.76 66.68 394.76  M 78.53 410.63 L 86.28 410.63 L 86.83 414.23 L 87.14 414.23 C 88.48 413.46 89.68 412.8 90.74 412.25 C 91.8 411.7 92.79 411.27 93.7 410.94 C 94.62 410.61 95.49 410.38 96.33 410.24 C 97.16 410.09 98 410.02 98.86 410.02 C 101.42 410.02 103.39 410.8 104.78 412.34 C 106.16 413.89 106.86 416.09 106.86 418.94 L 106.86 443.6 L 97.64 443.6 L 97.64 422.05 C 97.64 420.5 97.36 419.41 96.81 418.75 C 96.27 418.11 95.46 417.78 94.4 417.78 C 93.46 417.78 92.42 417.97 91.26 418.36 C 90.1 418.75 88.93 419.26 87.75 419.91 L 87.75 443.6 L 78.53 443.6 Z M 78.53 410.63  M 127.92 444.15 C 122.59 444.15 118.6 442.78 115.95 440.03 C 113.31 437.29 111.98 432.98 111.98 427.12 C 111.98 421.3 113.31 417 115.95 414.23 C 118.6 411.47 122.59 410.09 127.92 410.09 C 129.22 410.09 130.52 410.16 131.8 410.3 C 133.08 410.44 134.25 410.68 135.31 411 L 135.31 418.27 C 134.12 418.06 133 417.9 131.92 417.78 C 130.84 417.66 129.83 417.59 128.89 417.59 C 126.17 417.59 124.23 418.32 123.07 419.76 C 121.91 421.21 121.32 423.64 121.32 427.05 C 121.32 430.48 121.91 432.94 123.07 434.45 C 124.23 435.95 126.15 436.7 128.84 436.7 C 130.02 436.7 131.11 436.65 132.13 436.55 C 133.15 436.45 134.21 436.27 135.31 436.03 L 135.31 443.18 C 134.37 443.5 133.24 443.74 131.92 443.91 C 130.59 444.07 129.26 444.15 127.92 444.15  M 140.68 410.63 L 149.9 410.63 L 149.9 443.6 L 140.68 443.6 Z M 145.32 405.63 C 143.49 405.63 142.18 405.23 141.38 404.44 C 140.59 403.64 140.19 402.37 140.19 400.62 C 140.19 398.87 140.59 397.6 141.38 396.8 C 142.18 396.01 143.49 395.61 145.32 395.61 C 147.15 395.61 148.46 396.02 149.26 396.84 C 150.05 397.65 150.45 398.91 150.45 400.62 C 150.45 402.33 150.05 403.59 149.26 404.41 C 148.46 405.22 147.15 405.63 145.32 405.63  M 156.49 410.63 L 164.24 410.63 L 164.79 415.34 L 165.16 415.34 C 165.57 414.93 166.11 414.48 166.81 413.99 C 167.5 413.5 168.27 413.02 169.13 412.53 C 169.98 412.04 170.86 411.57 171.75 411.12 C 172.65 410.67 173.5 410.33 174.32 410.09 L 176.52 410.09 L 176.52 418.45 L 172.98 418.45 C 171.67 418.65 170.32 419.04 168.91 419.61 C 167.51 420.18 166.44 420.77 165.71 421.38 L 165.71 443.6 L 156.49 443.6 Z M 156.49 410.63  M 193.67 437.13 C 194.81 437.13 195.77 436.97 196.54 436.64 C 197.31 436.32 197.95 435.78 198.43 435.02 C 198.92 434.27 199.27 433.25 199.47 431.97 C 199.68 430.69 199.78 429.07 199.78 427.12 C 199.78 425.16 199.68 423.55 199.47 422.26 C 199.27 420.98 198.92 419.96 198.43 419.21 C 197.95 418.46 197.31 417.92 196.54 417.59 C 195.77 417.27 194.81 417.11 193.67 417.11 C 192.53 417.11 191.58 417.27 190.8 417.59 C 190.03 417.92 189.41 418.46 188.94 419.21 C 188.47 419.96 188.14 420.98 187.93 422.26 C 187.73 423.55 187.63 425.16 187.63 427.12 C 187.63 429.07 187.73 430.69 187.93 431.97 C 188.14 433.25 188.47 434.27 188.94 435.02 C 189.41 435.78 190.03 436.32 190.8 436.64 C 191.58 436.97 192.53 437.13 193.67 437.13 M 193.67 444.21 C 188.66 444.21 184.86 442.77 182.25 439.88 C 179.65 436.99 178.35 432.73 178.35 427.12 C 178.35 421.5 179.65 417.25 182.25 414.36 C 184.86 411.47 188.66 410.02 193.67 410.02 C 198.72 410.02 202.54 411.47 205.12 414.36 C 207.7 417.25 209 421.5 209 427.12 C 209 432.73 207.7 436.99 205.12 439.88 C 202.54 442.77 198.72 444.21 193.67 444.21  M 227.74 436.52 C 229.57 436.52 230.97 435.87 231.95 434.57 C 232.93 433.27 233.41 431.07 233.41 427.97 L 233.41 416.98 C 232.15 416.58 230.67 416.38 228.96 416.38 C 227.74 416.38 226.7 416.55 225.84 416.89 C 224.99 417.24 224.31 417.81 223.8 418.6 C 223.29 419.39 222.91 420.47 222.67 421.84 C 222.43 423.2 222.3 424.88 222.3 426.87 C 222.3 428.66 222.39 430.17 222.58 431.39 C 222.76 432.61 223.07 433.61 223.5 434.38 C 223.92 435.16 224.48 435.7 225.17 436.03 C 225.87 436.36 226.72 436.52 227.74 436.52 M 229.08 406.12 C 225.25 406.12 222.43 405.25 220.59 403.52 C 218.76 401.79 217.79 399.38 217.66 396.29 L 223.95 396.29 C 223.99 399.62 225.7 401.29 229.08 401.29 C 232.42 401.29 234.11 399.62 234.15 396.29 L 240.5 396.29 C 240.34 399.42 239.34 401.84 237.51 403.55 C 235.68 405.26 232.87 406.12 229.08 406.12 M 226.03 457.03 C 224.24 457.03 222.41 456.91 220.56 456.67 C 218.71 456.42 216.93 456.08 215.22 455.63 L 215.83 448.85 C 219.09 449.67 222.1 450.07 224.87 450.07 C 227.8 450.07 230 449.39 231.49 448.03 C 232.98 446.66 233.74 444.29 233.78 440.91 L 233.78 438.78 L 233.41 438.78 C 231.46 441.46 228.59 442.81 224.8 442.81 C 220.86 442.81 217.9 441.59 215.92 439.14 C 213.95 436.7 212.96 432.92 212.96 427.79 C 212.96 421.93 214.37 417.51 217.18 414.54 C 219.98 411.57 223.99 410.09 229.2 410.09 C 231.07 410.09 233.05 410.24 235.12 410.54 C 237.2 410.85 239.7 411.39 242.63 412.16 L 242.63 439.33 C 242.63 442.42 242.26 445.07 241.5 447.3 C 240.75 449.51 239.65 451.34 238.21 452.79 C 236.76 454.23 235.01 455.3 232.96 456 C 230.9 456.69 228.59 457.03 226.03 457.03  M 249.23 394.27 L 258.45 394.27 L 258.45 443.6 L 249.23 443.6 Z M 249.23 394.27  M 273.59 444.21 C 270.82 444.21 268.67 443.43 267.14 441.86 C 265.62 440.3 264.86 438.11 264.86 435.3 L 264.86 410.63 L 274.07 410.63 L 274.07 432.43 C 274.07 433.93 274.35 435.02 274.9 435.66 C 275.45 436.32 276.34 436.64 277.55 436.64 C 278.49 436.64 279.49 436.45 280.55 436.06 C 281.61 435.68 282.76 435.12 284.02 434.38 L 284.02 410.63 L 293.25 410.63 L 293.25 443.6 L 285.49 443.6 L 284.94 440.06 L 284.7 440.06 C 283.39 440.83 282.27 441.48 281.31 442.02 C 280.35 442.54 279.46 442.97 278.62 443.3 C 277.79 443.62 276.98 443.86 276.18 444 C 275.39 444.14 274.52 444.21 273.59 444.21  M 328.11 439.94 C 332.42 439.94 335.55 438.43 337.5 435.42 C 339.46 432.41 340.44 427.62 340.44 421.07 C 340.44 414.52 339.44 409.71 337.45 406.64 C 335.45 403.56 332.34 402.03 328.11 402.03 C 323.87 402.03 320.77 403.55 318.8 406.61 C 316.82 409.66 315.83 414.48 315.83 421.07 C 315.83 427.62 316.82 432.41 318.8 435.42 C 320.77 438.43 323.87 439.94 328.11 439.94 M 328.11 444.21 C 322.41 444.21 318.11 442.29 315.22 438.44 C 312.33 434.6 310.89 428.81 310.89 421.07 C 310.89 413.26 312.33 407.43 315.22 403.58 C 318.11 399.73 322.41 397.81 328.11 397.81 C 333.84 397.81 338.17 399.73 341.08 403.58 C 343.99 407.43 345.45 413.26 345.45 421.07 C 345.45 428.81 343.99 434.6 341.08 438.44 C 338.17 442.29 333.84 444.21 328.11 444.21  M 364.07 443.97 C 358.2 443.97 355.27 440.98 355.27 434.99 L 355.27 414.91 L 349.11 414.91 L 349.11 410.63 L 355.52 410.63 L 356.19 402.39 L 360.04 401.78 L 360.04 410.63 L 368.83 410.63 L 368.83 414.91 L 360.04 414.91 L 360.04 434.08 C 360.04 438.03 361.77 440 365.23 440 C 365.71 440 366.28 439.97 366.93 439.91 C 367.59 439.85 368.22 439.71 368.83 439.51 L 368.83 443.42 C 367.16 443.79 365.57 443.97 364.07 443.97  M 385.8 440.18 C 388.77 440.18 390.94 439.14 392.3 437.07 C 393.66 434.99 394.34 431.68 394.34 427.12 C 394.34 422.56 393.65 419.24 392.27 417.17 C 390.89 415.09 388.73 414.05 385.8 414.05 C 382.82 414.05 380.66 415.09 379.3 417.17 C 377.93 419.24 377.25 422.56 377.25 427.12 C 377.25 431.68 377.93 434.99 379.3 437.07 C 380.66 439.14 382.82 440.18 385.8 440.18 M 385.8 444.15 C 381.36 444.15 378 442.71 375.72 439.82 C 373.45 436.93 372.3 432.7 372.3 427.12 C 372.3 421.54 373.46 417.3 375.75 414.39 C 378.05 411.48 381.4 410.02 385.8 410.02 C 390.2 410.02 393.53 411.48 395.81 414.39 C 398.09 417.3 399.23 421.54 399.23 427.12 C 399.23 432.7 398.09 436.93 395.81 439.82 C 393.53 442.71 390.2 444.15 385.8 444.15  M 405.88 410.63 L 409.79 410.63 L 410.16 414.3 L 410.4 414.3 C 412.6 412.83 414.56 411.75 416.29 411.06 C 418.02 410.37 419.68 410.02 421.27 410.02 C 424.93 410.02 427.23 411.47 428.17 414.36 L 428.47 414.36 C 430.67 412.81 432.64 411.7 434.39 411.03 C 436.14 410.36 437.84 410.02 439.46 410.02 C 442.07 410.02 443.98 410.71 445.2 412.1 C 446.42 413.48 447.04 415.72 447.04 418.81 L 447.04 443.6 L 442.27 443.6 L 442.27 420.16 C 442.27 418.08 441.91 416.59 441.17 415.67 C 440.44 414.75 439.3 414.3 437.75 414.3 C 436.45 414.3 435.06 414.58 433.57 415.15 C 432.09 415.72 430.51 416.54 428.84 417.59 L 428.84 443.6 L 424.08 443.6 L 424.08 420.16 C 424.08 418.08 423.71 416.59 422.98 415.67 C 422.25 414.75 421.11 414.3 419.56 414.3 C 418.26 414.3 416.85 414.59 415.35 415.18 C 413.84 415.77 412.25 416.6 410.59 417.66 L 410.59 443.6 L 405.88 443.6 Z M 405.88 410.63  M 466.93 440.18 C 469.91 440.18 472.07 439.14 473.44 437.07 C 474.8 434.99 475.48 431.68 475.48 427.12 C 475.48 422.56 474.79 419.24 473.41 417.17 C 472.02 415.09 469.87 414.05 466.93 414.05 C 463.96 414.05 461.8 415.09 460.43 417.17 C 459.07 419.24 458.39 422.56 458.39 427.12 C 458.39 431.68 459.07 434.99 460.43 437.07 C 461.8 439.14 463.96 440.18 466.93 440.18 M 466.93 444.15 C 462.5 444.15 459.14 442.71 456.86 439.82 C 454.58 436.93 453.44 432.7 453.44 427.12 C 453.44 421.54 454.59 417.3 456.89 414.39 C 459.19 411.48 462.54 410.02 466.93 410.02 C 471.33 410.02 474.67 411.48 476.95 414.39 C 479.23 417.3 480.37 421.54 480.37 427.12 C 480.37 432.7 479.23 436.93 476.95 439.82 C 474.67 442.71 471.33 444.15 466.93 444.15  M 498.2 443.97 C 492.33 443.97 489.4 440.98 489.4 434.99 L 489.4 414.91 L 483.24 414.91 L 483.24 410.63 L 489.65 410.63 L 490.32 402.39 L 494.16 401.78 L 494.16 410.63 L 502.96 410.63 L 502.96 414.91 L 494.16 414.91 L 494.16 434.08 C 494.16 438.03 495.89 440 499.36 440 C 499.84 440 500.41 439.97 501.06 439.91 C 501.71 439.85 502.35 439.71 502.96 439.51 L 502.96 443.42 C 501.29 443.79 499.7 443.97 498.2 443.97  M 508.09 410.63 L 512.85 410.63 L 512.85 443.6 L 508.09 443.6 Z M 510.46 403.43 C 508.43 403.43 507.41 402.41 507.41 400.38 C 507.41 398.38 508.43 397.39 510.46 397.39 C 512.54 397.39 513.58 398.38 513.58 400.38 C 513.58 402.41 512.54 403.43 510.46 403.43  M 517.85 411.06 L 517.85 410.63 L 522.86 410.63 L 530.79 435.48 L 531.83 439.33 L 532.32 439.33 L 533.36 435.48 L 541.36 410.63 L 546.24 410.63 L 546.24 411.06 L 535.13 443.6 L 528.96 443.6 Z M 517.85 411.06 "/></svg></div><hr class="gt-rule">
-   <div class="gt-k">CEO Ofis · İş Geliştirme ve Strateji</div>
-   <h1>Performans Yönetim Platformu</h1><div class="gt-s">Servis · Ek Satış <span class="gt-soon">Satış · yakında</span></div>
+   <h1>Performans Yönetim Platformu</h1><div class="gt-s">Servis <span class="gt-soon"><i class="gt-dot" aria-hidden="true"></i>Satış · yakında</span></div>
    <div class="gt-pane" id="gtpGiris">
     <label for="gtm">Kurumsal e-posta</label><div class="gt-in"><i>✉</i><input id="gtm" type="email" autocomplete="username" placeholder="ad.soyad@inciroglu.com.tr"></div>
     <label for="gtp2">Şifre</label><div class="gt-in"><i>🔒</i><input id="gtp2" type="password" autocomplete="current-password" placeholder="Şifreniz"></div>
     <button class="gt-btn" type="button" id="gtb">Giriş yap</button>
     <button class="gt-link" type="button" id="gtYeniAl">İlk giriş ya da şifremi unuttum · <b>Yeni şifre al</b></button>
+    <div class="gt-note">Bu platform yalnızca yetkili İnciroğlu çalışanları içindir.</div>
    </div>
    <div class="gt-pane" id="gtpIstek" hidden>
     <div class="gt-h2">Yeni şifre al</div>
@@ -616,10 +643,9 @@ nav .sec2{padding-top:26px}nav .soonm{display:flex;align-items:center;justify-co
     <button class="gt-btn" type="button" id="gtYeniB">Kaydet ve gir</button>
    </div>
    <div class="gt-err" id="gte" role="alert"></div><div class="gt-ok" id="gtok" role="status"></div>
-   <div class="gt-note">Giriş bilgileri kişiye özeldir; paylaşmayın.</div>
    <div class="gt-nojs" id="gtnj">Sayfa bu pencerede çalışmıyor. Dosyayı Chrome veya Edge ile açın: indirdiğiniz dosyaya çift tıklayın ya da sağ tık → Birlikte aç → Chrome.</div>
   </form>
-  <div class="gt-foot">© 2026 İnciroğlu Otomotiv</div>
+  <div class="gt-foot"><span class="gt-imza">CEO Ofis · İş Geliştirme ve Strateji</span><span>© 2026 İnciroğlu Otomotiv</span></div>
  </div>
 </section>
 <section id="gw" hidden aria-label="Hoş geldiniz">
@@ -635,7 +661,7 @@ nav .sec2{padding-top:26px}nav .soonm{display:flex;align-items:center;justify-co
   <div id="menuS"></div>
   <div class="sec sec2">Satış Performans Yönetimi</div>
   <div class="soonm" title="Satış modülü hazırlanıyor"><span>Satış Performansı</span><em>Yakında</em></div>
-  <div class="foot"><div id="menuF"></div><div id="kul"></div>Kaynak veri kesimi<b id="kesim"></b></div>
+  <div class="foot"><div id="menuF"></div><div id="kul"></div>Kaynak veri kesimi<b id="kesim"></b><span class="sbo">CEO Ofis · İş Geliştirme ve Strateji</span></div>
 </nav>
 <div>
   <div class="top"><div class="in">
@@ -654,6 +680,7 @@ nav .sec2{padding-top:26px}nav .soonm{display:flex;align-items:center;justify-co
 </div>
 <div class="toast" id="toast" role="status"></div>
 <div id="tip" hidden></div>
+<div class="pfoot" aria-hidden="true">© <span id="pfy"></span> İnciroğlu Otomotiv <i></i> CEO Ofis · İş Geliştirme ve Strateji</div>
 <script>window.PANEL={api:"__API__"};</script>
 <script type="application/json" id="pdata">__DATA__</script>
 <script type="text/x-panel" id="appjs">
@@ -664,9 +691,11 @@ const CUT=D.ust.kesim_ay, YEAR=D.ust.kesim_yil, KON='Servis Konsolide Rapor', CU
 const ORDER=['Peugeot','Citroen','Opel','Fiat','Arj','Honda','Bmw','Motorrad','Tesla','Jaecoo'];
 const NAME={Peugeot:'Peugeot',Citroen:'Citroën',Opel:'Opel',Fiat:'Fiat',Arj:'Alfa Romeo & Jeep',Honda:'Honda',Bmw:'BMW & MINI',Motorrad:'BMW Motorrad',Tesla:'Tesla',Jaecoo:'Omoda & Jaecoo'};
 const GK='Garanti araç';
+const GVERI=['Bmw','Motorrad','Tesla'];   // bu markaların garanti araç girişi servis verisinden gelir (manuel giriş yok)
 function garKur(){const z=()=>({butce:0,fiili:0,g2025:0}), G=D.garm||{}, ks=Object.keys(D.markalar);
-  for(const b of ks){if(b===KON)continue;for(const a of Object.keys(D.markalar[b].aylar)){const m=(G[b]||{})[a]||{};
-    D.markalar[b].aylar[a].kategoriler[GK]={adet:{fiili:m.fiili||0,butce:m.butce||0,g2025:m.g2025||0},iscilik:z(),yp:z(),toplam:z()};}}
+  for(const b of ks){if(b===KON)continue;for(const a of Object.keys(D.markalar[b].aylar)){const m=(G[b]||{})[a]||{}, v=((D.markalar[b].aylar[a].kategoriler||{}).Garanti||{}).adet||{};
+    // fiili yalnız manuel girişten; bütçe ve 2025 fiili servis verisinden (manuel girilmişse o geçerli)
+    D.markalar[b].aylar[a].kategoriler[GK]={adet:{fiili:GVERI.includes(b)?(v.fiili||0):(m.fiili||0),butce:m.butce!=null?m.butce:(v.butce||0),g2025:m.g2025!=null?m.g2025:(v.g2025||0)},iscilik:z(),yp:z(),toplam:z()};}}
   if(D.markalar[KON])for(const a of Object.keys(D.markalar[KON].aylar)){const t={adet:z(),iscilik:z(),yp:z(),toplam:z()};
     for(const b of ks){if(b===KON)continue;const c=((D.markalar[b].aylar[a]||{}).kategoriler||{})[GK];if(c)for(const f of ['fiili','butce','g2025'])t.adet[f]+=c.adet[f];}
     D.markalar[KON].aylar[a].kategoriler[GK]=t;}}
@@ -795,7 +824,7 @@ function head(kick,title,sub){
     hw(y)+line+'</div>';
 }
 function notes(extra=''){const ms=PMS(),n=[];
-  if(ms.includes(CUT))n.push(MONTHS[CUT-1]+' devam ediyor: fiili '+esc(D.ust.veri_kesim)+' kesimine kadar; bütçe ayın tamamı, 2025 fiilisi geçen iş günü oranıyla ('+gun(CUT).gecen+'/'+gun(CUT).donem+') kıyaslanır.');
+  if(ms.includes(CUT))n.push(MONTHS[CUT-1]+' devam ediyor: fiili '+esc(D.ust.veri_kesim)+' kesimine kadar; bütçe ayın tamamıdır; 2025 fiilisi ise bugüne kadar geçen iş günü oranında ('+gun(CUT).gecen+'/'+gun(CUT).donem+') alınır, yani 2025 '+MONTHS[CUT-1]+' tutarının '+gun(CUT).gecen+'/'+gun(CUT).donem+'\'u ile kıyaslanır. Araç başı (AB) gibi oranlarda bu düzeltme gerekmez; AB\'de 2025 ve bütçe ayın tamamının AB\'sidir.');
   const pl=ms.filter(m=>m>CUT);if(pl.length&&ACT(ms).length)n.push('Plan ayları ('+pl.map(m=>MONTHS[m-1].slice(0,3)).join(', ')+') kıyasa girmez.');
   if(extra)n.push(extra);
   n.push('Marka adının üzerine gelince aylık seyir görünür; satıra tıklayınca 12 aylık detay açılır.');
@@ -905,12 +934,12 @@ function markaTablo(bs,tip,id,fixKat){
   const title=tip==='ab'?'Marka karşılaştırması · '+abKat+' araç başı (AB)':'Marka karşılaştırması · '+(kat||'Toplam (tüm kırılımlar)');
   const sub=tip==='ab'?abKat+' cirosu ÷ '+abKat.toLowerCase()+' iş emri adedi'+(kat?'':' · Toplam seçiliyken Mekanik AB')
     :(kat?kat+' kırılımı':'İş emri adedi ve cirolar tüm kırılımların toplamı · araç girişi (mekanik) için Kırılım: Mekanik')+(NA?' · bu kırılımda iş emri adedi yok':'');
-  const note=(pm.includes(CUT)||ym.includes(CUT))?' · bütçe ay tamamı, 2025 fiili geçen iş günü oranında ('+gun(CUT).gecen+'/'+gun(CUT).donem+')':'';
+  const note=(pm.includes(CUT)||ym.includes(CUT))?(tip==='ab'?' · AB oran olduğu için bütçe ve 2025 ayın tamamının AB\'si ile kıyaslanır':' · bütçe ay tamamı, 2025 fiili geçen iş günü oranında ('+gun(CUT).gecen+'/'+gun(CUT).donem+')'):'';
   if(!rows0.length)return box(title,sub,'<div class="empty">Bu kırılımda seçili markalar için veri yok.</div>',kSel);
   return box2('dense krt mtb'+(tip==='ab'?' krab':''),title,sub+note,tbl(hd,body).replace(/min-width:\d+px/,'min-width:'+(tip==='ab'?1000:G.length*262+130)+'px'),kSel+sSel);
 }
 /* günlük araç girişi: mekanik · hasar · garanti (garanti araç girişi manuel dosyadan) */
-const garVar=(bs,ms)=>!!D.garm&&bs.some(b=>(b===KON?BR:[b]).some(x=>ms.some(m=>D.garm[x]&&D.garm[x][ayk(m)]&&D.garm[x][ayk(m)].fiili!=null)));
+const garVar=(bs,ms)=>bs.some(b=>(b===KON?BR:[b]).some(x=>GVERI.includes(x)||ms.some(m=>D.garm&&D.garm[x]&&D.garm[x][ayk(m)]&&D.garm[x][ayk(m)].fiili!=null)));
 function gunlukTablo(bs,id,kats){
   kats=kats||['Mekanik','Kaporta Boya',GK];
   const KL={'Mekanik':'Mekanik araç girişi','Kaporta Boya':'Hasar · kaporta-boya iş emri',[GK]:'Garanti araç girişi · manuel'};
@@ -919,7 +948,7 @@ function gunlukTablo(bs,id,kats){
   if(!rows0.length)return '';
   const srt=st.sort[id]||'';
   const hd='<tr class="per"><th class="kd"></th><th></th>'+kats.map(k=>'<th colspan="5" class="cur sep">'+KL[k]+'</th>').join('')+'</tr>'+
-    '<tr><th class="kd"></th><th class="kn">Marka</th>'+kats.map(()=>'<th class="sep">Toplam</th><th>Günlük bütçe</th><th>Günlük fiili</th><th>Gerç. %</th><th>Δ % 2025</th>').join('')+'</tr>';
+    '<tr><th class="kd"></th><th class="kn">Marka</th>'+kats.map(()=>'<th class="sep">Toplam</th><th title="Günlük bütçe">Bütçe/gün</th><th title="Günlük fiili">Fiili/gün</th><th>Gerç.</th><th title="2025 aynı döneme göre değişim">Δ \'25</th>').join('')+'</tr>';
   const cells=(b,ms,k,plan)=>{const x=val(b,ms,'gunAdet',k).x, t=val(b,ms,'adet',k).x;
     if(k===GK&&!plan&&!garVar(b,ms))return '<td class="sep na">–</td><td class="na">–</td><td class="na">–</td><td class="na">–</td><td class="na">–</td>';
     if(plan)return '<td class="sep">–</td>'+td(x.butce,'ad1')+'<td>–</td><td>–</td><td>–</td>';
@@ -936,8 +965,8 @@ function gunlukTablo(bs,id,kats){
   const body=AYAY()?pm.map(m=>blk([m],MONTHS[m-1]+(m===CUT?' · devam':''))).join('')+blk(pm,'Seçim toplamı'):blk(pm,esc(monthLabel(pm)))+(same?'':blk(ym,'YTD'));
   const sSel='<label class="srt">Sıralama <select data-sort="'+id+'">'+[['','Sabit marka sırası'],['fiili','En yüksek günlük '+(kats[0]==='Mekanik'?'mekanik':'iş emri')],['pct','En yüksek gerçekleşme %'],['delta','En yüksek Δ %']].map(([v,t])=>'<option value="'+v+'"'+(srt===v?' selected':'')+'>'+t+'</option>').join('')+'</select></label>';
   const note=(pm.includes(CUT)||ym.includes(CUT))?' · '+MONTHS[CUT-1]+': fiili ÷ geçen iş günü, bütçe ÷ ayın iş günü':'';
-  const gn=kats.includes(GK)?' · garanti araç girişi garanti_arac_girisi.xlsx dosyasından'+(D.garm?'':' (henüz girilmedi)'):'';
-  return box2('dense krt mtb gnt','Günlük araç girişi','adet ÷ iş günü'+note+gn,tbl(hd,body).replace(/min-width:\d+px/,'min-width:'+(kats.length*318+150)+'px'),sSel);
+  const gn=kats.includes(GK)?' · garanti: fiili manuel giriş (BMW & MINI, Motorrad ve Tesla servis verisinden), bütçe ve 2025 servis verisinden':'';
+  return box2('dense krt mtb gnt','Günlük araç girişi','adet ÷ iş günü'+note+gn,tbl(hd,body).replace(/min-width:\d+px/,'min-width:'+(kats.length*250+150)+'px;width:100%'),sSel);
 }
 /* çok ay seçiliyse: marka × ay ısı haritası (bütçe gerçekleşmesi); tek marka seçiliyse kırılım × ay */
 const HMK=[['toplam','Toplam ciro (işçilik + YP)'],['iscilik','İşçilik cirosu'],['yp','Yedek parça cirosu'],['adet','Araç girişi (mekanik)']];
@@ -1175,23 +1204,24 @@ function pHomer(){
 /* ---------- Garanti araç girişi (panelden kaydet → Google E-Tablo) ---------- */
 const GAL=[['fiili','Fiili '+YEAR],['butce','Bütçe '+YEAR],['g2025','Fiili '+(YEAR-1)]];
 let GED={};   // kaydedilmemiş değişiklikler: 'kod|AY|alan' → metin
-const garIzin=()=>KUL&&KUL.markalar&&KUL.markalar.length?BR.filter(b=>KUL.markalar.includes(b)):BR;
+const garIzin=()=>(KUL&&KUL.markalar&&KUL.markalar.length?BR.filter(b=>KUL.markalar.includes(b)):BR).filter(b=>!GVERI.includes(b));
 const garDeg=(b,a,f)=>{const c=((D.garm||{})[b]||{})[a]||{};return c[f];};
+const garVeri=(b,a,f)=>{const v=(((D.markalar[b]||{}).aylar||{})[a]||{}).kategoriler;const x=v&&v.Garanti&&v.Garanti.adet;return x&&f!=='fiili'?x[f]:undefined;};
 function pGar(){
   const al=st.garAl||'fiili', bs=garIzin(), n=Object.keys(GED).length;
   const seg='<div class="seg" id="garal">'+GAL.map(([k,t])=>'<button type="button" data-k="'+k+'" class="'+(k===al?'on':'')+'">'+t+'</button>').join('')+'</div>';
   const hd='<tr><th class="kn">Marka</th>'+MONTHS.map((m,i)=>'<th>'+m.slice(0,3)+'</th>').join('')+'<th class="sep">Toplam</th></tr>';
-  const rows=bs.map(b=>{let t=0,any=0;const tds=D.aylar.map((A,i)=>{const k=b+'|'+A+'|'+al, ed=k in GED, v=ed?GED[k]:garDeg(b,A,al);
-      if(v!==undefined&&v!==null&&v!==''){t+=+v||0;any=1;}
+  const rows=bs.map(b=>{let t=0,any=0;const tds=D.aylar.map((A,i)=>{const k=b+'|'+A+'|'+al, ed=k in GED, v=ed?GED[k]:garDeg(b,A,al), dv=garVeri(b,A,al);
+      if(v!==undefined&&v!==null&&v!==''){t+=+v||0;any=1;}else if(dv){t+=dv;any=1;}
       const kapali=al==='fiili'&&i+1>CUT;
-      return '<td class="gin'+(ed?' chg':'')+'"><input inputmode="numeric" data-gk="'+k+'" value="'+(v===undefined||v===null?'':esc(String(v)))+'"'+(kapali?' disabled title="Gelecek ay"':'')+' aria-label="'+esc(lab(b))+' '+MONTHS[i]+'"></td>';}).join('');
+      return '<td class="gin'+(ed?' chg':'')+'"><input inputmode="numeric" data-gk="'+k+'" value="'+(v===undefined||v===null?'':esc(String(v)))+'"'+(dv!=null?' placeholder="'+FM.ad(dv)+'"':'')+(kapali?' disabled title="Gelecek ay"':'')+' aria-label="'+esc(lab(b))+' '+MONTHS[i]+'"></td>';}).join('');
     return '<tr><td class="kn"><b>'+esc(lab(b))+'</b></td>'+tds+'<td class="sep"><b>'+(any?FM.ad(t):'–')+'</b></td></tr>';}).join('');
   const bar='<div class="garbar">'+seg+'<span class="garn" id="garn">'+(n?n+' hücre değişti · kaydedilmedi':'Değişiklik yok')+'</span>'+
     '<button type="button" class="gbtn ghost" id="garvaz"'+(n?'':' disabled')+'>Vazgeç</button><button type="button" class="gbtn" id="garkay"'+(n?'':' disabled')+'>Kaydet</button></div>';
   return head('Servis Performans Yönetimi','Garanti araç girişi','Orijinal garanti araç girişleri · manuel giriş · '+YEAR)+
-    box2('garg','Marka × ay · '+GAL.find(x=>x[0]===al)[1],'Hücreye adet yazın; Excel\'den kopyalayıp yapıştırabilirsiniz. Kaydet\'e basınca herkes için güncellenir.'+(KUL&&KUL.markalar&&KUL.markalar.length?' · yetkiniz: '+bs.map(lab).join(', '):''),
+    box2('garg','Marka × ay · '+GAL.find(x=>x[0]===al)[1],(al==='fiili'?'Hücreye adet yazın; Excel\'den kopyalayıp yapıştırabilirsiniz. Kaydet\'e basınca herkes için güncellenir.':'Gri rakamlar servis verisinden gelir (garanti iş emri '+(al==='butce'?'bütçesi':'fiili')+'); yalnız farklı olması gereken aylara yazın, yazılan değer veriden önce gelir.')+(KUL&&KUL.markalar&&KUL.markalar.length?' · yetkiniz: '+bs.map(lab).join(', '):''),
       bar+tbl(hd,rows).replace(/min-width:\d+px/,'min-width:980px'))+
-    '<p class="note">Boş bırakılan ay panelde "–" görünür. Kayıtlar Google E-Tablo\'da tutulur; kimin neyi ne zaman girdiği kayıt altındadır. Excel dosyası (garanti_arac_girisi.xlsx) varsa, panelden girilen ay onun yerine geçer.</p>';
+    '<p class="note">Boş bırakılan ay panelde "–" görünür. Kayıtlar Google E-Tablo\'da tutulur; kimin neyi ne zaman girdiği kayıt altındadır. Excel dosyası (garanti_arac_girisi.xlsx) varsa, panelden girilen ay onun yerine geçer. BMW & MINI, BMW Motorrad ve Tesla listede yok: garanti araç girişleri servis verisinden gelir.</p>';
 }
 function garSay(){const n=Object.keys(GED).length,e=$('garn');if(!e)return;e.textContent=n?n+' hücre değişti · kaydedilmedi':'Değişiklik yok';$('garkay').disabled=$('garvaz').disabled=!n;}
 function garGir(inp,v){const k=inp.dataset.gk,[b,A,f]=k.split('|'),c=garDeg(b,A,f),t=String(v).replace(/[.\s]/g,'').replace(',','.').trim();
@@ -1208,7 +1238,212 @@ async function garKaydet(){
     garUygula(o.garm);GED={};render();toast(o.kaydedilen+' ay/marka kaydedildi · herkes için güncel');}
   catch(e){btn.disabled=false;btn.textContent='Kaydet';toast('Kaydedilemedi: '+e.message);}
 }
-window.addEventListener('beforeunload',e=>{if(Object.keys(GED).length){e.preventDefault();e.returnValue='';}});
+window.addEventListener('beforeunload',e=>{if(Object.keys(GED).length||!vBos('kt')||!vBos('sd')||!vBos('aie')||!vBos('yps')){e.preventDefault();e.returnValue='';}});
+/* ---------- haftalık girişler: ortak yardımcılar (kapanış tahmini 'kt', stok devir 'sd') ---------- */
+let VED={kt:{},sd:{},aie:{},yps:{}};   // kaydedilmemiş: alan → 'kod|AY|anahtar' → metin
+const vV=(al,b,A,k)=>{const c=D[al]&&D[al][b]&&D[al][b][A]&&D[al][b][A][k];return c?c.v:undefined;};
+const vZ=(al,b,A)=>{const c=(D[al]&&D[al][b]&&D[al][b][A])||{};let z='';for(const k in c)if(c[k].z>z)z=c[k].z;return z;};
+const vIzin=(al,b)=>KUL&&(al==='sd'||al==='yps'?KUL.yp:KUL.rol!=='izleyici')&&(!KUL.markalar||!KUL.markalar.length||KUL.markalar.includes(b));
+const vBos=al=>!Object.keys(VED[al]).length;
+const tazelik=z=>{if(!z)return '';const g=Math.floor((Date.now()-new Date(z))/864e5),t=new Date(z).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit'});
+  return '<small class="tz '+(g>14?'r':g>7?'a':'')+'" title="Son güncelleme '+new Date(z).toLocaleString('tr-TR')+'">'+t+'</small>';};
+function vGir(inp){const al=inp.dataset.al,k=inp.dataset.vk,[b,A,an]=k.split('|'),c=vV(al,b,A,an),t=String(inp.value).replace(/[₺\s.]/g,'').replace(',','.').trim();
+  inp.value=t;const same=(t===''&&c==null)||(t!==''&&Math.round(+t)===c);if(same)delete VED[al][k];else VED[al][k]=t;inp.parentNode.classList.toggle('chg',!same);
+  const n=Object.keys(VED[al]).length,e=$(al+'n');if(e){e.textContent=n?n+' hücre değişti · kaydedilmedi':'Değişiklik yok';$(al+'kay').disabled=!n;}}
+async function vKaydet(al){
+  const bad=Object.entries(VED[al]).find(([k,v])=>v!==''&&!(isFinite(+v)&&+v>=0));if(bad){toast('Geçersiz değer: '+bad[1]);return;}
+  const satirlar=Object.entries(VED[al]).map(([k,v])=>{const [kod,ay,anahtar]=k.split('|');return {kod,ay,anahtar,deger:v===''?'':Math.round(+v)};});
+  const btn=$(al+'kay');btn.disabled=true;btn.textContent='Kaydediliyor…';
+  try{const o=await window.PANEL_API('veriKaydet',{alan:al,yil:al==='aie'?(D.aieYil||YEAR):YEAR,satirlar});if(!o||!o.ok)throw new Error(o&&o.hata||'Kaydedilemedi');
+    D[al]=o.veri;VED[al]={};st[al+'Edit']=false;render();toast(o.kaydedilen+' değer kaydedildi · herkes için güncel');}
+  catch(e){btn.disabled=false;btn.textContent='Kaydet';toast('Kaydedilemedi: '+e.message);}
+}
+const vBar=(al,izinli,metin)=>{if(!izinli)return '';const ed=st[al+'Edit'],n=Object.keys(VED[al]).length;
+  return '<div class="garbar">'+(ed?'<span class="garn" id="'+al+'n">'+(n?n+' hücre değişti · kaydedilmedi':'Değerleri yazın ya da Excel\'den yapıştırın')+'</span><button type="button" class="gbtn ghost" data-vvaz="'+al+'">Vazgeç</button><button type="button" class="gbtn" id="'+al+'kay" data-vkay="'+al+'"'+(n?'':' disabled')+'>Kaydet</button>'
+    :'<span class="garn">'+metin+'</span><button type="button" class="gbtn" data-vduz="'+al+'">Değerleri güncelle</button>')+'</div>';};
+const vInp=(al,b,A,an,r,c,ph)=>{const k=b+'|'+A+'|'+an,e=k in VED[al],v=e?VED[al][k]:vV(al,b,A,an);
+  return '<td class="gin'+(e?' chg':'')+'"><input inputmode="numeric" data-al="'+al+'" data-vk="'+k+'" data-r="'+r+'" data-c="'+c+'" value="'+(v==null?'':esc(String(v)))+'"'+(ph!=null?' placeholder="'+esc(String(ph))+'"':'')+'></td>';};
+const ayKapali=m=>m<CUT;
+
+/* ---------- Kapanış Tahmini · markalar haftalık girer; bütçe ve fiili servis verisinden ---------- */
+const KIR=[['mek','Mekanik','Mekanik'],['banko','Banko','Banko'],['gar','Garanti','Garanti'],['hasar','Hasar','Kaporta Boya']];
+const KTM=[['top','Toplam ciro'],['isc','İşçilik'],['yp','Yedek parça'],['adet','Araç girişi']];
+const KMET={isc:'iscilik',yp:'yp',adet:'adet'};
+function ktHucre(b,m,kir,met){   // {butce,fiili,tahmin}
+  const A=ayk(m),cat=KIR.find(x=>x[0]===kir)[2],c=(((D.markalar[b]||{}).aylar||{})[A]||{}).kategoriler||{};
+  if(met==='top'){const i=ktHucre(b,m,kir,'isc'),y=ktHucre(b,m,kir,'yp');return {butce:i.butce+y.butce,fiili:i.fiili+y.fiili,tahmin:i.tahmin==null&&y.tahmin==null?null:(i.tahmin||0)+(y.tahmin||0)};}
+  const x=(c[cat]||{})[KMET[met]]||{};const t=vV('kt',b,A,kir+'.'+met);return {butce:x.butce||0,fiili:x.fiili||0,tahmin:t==null?null:t};}
+function ktTop(bs,m,met,kirs){const o={butce:0,fiili:0,tahmin:null,tbb:0,tf:0,n:0,N:0};
+  for(const b of bs){let var_=0,has=0;for(const k of kirs){const h=ktHucre(b,m,k,met);o.butce+=h.butce;o.fiili+=h.fiili;if(h.butce||h.fiili)has=1;if(h.tahmin!=null){o.tahmin=(o.tahmin||0)+h.tahmin;var_=1;}}
+    if(has)o.N++;if(var_){o.n++;for(const k of kirs){const h=ktHucre(b,m,k,met);o.tbb+=h.butce;o.tf+=h.fiili;}}}return o;}   // T/B ve isabet yalnız tahmin giren markalar üzerinden
+function pKT(){
+  if(!D.kt)return head('Servis Performans Yönetimi','Kapanış Tahmini','Haftalık kapanış tahminleri')+'<div class="empty">Kapanış tahmini verisi yüklenemedi. Sayfayı yenileyin; sorun sürerse yöneticiye bildirin.</div>';
+  const m=+st.sort.ktAy&&+st.sort.ktAy<=CUT?+st.sort.ktAy:CUT, A=ayk(m), met=st.ktM||'top', adet=met==='adet', cur=m===CUT, G=gun(m);
+  const ed=!!st.ktEdit&&met!=='top'&&KUL&&KUL.rol!=='izleyici';
+  const f=v=>v==null?'–':adet?FM.ad(v):FM.m2(v), kirs=KIR.map(k=>k[0]);
+  const bs=BR.filter(b=>kirs.some(k=>{const h=ktHucre(b,m,k,met);return h.butce||h.fiili||h.tahmin!=null;}));
+  const run=x=>cur&&G.gecen?x.fiili/G.gecen*G.donem:null;
+  const flag=(t,x)=>{if(x.N>1&&x.n<x.N)return '';const g=run(x);if(t==null||!g)return '';const d=t/g-1;return Math.abs(d)>.15?(d>0?' kt-up" title="Tahmin, bugünkü gidişatın %'+nf.format(d*100)+' üzerinde (iyimser)':' kt-dn" title="Tahmin, bugünkü gidişatın %'+nf.format(-d*100)+' altında (temkinli)'):'';};
+  const grp=(x,b,kir,ri,ci,top)=>{let t='';
+    if(ed&&!top&&b&&vIzin('kt',b))t=vInp('kt',b,A,kir+'.'+met,ri,ci);
+    else t='<td class="ktt'+flag(x.tahmin,x)+'"'+(x.tahmin!=null?' data-v="'+x.tahmin+'" data-f="'+(adet?'ad':'mn')+'"':'')+'><b>'+f(x.tahmin)+'</b>'+(x.N>1&&x.n>0&&x.n<x.N?'<small class="ktn" title="Tahmin giren marka sayısı">'+x.n+'/'+x.N+' marka</small>':'')+'</td>';
+    const bb=x.N>1?x.tbb:x.butce, ff=x.N>1?x.tf:x.fiili, tb=x.tahmin!=null&&bb?x.tahmin/bb:null;
+    let ek='';if(top){if(cur){const g=run(x);ek='<td class="ktg">'+f(g)+'</td>';}else{const is=x.tahmin!=null&&ff?1-Math.abs(x.tahmin-ff)/ff:null;ek='<td>'+(is==null?'–':'%'+nf1.format(Math.max(0,is)*100))+'</td>';}}
+    return td(x.butce,adet?'ax':'m2','sep')+td(x.fiili,adet?'ax':'m2')+t+td(tb,'p')+ek;};
+  const H=top=>'<th class="sep">Bütçe</th><th>Fiili</th><th>Tahmin</th><th title="Tahmin ÷ bütçe">T/B</th>'+(top?(cur?'<th title="Bugünkü gidişat: fiili ÷ geçen iş günü × ayın iş günü">Gidişat</th>':'<th title="Son tahminin gerçekleşene yakınlığı">İsabet</th>'):'');
+  const hd='<tr class="per"><th></th><th colspan="5" class="cur sep">Toplam</th>'+KIR.map(k=>'<th colspan="4" class="cur sep">'+k[1]+'</th>').join('')+'</tr><tr><th class="kn">Marka</th>'+H(1)+KIR.map(()=>H(0)).join('')+'</tr>';
+  const row=(b,ri)=>'<tr><td class="kn"><b>'+esc(lab(b))+'</b>'+(cur?tazelik(vZ('kt',b,A)):'')+'</td>'+grp(ktTop([b],m,met,kirs),b,'',ri,-1,1)+KIR.map((k,ci)=>grp(ktHucre(b,m,k[0],met),b,k[0],ri,ci,0)).join('')+'</tr>';
+  const tot='<tr class="main tot"><td class="kn"><b>Toplam</b></td>'+grp(ktTop(bs,m,met,kirs),'','',0,0,1)+KIR.map(k=>grp(ktTop(bs,m,met,[k[0]]),'','',0,0,0)).join('')+'</tr>';
+  const segM='<div class="seg" id="ktm">'+KTM.map(([k,t])=>'<button type="button" data-k="'+k+'" class="'+(k===met?'on':'')+'">'+t+'</button>').join('')+'</div>';
+  const ayS='<label class="srt">Ay <select data-sort="ktAy">'+Array.from({length:CUT},(_,i)=>i+1).map(x=>'<option value="'+x+'"'+(x===m?' selected':'')+'>'+MONTHS[x-1]+(x===CUT?' · devam':'')+'</option>').join('')+'</select></label>';
+  const izin=KUL&&KUL.rol!=='izleyici';
+  const bar=izin?(met==='top'&&!st.ktEdit?'<div class="garbar"><span class="garn">Tahmin girmek için İşçilik, Yedek parça ya da Araç girişi sekmesini seçin.</span></div>':vBar('kt',true,(KUL.markalar&&KUL.markalar.length?'Giriş yetkiniz: '+KUL.markalar.map(lab).join(', '):'Tüm markalar için giriş yetkiniz var')+' · '+KTM.find(x=>x[0]===met)[1]+' tahmini')):'';
+  const nt=cur?'Gidişat = fiili ÷ geçen iş günü ('+G.gecen+') × ayın iş günü ('+G.donem+'). Tahmin gidişattan %15\'ten fazla saparsa turuncu (iyimser) ya da mavi (temkinli) işaretlenir. Marka adının yanındaki tarih son güncellemedir: 7 günü geçince sarı, 14 günü geçince kırmızı.':'Kapanmış ay: İsabet = 1 − |son tahmin − gerçekleşen| ÷ gerçekleşen.';
+  return head('Servis Performans Yönetimi','Kapanış Tahmini',MONTHS[m-1]+' '+YEAR+(cur?' · ay devam ediyor':' · kapandı')+' · markalar her hafta günceller')+
+    '<div class="ktbar">'+segM+ayS+'</div>'+
+    box2('dense garg ktt-box',KTM.find(x=>x[0]===met)[1]+' · bütçe, fiili ve kapanış tahmini',(adet?'Adet':'Mn ₺')+' · bütçe ve fiili servis verisinden, tahmin markalardan'+(ed?' · tahminleri ₺ olarak tam sayı girin':''),bar+tbl(hd,bs.map(row).join(''),tot).replace(/min-width:\d+px/,'min-width:'+(ed?1480:1120)+'px;width:100%'))+
+    '<p class="note">'+nt+'</p>';
+}
+/* ---------- Stok devir hızı · satılacak YP maliyeti = YP satışı × marka oranı; ortalama stok = (dönem başı + dönem sonu) ÷ 2 ---------- */
+const YPORAN={Bmw:.75,Honda:.9,Jaecoo:.6}, ypOran=b=>YPORAN[b]!=null?YPORAN[b]:.7;
+function sdSatis(b,m){const ks=KIR.map(k=>k[0]);
+  if(m===CUT){let t=null;for(const k of ks){const h=ktHucre(b,m,k,'yp');if(h.tahmin!=null)t=(t||0)+h.tahmin;}
+    if(t!=null)return {v:t,src:'tahmin'};const G=gun(m),f=ks.reduce((a,k)=>a+ktHucre(b,m,k,'yp').fiili,0);return {v:G.gecen?f/G.gecen*G.donem:null,src:'gidişat'};}
+  return {v:ks.reduce((a,k)=>a+ktHucre(b,m,k,'yp').fiili,0),src:'fiili'};}
+function sdHesap(b,m){const A=ayk(m),s=sdSatis(b,m),mal=s.v==null?null:s.v*ypOran(b);
+  let bas=vV('sd',b,A,'bas'),oto=false;   // dönem başı: manuel › önceki ay kapanışı › önceki ayın dönem sonu
+  if(bas==null&&m>1){const pk=vV('yps',b,ayk(m-1),'stok');bas=pk!=null?pk:vV('sd',b,ayk(m-1),'son');oto=bas!=null?(pk!=null?MONTHS[m-2]+' kapanışı':'önceki ay'):false;}
+  let son=vV('sd',b,A,'son'),sOto=false;   // dönem sonu: manuel › bu ay kapanışı › (devam eden ay) son haftalık stok
+  if(son==null){const k=vV('yps',b,A,'stok');if(k!=null){son=k;sOto='ay kapanışı';}else if(m===CUT){const w=ypSonHafta(b,m);if(w){son=w.v;sOto=w.w+'. hafta stoğu';}}}
+  const ort=bas!=null&&son!=null?(bas+son)/2:null,dv=mal!=null&&ort?mal/ort:null;
+  return {s,mal,bas,oto,sOto,son,ort,dv,yil:dv!=null?dv*12:null,gun:dv?365/(dv*12):null};}
+function sdBolum(){
+  const m=+st.sort.sdAy&&+st.sort.sdAy<=CUT?+st.sort.sdAy:CUT, A=ayk(m), ed=!!st.sdEdit&&KUL&&KUL.yp;
+  if(!D.sd)return box('Stok devir hızı','','<div class="empty">Stok devir verisi yüklenemedi.</div>');
+  const f2=v=>v==null?'–':FM.m2(v), d2=v=>v==null?'–':nf2.format(v);
+  const row=(b,ri)=>{const h=sdHesap(b,m),p=m>1?sdHesap(b,m-1):null,dg=h.gun!=null&&p&&p.gun!=null?h.gun-p.gun:null;
+    const kay={tahmin:'kapanış tahmini',gidişat:'gidişat (tahmin girilmedi)',fiili:'gerçekleşen'}[h.s.src];
+    const inp=(an,ci,ph)=>vInp('sd',b,A,an,ri,ci,ph);
+    return '<tr><td class="kn"><b>'+YPBL[b]+'</b>'+(m===CUT?tazelik(vZ('sd',b,A)):'')+'</td><td title="'+kay+'"'+(h.s.src==='gidişat'?' class="ktg"':'')+'>'+f2(h.s.v)+'</td><td>'+nf2.format(ypOran(b))+'</td><td><b>'+f2(h.mal)+'</b></td>'+
+      (ed&&vIzin('sd',b)?inp('bas',0,h.oto?nf.format(h.bas):null)+inp('son',1,h.sOto?nf.format(h.son):null):'<td class="sep">'+f2(h.bas)+(h.oto?'<small class="oto">'+h.oto+'</small>':'')+'</td><td>'+f2(h.son)+(h.sOto?'<small class="oto">'+h.sOto+'</small>':'')+'</td>')+
+      '<td>'+f2(h.ort)+'</td><td class="sep"><b>'+d2(h.dv)+'</b></td><td>'+d2(h.yil)+'</td><td><b>'+(h.gun==null?'–':nf.format(h.gun)+' gün')+'</b></td>'+
+      '<td class="'+(dg==null?'':dg<=0?'g':'r')+'">'+(dg==null?'–':(dg>0?'▲ ':'▼ ')+nf.format(Math.abs(dg))+' gün')+'</td></tr>';};
+  const T=(()=>{let mal=0,ort=0,ok1=0;for(const b of YPB){const h=sdHesap(b,m);if(h.mal!=null&&h.ort){mal+=h.mal;ort+=h.ort;ok1++;}}const dv=ort?mal/ort:null;return {mal,ort,dv,ok1};})();
+  const hd='<tr class="per"><th></th><th colspan="3" class="cur sep">Satılacak maliyet</th><th colspan="3" class="cur sep">Stok (tüm stok grupları dahil)</th><th colspan="4" class="cur sep">Devir</th></tr>'+
+    '<tr><th class="kn">Marka</th><th class="sep" title="YP satışı: devam eden ayda kapanış tahmini, kapanan ayda gerçekleşen (4 kırılım)">YP satışı</th><th>Oran</th><th>Maliyet</th><th class="sep">Dönem başı</th><th>Dönem sonu</th><th>Ortalama</th><th class="sep">Aylık</th><th>Yıllık</th><th title="365 ÷ yıllık devir">Stokta kalma</th><th title="Önceki aya göre stokta kalma süresi">Önceki aya göre</th></tr>';
+  const tot='<tr class="main tot"><td class="kn"><b>Toplam</b>'+(T.ok1<YPB.length?'<small class="ktn">'+T.ok1+' marka hesaplandı</small>':'')+'</td><td></td><td></td><td><b>'+f2(T.ok1?T.mal:null)+'</b></td><td class="sep"></td><td></td><td>'+f2(T.ok1?T.ort:null)+'</td><td class="sep"><b>'+d2(T.dv)+'</b></td><td>'+d2(T.dv!=null?T.dv*12:null)+'</td><td><b>'+(T.dv?nf.format(365/(T.dv*12))+' gün':'–')+'</b></td><td></td></tr>';
+  const ayS='<label class="srt">Ay <select data-sort="sdAy">'+Array.from({length:CUT},(_,i)=>i+1).map(x=>'<option value="'+x+'"'+(x===m?' selected':'')+'>'+MONTHS[x-1]+(x===CUT?' · devam':'')+'</option>').join('')+'</select></label>';
+  const bar=vBar('sd',KUL&&KUL.yp,'Dönem başı ve dönem sonu stok tutarlarını girin · '+MONTHS[m-1]+(m===CUT?' (dönem sonu tahmini)':''));
+  return box2('dense garg ktt-box sdt','Stok devir hızı · '+MONTHS[m-1]+' '+YEAR,'Mn ₺ · satılacak maliyet = YP satışı × marka oranı · aylık devir = maliyet ÷ ortalama stok · yıllık = aylık × 12',
+    bar+tbl(hd,YPB.map(row).join(''),tot).replace(/min-width:\d+px/,'min-width:'+(ed?1250:1000)+'px;width:100%'),ayS)+
+    '<p class="note">'+(m===CUT?'Devam eden ayda YP satışı markanın kapanış tahminidir; tahmin girilmemişse bugünkü gidişat kullanılır (italik). ':'')+'Dönem başı boşsa önceki ayın kapanış stoğu, dönem sonu boşsa bu ayın kapanış stoğu (devam eden ayda son haftalık stok) otomatik alınır; buraya yazılan değer önce gelir. Oranlar: BMW & MINI 0,75 · Honda 0,90 · O&J 0,60 · diğerleri 0,70.</p>';
+}
+/* ---------- Açık İş Emri · markalar her hafta girer (ISO hafta) ---------- */
+const AIK=[['mek','Mekanik','Mekanik'],['hasar','Hasar','Kaporta Boya'],['gar','Garanti','Garanti']];
+function isoH(d){const q=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const g=q.getUTCDay()||7;q.setUTCDate(q.getUTCDate()+4-g);
+  const y=q.getUTCFullYear(),w=Math.ceil(((q-Date.UTC(y,0,1))/864e5+1)/7);const pzt=new Date(q);pzt.setUTCDate(q.getUTCDate()-3);return {y,w,pzt};}
+const hEtiket=(y,w)=>{const j=new Date(Date.UTC(y,0,4)),p=new Date(j);p.setUTCDate(j.getUTCDate()-((j.getUTCDay()||7)-1)+(w-1)*7);const z=new Date(p);z.setUTCDate(p.getUTCDate()+6);
+  const f=d=>d.getUTCDate()+' '+MONTHS[d.getUTCMonth()].slice(0,3);return w+'. hafta · '+f(p)+' – '+f(z);};
+function aieDeg(b,H){const o={};let any=0;for(const [k] of AIK)for(const t of ['acik','g45']){const v=vV('aie',b,H,k+'.'+t);o[k+'.'+t]=v;if(v!=null)any=1;}
+  o.acik=AIK.reduce((a,[k])=>o[k+'.acik']==null?a:(a||0)+o[k+'.acik'],null);o.g45=AIK.reduce((a,[k])=>o[k+'.g45']==null?a:(a||0)+o[k+'.g45'],null);o.any=any;return o;}
+function pAIE(){
+  if(!D.aie)return head('Servis Performans Yönetimi','Açık İş Emri','Haftalık açık iş emri')+'<div class="empty">Açık iş emri verisi yüklenemedi. Sayfayı yenileyin; sorun sürerse yöneticiye bildirin.</div>';
+  const bu=isoH(new Date()), yil=D.aieYil||bu.y, wS=+st.sort.aieH||bu.w, H='H'+wS, Hp='H'+(wS-1), ed=!!st.aieEdit&&KUL&&KUL.rol!=='izleyici';
+  const haftalar=new Set(Array.from({length:8},(_,i)=>bu.w-i).filter(w=>w>0));for(const b in D.aie)for(const h in D.aie[b])haftalar.add(+h.slice(1));
+  const G=gun(CUT), gunluk=b=>{if(!G.gecen)return null;const c=(((D.markalar[b]||{}).aylar||{})[ayk(CUT)]||{}).kategoriler||{};return AIK.reduce((a,[,,cat])=>a+((c[cat]||{}).adet||{}).fiili||0,0)/G.gecen;};
+  const pct=(a,b)=>a!=null&&b?a/b:null, oc=v=>v==null?'':v>.25?' r':v<=.1?' g':'';
+  const bs=BR;
+  const T={};for(const [k] of AIK)for(const t of ['acik','g45'])T[k+'.'+t]=null;T.acik=null;T.g45=null;let Tp=null,gT=0,n=0;
+  const row=(b,ri)=>{const o=aieDeg(b,H),p=aieDeg(b,Hp);if(o.any)n++;
+    for(const k in T)if(o[k]!=null)T[k]=(T[k]||0)+o[k];if(p.acik!=null&&o.acik!=null)Tp=(Tp||0)+p.acik;
+    const c=(t,ci)=>AIK.map(([k],i)=>ed&&vIzin('aie',b)?vInp('aie',b,H,k+'.'+t,ri,ci+i):'<td'+(i?'':' class="sep"')+'>'+(o[k+'.'+t]==null?'–':FM.ad(o[k+'.'+t]))+'</td>').join('');
+    const dl=o.acik!=null&&p.acik!=null?o.acik-p.acik:null, r45=pct(o.g45,o.acik);
+    return '<tr><td class="kn"><b>'+esc(lab(b))+'</b>'+(wS===bu.w?tazelik(vZ('aie',b,H)):'')+'</td>'+c('acik',0)+'<td class="ait"><b>'+(o.acik==null?'–':FM.ad(o.acik))+'</b></td>'+c('g45',4)+'<td class="ait"><b>'+(o.g45==null?'–':FM.ad(o.g45))+'</b></td>'+
+      '<td class="sep'+oc(r45)+'"><b>'+(r45==null?'–':'%'+nf1.format(r45*100))+'</b></td><td class="'+(dl==null?'':dl<=0?'g':'r')+'">'+(dl==null?'–':(dl>0?'▲ ':dl<0?'▼ ':'')+nf.format(Math.abs(dl)))+'</td></tr>';};
+  const body=bs.map(row).join('');
+  const r45T=pct(T.g45,T.acik), dT=T.acik!=null&&Tp!=null?T.acik-Tp:null;
+  const tot='<tr class="main tot"><td class="kn"><b>Toplam</b>'+(n<bs.length?'<small class="ktn">'+n+'/'+bs.length+' marka girdi</small>':'')+'</td>'+AIK.map(([k],i)=>'<td'+(i?'':' class="sep"')+'><b>'+(T[k+'.acik']==null?'–':FM.ad(T[k+'.acik']))+'</b></td>').join('')+'<td class="ait"><b>'+(T.acik==null?'–':FM.ad(T.acik))+'</b></td>'+
+    AIK.map(([k],i)=>'<td'+(i?'':' class="sep"')+'><b>'+(T[k+'.g45']==null?'–':FM.ad(T[k+'.g45']))+'</b></td>').join('')+'<td class="ait"><b>'+(T.g45==null?'–':FM.ad(T.g45))+'</b></td><td class="sep'+oc(r45T)+'"><b>'+(r45T==null?'–':'%'+nf1.format(r45T*100))+'</b></td><td>'+(dT==null?'–':(dT>0?'▲ ':dT<0?'▼ ':'')+nf.format(Math.abs(dT)))+'</td></tr>';
+  const card=(t,v,u,dark)=>'<div class="card'+(dark?' dark':'')+'"><div class="t">'+t+'</div><div class="v">'+v+'</div><div class="u">'+u+'</div></div>';
+  const gr=pct(T['gar.g45'],T['gar.acik']);
+  const cards='<div class="cards">'+card('Açık iş emri',T.acik==null?'–':FM.ad(T.acik),dT==null?'tüm markalar':(dT>0?'▲ ':'▼ ')+nf.format(Math.abs(dT))+' önceki haftaya göre',1)+card('45 gün üzeri',T.g45==null?'–':FM.ad(T.g45),r45T==null?'':'açık iş emrinin %'+nf1.format(r45T*100)+'\'i')+
+    card('Garanti · 45 gün üzeri',gr==null?'–':'%'+nf1.format(gr*100),T['gar.g45']==null?'':FM.ad(T['gar.g45'])+' / '+FM.ad(T['gar.acik'])+' garanti iş emri')+card('Veri girişi',n+' / '+bs.length,n<bs.length?'marka bu hafta girdi · '+(bs.length-n)+' marka bekleniyor':'tüm markalar bu hafta girdi')+'</div>';
+  const hd='<tr class="per"><th></th><th colspan="4" class="cur sep">Açık iş emri adedi</th><th colspan="4" class="cur sep">45 gün üzeri açık iş emri</th><th colspan="2" class="cur sep">Gösterge</th></tr>'+
+    '<tr><th class="kn">Marka</th>'+AIK.map((k,i)=>'<th'+(i?'':' class="sep"')+'>'+k[1]+'</th>').join('')+'<th>Toplam</th>'+AIK.map((k,i)=>'<th'+(i?'':' class="sep"')+'>'+k[1]+'</th>').join('')+'<th>Toplam</th><th class="sep" title="45 gün üzeri ÷ açık iş emri">45+ oranı</th><th title="Toplam açık iş emrinin önceki haftaya göre değişimi">Önceki hafta</th></tr>';
+  const hS='<label class="srt">Hafta <select data-sort="aieH">'+[...haftalar].sort((a,b)=>b-a).map(w=>'<option value="'+w+'"'+(w===wS?' selected':'')+'>'+hEtiket(yil,w)+(w===bu.w?' · bu hafta':'')+'</option>').join('')+'</select></label>';
+  const bar=vBar('aie',KUL&&KUL.rol!=='izleyici',(KUL&&KUL.markalar&&KUL.markalar.length?'Giriş yetkiniz: '+KUL.markalar.map(lab).join(', '):'Tüm markalar için giriş yetkiniz var')+' · '+hEtiket(yil,wS));
+  return head('Servis Performans Yönetimi','Açık İş Emri',hEtiket(yil,wS)+' · markalar her hafta günceller')+cards+
+    box2('dense garg ktt-box aiet','Açık iş emri · '+hEtiket(yil,wS),'Adet · 45+ oranı %10 ve altı yeşil, %25 üzeri kırmızı',bar+tbl(hd,body,tot).replace(/min-width:\d+px/,'min-width:'+(ed?1250:1000)+'px;width:100%'),hS)+
+    '<p class="note">Excel\'deki "Açık İş Emri Adet" tablosundan bir markanın satırını (Mekanik · Hasar · Garanti · Toplam · Mekanik · Hasar · Garanti · Toplam) kopyalayıp Mekanik hücresine yapıştırabilirsiniz; toplam sütunları atlanır. Marka adının altındaki tarih son güncellemedir.</p>';
+}
+/* ---------- Veri giriş durumu · yalnız yönetici: hangi marka neyi en son ne zaman girdi ---------- */
+function sonGiris(al,b,donem){   // {z,k} — dönem verilirse yalnız o dönem
+  let o=null;const B=(D[al]||{})[b]||{};
+  for(const A in B){if(donem&&A!==donem)continue;for(const k in B[A]){const c=B[A][k];if(c&&c.z&&(!o||c.z>o.z))o={z:c.z,k:c.k};}}return o;}
+function pDurum(){
+  const bu=isoH(new Date()), H='H'+bu.w, A=ayk(CUT), now=Date.now();
+  const kim=k=>esc(String(k||'').split('@')[0].split(/[._-]/).filter(Boolean).map(x=>x.charAt(0).toLocaleUpperCase('tr-TR')+x.slice(1)).join(' '));
+  const hc=(o,yok)=>{if(yok)return '<td class="dz na">'+yok+'</td>';if(!o)return '<td class="dz d0">Girilmedi</td>';
+    const g=Math.floor((now-new Date(o.z))/864e5),c=g<=7?'d1':g<=14?'d2':'d3';
+    return '<td class="dz '+c+'" title="'+new Date(o.z).toLocaleString('tr-TR')+(o.k?' · '+esc(o.k):'')+'"><b>'+new Date(o.z).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit'})+'</b><small>'+(g===0?'bugün':g+' gün önce')+(o.k?' · '+kim(o.k):'')+'</small></td>';};
+  const C=[
+    ['Garanti araç girişi','aylık · '+MONTHS[CUT-1],b=>GVERI.includes(b)?[null,'Servis verisinden']:[D.garz?D.garz[b]:null]],
+    ['Kapanış tahmini','haftalık · '+MONTHS[CUT-1],b=>[sonGiris('kt',b,A)]],
+    ['Açık iş emri','haftalık · '+bu.w+'. hafta',b=>[sonGiris('aie',b,H)]],
+    ['Yedek parça stok','haftalık · '+bu.w+'. hafta',b=>[sonGiris('yps',b,H)]],
+    ['Stok devir · dönem stoğu','aylık · '+MONTHS[CUT-1],b=>[sonGiris('sd',b,A)]]];
+  const say=C.map(()=>0), eks=C.map(()=>0);
+  const rows=BR.map(b=>'<tr><td class="kn"><b>'+esc(lab(b))+'</b></td>'+C.map((c,i)=>{const [o,yok]=c[2](b);if(yok)eks[i]++;else if(o&&now-new Date(o.z)<=7*864e5)say[i]++;return hc(o,yok);}).join('')+'</tr>').join('');
+  const hd='<tr><th class="kn">Marka</th>'+C.map(c=>'<th class="sep">'+c[0]+'<small>'+c[1]+'</small></th>').join('')+'</tr>';
+  const tot='<tr class="main tot"><td class="kn"><b>Güncel (son 7 gün)</b></td>'+C.map((c,i)=>'<td class="dz"><b>'+say[i]+' / '+(BR.length-eks[i])+'</b><small>marka</small></td>').join('')+'</tr>';
+  const lj='<div class="dzl"><span class="d1">son 7 gün</span><span class="d2">8–14 gün</span><span class="d3">14 günden eski</span><span class="d0">hiç girilmedi</span></div>';
+  return head('Servis Performans Yönetimi','Veri giriş durumu','Markaların panelden yaptığı girişler · son güncelleme ve giren kişi')+
+    box2('dense garg dzt','Giriş takibi','Hücrenin üzerine gelince tam zaman ve giren kişinin e-postası görünür',lj+tbl(hd,rows,tot).replace(/min-width:\d+px/,'min-width:900px;width:100%'))+
+    '<p class="note">Bu ekranı yalnız yöneticiler görür. Garanti girişi BMW & MINI, BMW Motorrad ve Tesla için servis verisinden geldiği için takip edilmez.</p>';
+}
+/* ---------- Yedek Parça · stok değerleri: haftalık güncelleme + ay kapanışı (yetkililer girer → Google E-Tablo) ---------- */
+const YPB=['Peugeot','Citroen','Opel','Honda','Fiat','Arj','Bmw','Motorrad','Tesla','Jaecoo'];
+const YPBL={Peugeot:'Peugeot',Citroen:'Citroën',Opel:'Opel',Honda:'Honda',Fiat:'Fiat',Arj:'ARJ',Bmw:'BMW & MINI',Motorrad:'BMW Motorrad',Tesla:'Tesla',Jaecoo:'O&J'};
+const YPK=[['stok','Güncel toplam stok','her şey dahil'],['olu','Ölü stok 12 ay',''],['aks','Aksesuar',''],['yag','Motor yağı',''],['lastik','Lastik',''],
+  ['sip','Siparişteki iş emri üzeri','parça'],['stokis','Stoktaki iş emri üzeri','parça']];
+VED.yps={};
+const tl0=v=>v==null?'–':nf.format(Math.round(v));
+const ypOnce=P=>P[0]==='H'?'H'+(+P.slice(1)-1):(D.aylar.indexOf(P)>0?D.aylar[D.aylar.indexOf(P)-1]:null);
+const ypAd=P=>P[0]==='H'?hEtiket(isoH(new Date()).y,+P.slice(1)):MONTHS[D.aylar.indexOf(P)]+' '+YEAR+' kapanışı';
+const ypV=(P,b,k)=>P?vV('yps',b,P,k):undefined;
+const ypTop=(P,k)=>YPB.reduce((a,b)=>{const v=ypV(P,b,k);return v==null?a:(a||0)+v;},null);
+const ypFark=(P,Q,k)=>{let d=null;for(const b of YPB){const v=ypV(P,b,k),p=ypV(Q,b,k);if(v!=null&&p!=null)d=(d||0)+v-p;}return d;};   // yalnız iki dönemde de girilen markalar
+function ypSonHafta(b,m){   // ay içindeki en son haftalık stok
+  let best=null;const B=(D.yps||{})[b]||{};for(const P in B){if(P[0]!=='H'||!B[P].stok)continue;const w=+P.slice(1),j=new Date(Date.UTC(isoH(new Date()).y,0,4));j.setUTCDate(j.getUTCDate()-((j.getUTCDay()||7)-1)+(w-1)*7);
+    if(j.getUTCMonth()+1===m&&(!best||w>best.w))best={w,v:B[P].stok.v};}return best;}
+function pYP(){
+  if(!D.yps)return head('Servis Performans Yönetimi','Yedek Parça','Stok değerleri')+'<div class="empty">Yedek parça verisi yüklenemedi. Sayfayı yenileyin; sorun sürerse yöneticiye bildirin.</div>';
+  const bu=isoH(new Date()), P=st.sort.ypD||('H'+bu.w), Pp=ypOnce(P), hafta=P[0]==='H', ed=!!st.ypsEdit&&KUL&&KUL.yp;
+  const hs=new Set(Array.from({length:8},(_,i)=>bu.w-i).filter(w=>w>0));for(const b in D.yps)for(const x in D.yps[b])if(x[0]==='H')hs.add(+x.slice(1));
+  const opt=[...hs].sort((a,b)=>b-a).map(w=>['H'+w,hEtiket(bu.y,w)+(w===bu.w?' · bu hafta':'')]).concat(Array.from({length:CUT},(_,i)=>CUT-i).map(m=>[ayk(m),'Ay kapanışı · '+MONTHS[m-1]+(m===CUT?' (ay sonunda girilir)':'')]));
+  const sel='<label class="srt">Dönem <select data-sort="ypD">'+opt.map(([v,t])=>'<option value="'+v+'"'+(v===P?' selected':'')+'>'+t+'</option>').join('')+'</select></label>';
+  const oran=(a,b)=>a!=null&&b?a/b:null, dMn=d=>(d>0?'▲ ':d<0?'▼ ':'')+nf2.format(Math.abs(d)/1e6)+' Mn';
+  const fark=(v,p)=>v!=null&&p!=null&&v!==p?'<small class="ypd">'+dMn(v-p)+'</small>':'';
+  const card=(t,k,u,dark)=>{const v=ypTop(P,k),d=ypFark(P,Pp,k);return '<div class="card'+(dark?' dark':'')+'"><div class="t">'+t+'</div><div class="v">'+(v==null?'–':FM.mn(v))+'</div><div class="u">'+(v!=null&&d!=null?dMn(d)+' önceki '+(hafta?'haftaya':'aya')+' göre':u)+'</div></div>';};
+  const cards='<div class="cards">'+card('Güncel toplam stok','stok','tüm markalar · her şey dahil',1)+card('Ölü stok 12 ay','olu',oran(ypTop(P,'olu'),ypTop(P,'stok'))!=null?'toplam stokun %'+nf1.format(oran(ypTop(P,'olu'),ypTop(P,'stok'))*100)+'\'i':'')+
+    card('Siparişteki iş emri üzeri','sip','parça')+card('Stoktaki iş emri üzeri','stokis','parça')+'</div>';
+  const hd='<tr><th class="kn">Kalem · ₺</th>'+YPB.map(b=>'<th>'+YPBL[b]+'</th>').join('')+'<th class="sep">Toplam</th></tr>';
+  const cell=(b,k,ri,ci)=>{const v=ypV(P,b,k),p=ypV(Pp,b,k);
+    if(ed&&vIzin('yps',b))return vInp('yps',b,P,k,ri,ci,p!=null?nf.format(p):null);
+    return v==null?'<td class="na">–</td>':'<td data-v="'+v+'" data-f="tl">'+tl0(v)+fark(v,p)+'</td>';};
+  const row=(k,l,sub,ri,c='')=>'<tr class="'+c+'"><td class="kn"><b>'+l+'</b>'+(sub?' <small>('+sub+')</small>':'')+'</td>'+YPB.map((b,ci)=>cell(b,k,ri,ci)).join('')+'<td class="sep"><b>'+tl0(ypTop(P,k))+'</b>'+(ypFark(P,Pp,k)?'<small class="ypd">'+dMn(ypFark(P,Pp,k))+'</small>':'')+'</td></tr>';
+  const pct=(l,a,b)=>'<tr class="ypr"><td class="kn">'+l+'</td>'+YPB.map(x=>{const r=oran(ypV(P,x,a),ypV(P,x,b));return '<td>'+(r==null?'–':'%'+nf1.format(r*100))+'</td>';}).join('')+'<td class="sep">'+(oran(ypTop(P,a),ypTop(P,b))==null?'–':'%'+nf1.format(oran(ypTop(P,a),ypTop(P,b))*100))+'</td></tr>';
+  let body='';YPK.forEach(([k,l,sub],ri)=>{if(k==='sip')body+='<tr class="ypsep"><td colspan="'+(YPB.length+2)+'"></td></tr>';body+=row(k,l,sub,ri,ri===0?'main':'');if(k==='olu')body+=pct('Ölü stok oranı','olu','stok');});
+  const gt=(Q,b)=>{const a=ypV(Q,b,'stok'),c=ypV(Q,b,'stokis');return a==null&&c==null?null:(a||0)+(c||0);};
+  const gtT=Q=>YPB.reduce((a,b)=>gt(Q,b)==null?a:(a||0)+gt(Q,b),null);
+  const foot='<tr class="main tot"><td class="kn"><b>Genel toplam</b> <small>(güncel stok + stoktaki iş emri üzeri)</small></td>'+YPB.map(b=>'<td><b>'+tl0(gt(P,b))+'</b>'+fark(gt(P,b),gt(Pp,b))+'</td>').join('')+'<td class="sep"><b>'+tl0(gtT(P))+'</b>'+(()=>{let d=null;for(const b of YPB){const v=gt(P,b),p=gt(Pp,b);if(v!=null&&p!=null)d=(d||0)+v-p;}return d?'<small class="ypd">'+dMn(d)+'</small>':'';})()+'</td></tr>'+
+    '<tr class="ypz"><td class="kn">Son güncelleme</td>'+YPB.map(b=>{const z=vZ('yps',b,P);return '<td>'+(z?new Date(z).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric'}):'–')+'</td>';}).join('')+'<td class="sep"></td></tr>';
+  let bar=vBar('yps',KUL&&KUL.yp,(KUL&&KUL.markalar&&KUL.markalar.length?'Giriş yetkiniz: '+KUL.markalar.map(b=>YPBL[b]||b).join(', '):'Tüm markalar için giriş yetkiniz var')+' · '+ypAd(P));
+  if(ed&&Pp)bar=bar.replace('<button type="button" class="gbtn ghost" data-vvaz="yps">','<button type="button" class="gbtn ghost" id="ypkop" title="Boş hücreleri önceki dönemin değerleriyle doldurur">Önceki dönemden kopyala</button><button type="button" class="gbtn ghost" data-vvaz="yps">');
+  return head('Servis Performans Yönetimi','Yedek Parça',ypAd(P)+' · '+(hafta?'markalar her hafta günceller':'ay sonu kesin değerler'))+cards+
+    box2('garg ypt',(hafta?'Haftalık stok değerleri':'Ay kapanışı')+' · '+ypAd(P),'Tutarlar ₺ · hücrenin altındaki küçük rakam önceki '+(hafta?'haftaya':'ay kapanışına')+' göre fark (Mn ₺)',bar+tbl(hd,body,foot).replace(/min-width:\d+px/,'min-width:1080px'),sel)+
+    '<p class="note">Her hafta güncel değerler, ay sonunda "Ay kapanışı" dönemi seçilerek kesin değerler girilir. Ay kapanışındaki güncel toplam stok, stok devir hızında dönem sonu stoğu olarak kullanılır. Ölü stok oranı = ölü stok 12 ay ÷ güncel toplam stok.</p>'+'<div class="pb"></div>'+sdBolum();
+}
 /* ---------- 05 · Car Care ---------- */
 function pCar(){
   return head('Servis Performans Yönetimi','Car Care','Car Care cirosu · '+PL())+'<div class="grid2">'+
@@ -1325,8 +1560,9 @@ function pVeri(){
 
 /* ---------- sayfalar ---------- */
 const KUL=window.KULLANICI||null, GARYETKI=!!(KUL&&KUL.rol!=='izleyici');
-const PAGES=[['ozet','Yönetici Özeti',pOzet,'S'],['perf','Servis Performansı',pPerf,'S'],['homer','HOMER',pHomer,'S'],['carcare','Car Care',pCar,'S'],['ek','Ek Satış',pEk,'S'],['veri','Veri & hesap kontrolü',pVeri,'F']];
+const PAGES=[['ozet','Yönetici Özeti',pOzet,'S'],['perf','Servis Performansı',pPerf,'S'],['homer','HOMER',pHomer,'S'],['carcare','Car Care',pCar,'S'],['ek','Ek Satış',pEk,'S'],...(KUL?[['kt','Kapanış Tahmini',pKT,'S'],['aie','Açık İş Emri',pAIE,'S'],['yp','Yedek Parça',pYP,'S']]:[]),['veri','Veri & hesap kontrolü',pVeri,'F']];
 if(GARYETKI)PAGES.splice(PAGES.length-1,0,['garanti','Garanti araç girişi',pGar,'F']);
+if(KUL&&KUL.rol==='yonetici')PAGES.splice(PAGES.length-1,0,['durum','Veri giriş durumu',pDurum,'F']);
 
 /* ---------- açılır seçiciler ---------- */
 function ddInit(id,build,apply){
@@ -1353,7 +1589,7 @@ function scopeRender(){
   $('ddB').querySelector('.msb span').textContent=st.brands.length?brandLabel():'Tüm markalar ('+BR.length+')';
   $('ddM').querySelector('.msb span').textContent=monthLabel();
   $('ddK').querySelector('.msb span').textContent=st.kpis.map(k=>KP[k][1].replace(' cirosu','').replace('Yedek parça','YP').replace(' (iş emri)','')).join(' · ');
-  $('ddK').style.display='none';const cm=$('cmpT');cm.style.display=PMS().length>1&&st.page!=='ek'&&st.page!=='garanti'&&st.page!=='veri'&&st.page!=='homer'?'':'none';cm.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.cmp===(st.cmp||'ay')));$('ddB').style.display=$('ddM').style.display=st.page==='ek'||st.page==='garanti'?'none':'';
+  $('ddK').style.display='none';const cm=$('cmpT');cm.style.display=PMS().length>1&&st.page!=='ek'&&st.page!=='garanti'&&st.page!=='yp'&&st.page!=='kt'&&st.page!=='aie'&&st.page!=='durum'&&st.page!=='veri'&&st.page!=='homer'?'':'none';cm.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.cmp===(st.cmp||'ay')));$('ddB').style.display=$('ddM').style.display=['ek','garanti','yp','kt','aie','durum'].includes(st.page)?'none':'';
 }
 
 /* ---------- ipucu (hover) ---------- */
@@ -1389,11 +1625,16 @@ $('app').addEventListener('click',e=>{
     const t=[...document.querySelectorAll('#app .box')].find(b=>b.querySelector('h2')?.textContent===KP[k][1]);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});}
   if(e.target.closest('#ekAll')){st.ekAll=!st.ekAll;render();}
 });
-$('app').addEventListener('input',e=>{const i=e.target.closest('input[data-gk]');if(i){garGir(i,i.value);garSay();}});
+$('app').addEventListener('input',e=>{const i=e.target.closest('input[data-gk]');if(i){garGir(i,i.value);garSay();}const v=e.target.closest('input[data-vk]');if(v)vGir(v);});
+$('app').addEventListener('paste',e=>{const i=e.target.closest('input[data-vk]');if(!i)return;const t=(e.clipboardData||window.clipboardData).getData('text');if(!/[\t\n]/.test(t.trim()))return;e.preventDefault();
+  const al=i.dataset.al,r0=+i.dataset.r,c0=+i.dataset.c;t.replace(/\r/g,'').replace(/\n$/,'').split('\n').forEach((ln,ri)=>ln.split('\t').forEach((v,ci)=>{const x=document.querySelector('#app input[data-al="'+al+'"][data-r="'+(r0+ri)+'"][data-c="'+(c0+ci)+'"]');if(x){x.value=v;vGir(x);}}));});
 $('app').addEventListener('paste',e=>{const i=e.target.closest('input[data-gk]');if(!i)return;const t=(e.clipboardData||window.clipboardData).getData('text');if(!/[\t\n]/.test(t.trim()))return;e.preventDefault();
   const all=[...document.querySelectorAll('#app input[data-gk]')],cols=12,p=all.indexOf(i),r0=Math.floor(p/cols),c0=p%cols;
   t.replace(/\r/g,'').replace(/\n$/,'').split('\n').forEach((ln,ri)=>ln.split('\t').forEach((v,ci)=>{const x=all[(r0+ri)*cols+c0+ci];if(x&&!x.disabled&&c0+ci<cols)garGir(x,v);}));garSay();});
-document.addEventListener('click',e=>{if(e.target.id==='cikis'){if(Object.keys(GED).length&&!confirm('Kaydedilmemiş garanti girişleri var. Çıkılsın mı?'))return;GED={};window.PANEL_CIKIS&&window.PANEL_CIKIS();}
+document.addEventListener('click',e=>{if(e.target.id==='cikis'){if((Object.keys(GED).length||!vBos('kt')||!vBos('sd')||!vBos('aie')||!vBos('yps'))&&!confirm('Kaydedilmemiş garanti girişleri var. Çıkılsın mı?'))return;GED={};window.PANEL_CIKIS&&window.PANEL_CIKIS();}
+  const vd=e.target.closest('[data-vduz]');if(vd){st[vd.dataset.vduz+'Edit']=true;render();}const vz=e.target.closest('[data-vvaz]');if(vz){VED[vz.dataset.vvaz]={};st[vz.dataset.vvaz+'Edit']=false;render();}
+  const vk=e.target.closest('[data-vkay]');if(vk)vKaydet(vk.dataset.vkay);const km=e.target.closest('#ktm button');if(km){if(!vBos('kt')&&!confirm('Kaydedilmemiş tahminler var, sekme değişirse kaybolur. Devam edilsin mi?'))return;VED.kt={};st.ktM=km.dataset.k;render();}
+  if(e.target.id==='ypkop'){const P=st.sort.ypD||('H'+isoH(new Date()).w),Q=ypOnce(P);document.querySelectorAll('#app input[data-al="yps"]').forEach(x=>{if(x.value!=='')return;const [b,,k]=x.dataset.vk.split('|'),v=ypV(Q,b,k);if(v!=null){x.value=String(v);vGir(x);}});}
   if(e.target.id==='garkay')garKaydet();if(e.target.id==='garvaz'){GED={};render();}const g=e.target.closest('#garal button');if(g){st.garAl=g.dataset.k;render();}});
 $('app').addEventListener('change',e=>{const s=e.target.closest('select[data-sort]');if(s){st.sort[s.dataset.sort]=s.value;render();}});
 
@@ -1411,6 +1652,7 @@ function sheetFrom(root,title){
         if(span>1)merges.push({s:{r,c},e:{r,c:c+span-1}});c+=span;});
       aoa.push(row);});
     aoa.push([]);});
+  aoa.push([],['© '+YEAR+' İnciroğlu Otomotiv · CEO Ofis · İş Geliştirme ve Strateji']);
   const ws=XLSX.utils.aoa_to_sheet(aoa);
   for(const k in fmts){const [r,c]=k.split(',').map(Number),a=XLSX.utils.encode_cell({r,c});if(ws[a])ws[a].z=fmts[k];}
   ws['!merges']=merges;ws['!cols']=[{wch:30}].concat(Array(24).fill({wch:15}));
@@ -1422,7 +1664,7 @@ function needX(){if(window.XLSX)return true;toast('Excel kütüphanesi yüklenem
 $('xOne').onclick=()=>{closeDD();if(!needX())return;const P=PAGES.find(p=>p[0]===st.page);
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,sheetFrom($('app'),P[1]),sname(P[1]));XLSX.writeFile(wb,fname(P[1]));};
 $('xAll').onclick=()=>{closeDD();if(!needX())return;const wb=XLSX.utils.book_new(),tmp=document.createElement('div');
-  for(const p of PAGES){if(p[0]==='garanti')continue;tmp.innerHTML=p[2]();XLSX.utils.book_append_sheet(wb,sheetFrom(tmp,p[1]),sname(p[1]));}
+  for(const p of PAGES){if(p[0]==='garanti'||p[0]==='durum')continue;tmp.innerHTML=p[2]();XLSX.utils.book_append_sheet(wb,sheetFrom(tmp,p[1]),sname(p[1]));}
   XLSX.writeFile(wb,fname('Yonetici_Paketi'));};
 
 /* ---------- çizim ---------- */
@@ -1435,7 +1677,7 @@ function render(){
   $('kul').innerHTML=KUL?'<div class="kul"><span><b>'+esc(KUL.ad||KUL.email||'')+'</b>'+({yonetici:'Yönetici',giris:'Veri girişi',izleyici:'İzleyici'}[KUL.rol]||'')+'</span><button type="button" id="cikis">Çıkış</button></div>':'';
   $('crumb').innerHTML='Servis Performans Yönetimi / <b>'+P[1]+'</b>';
   scopeRender();TIP.hidden=true;
-  $('app').innerHTML='<table class="pw"><thead><tr><td><div class="phead"><div class="plogo">'+LOGO+'</div><div class="ptx"><b>'+P[1]+'</b><span>'+(st.page==='ek'&&EK?esc(EK.meta.donem)+' · ek satış planı ve gerçekleşme':esc(brandLabel())+' · '+PL()+(TWO()?' ve '+ytdLabel():''))+'</span></div><div class="pk">'+(st.page==='ek'&&EK?'Güncellenme <b>'+esc(EK.meta.veriTarihi)+'</b>':'Veri kesimi <b>'+esc(D.ust.veri_kesim)+'</b>')+'<br>Servis Performans Yönetimi</div></div></td></tr></thead><tbody><tr><td>'+P[2]()+'</td></tr></tbody></table><div class="prt">İnciroğlu Otomotiv · '+P[1]+' · '+esc(brandLabel())+' · '+PL()+' · veri kesimi '+esc(D.ust.veri_kesim)+' · yazdırma '+new Date().toLocaleDateString('tr-TR')+'</div>';
+  $('app').innerHTML='<table class="pw"><thead><tr><td><div class="phead"><div class="plogo">'+LOGO+'</div><div class="ptx"><b>'+P[1]+'</b><span>'+(st.page==='ek'&&EK?esc(EK.meta.donem)+' · ek satış planı ve gerçekleşme':esc(brandLabel())+' · '+PL()+(TWO()?' ve '+ytdLabel():''))+'</span></div><div class="pk">'+(st.page==='ek'&&EK?'Güncellenme <b>'+esc(EK.meta.veriTarihi)+'</b>':'Veri kesimi <b>'+esc(D.ust.veri_kesim)+'</b>')+'<br>Servis Performans Yönetimi</div></div></td></tr></thead><tbody><tr><td>'+P[2]()+'</td></tr></tbody></table><div class="prt">İnciroğlu Otomotiv · Hazırlayan: CEO Ofis · İş Geliştirme ve Strateji · '+P[1]+' · '+esc(brandLabel())+' · '+PL()+' · veri kesimi '+esc(D.ust.veri_kesim)+' · yazdırma '+new Date().toLocaleDateString('tr-TR')+'</div>';
   document.title=P[1]+' · İnciroğlu Otomotiv';
   const AK=[st.page,st.brands,st.months,st.hkat,st.ekKat,st.hmet,st.kpis,st.ek.tab,st.ek.cp,st.ek.brand,st.ek.kal].join('|'), still=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const anim=AK!==window.__ak&&!still;window.__ak=AK;$('app').classList.toggle('anim',anim);
@@ -1454,6 +1696,7 @@ $('pdf').onclick=()=>{closeDD();render();setTimeout(()=>window.print(),50);};
 // yazdırırken animasyon ortasında kalmasın: son değerlerle statik yeniden çiz
 window.addEventListener('beforeprint',()=>render());
 if(location.hash&&PAGES.some(p=>p[0]===location.hash.slice(1)))st.page=location.hash.slice(1);
+$('pfy').textContent=YEAR;
 render();
 </script>
 <script>
@@ -1483,7 +1726,11 @@ window.PANEL_API=(islem,veri)=>{const o=oku();if(!o)return Promise.resolve({ok:f
 window.PANEL_CIKIS=()=>{try{sessionStorage.removeItem(OT);sessionStorage.removeItem('inc_oturum');}catch(_){}location.reload();};
 
 // veri: <script id="pdata"> içinde açık JSON ya da {"sifreli":1,"iv":..,"ct":..} (AES-256-GCM)
-const ham=JSON.parse(g('pdata').textContent);
+const pt=g('pdata').textContent.trim();
+if(pt==='__DA'+'TA__'){   // şablon doğrudan açıldı: veri henüz yok
+  g('gtnj').textContent='Bu dosya panel_sablon.html — yalnızca şablondur, içinde veri yok. GUNCELLE.bat çalıştırın ve oluşan index.html dosyasını ya da sitenin linkini açın.';
+  document.documentElement.classList.remove('gtjs');g('gtb').disabled=true;throw new Error('sablon-bos');}
+const ham=JSON.parse(pt);
 const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 async function coz(anahtar){
   if(!ham.sifreli)return ham;
@@ -1498,10 +1745,17 @@ function baslat(D){   // uygulama kodu ancak veri hazır olunca çalışır
 async function ac(o,karsila){
   const D=await coz(o.anahtar);
   if(API){   // e-tablodaki garanti girişleri dosyadakilerin önüne geçer
-    const r=await Promise.race([api('garantiOku',{jeton:o.jeton,yil:D.ust.kesim_yil}),new Promise(x=>setTimeout(()=>x(null),8000))]);
-    if(r&&r.ok&&r.garm){D.garm=D.garm||{};for(const b in r.garm)for(const a in r.garm[b])(D.garm[b]=D.garm[b]||{})[a]=r.garm[b][a];}
+    const zm=p=>Promise.race([p,new Promise(x=>setTimeout(()=>x(null),8000))]);
+    const yl=D.ust.kesim_yil;
+    const [r,y,kt,sd]=await Promise.all([zm(api('garantiOku',{jeton:o.jeton,yil:yl})),zm(api('veriOku',{jeton:o.jeton,alan:'yps',yil:yl})),
+      zm(api('veriOku',{jeton:o.jeton,alan:'kt',yil:yl})),zm(api('veriOku',{jeton:o.jeton,alan:'sd',yil:yl}))]);
+    D.kt=kt&&kt.ok?kt.veri:null;D.sd=sd&&sd.ok?sd.veri:null;
+    const t=new Date(),q=new Date(Date.UTC(t.getFullYear(),t.getMonth(),t.getDate()));q.setUTCDate(q.getUTCDate()+4-(q.getUTCDay()||7));
+    const ai=await zm(api('veriOku',{jeton:o.jeton,alan:'aie',yil:q.getUTCFullYear()}));D.aie=ai&&ai.ok?ai.veri:null;D.aieYil=q.getUTCFullYear();   // açık iş emri (ISO hafta)   // kapanış tahmini · stok devir (dönem başı/sonu)
+    D.garz=r&&r.ok?r.garz||{}:null;if(r&&r.ok&&r.garm){D.garm=D.garm||{};for(const b in r.garm)for(const a in r.garm[b])(D.garm[b]=D.garm[b]||{})[a]=r.garm[b][a];}
+    D.yps=y&&y.ok?y.veri:null;   // yedek parça stok: haftalık (H43) ve ay kapanışı (EKİM)
   }
-  window.KULLANICI={ad:o.ad,email:o.email,rol:o.rol,markalar:o.markalar||[]};
+  window.KULLANICI={ad:o.ad,email:o.email,rol:o.rol,markalar:o.markalar||[],yp:!!o.yp};
   baslat(D);
   if(karsila){try{gwShow(o.ad||gtName(o.email));}catch(err){console.error(err);gwOpen('ozet');}}
   else g('gt').hidden=true;
@@ -1522,7 +1776,7 @@ async function girisYap(){
   tamam(Object.assign(r,{email}));
 }
 async function tamam(r){
-  const o={jeton:r.jeton,anahtar:r.anahtar,ad:r.ad,email:r.email,rol:r.rol,markalar:r.markalar,bitis:r.bitis};
+  const o={jeton:r.jeton,anahtar:r.anahtar,ad:r.ad,email:r.email,rol:r.rol,markalar:r.markalar,yp:r.yp,bitis:r.bitis};
   kaydet(o);
   try{await ac(o,true);}catch(err){console.error(err);try{sessionStorage.removeItem(OT);}catch(_){}g('gt').hidden=false;pane('gtpGiris');
     msg(err.name==='OperationError'?'Panel verisi açılamadı: veri anahtarı uyuşmuyor. Lütfen yöneticiye bildirin.':'Panel verisi açılamadı: '+(err.message||err.name)+' Sorun sürerse yöneticiye bildirin.');}
