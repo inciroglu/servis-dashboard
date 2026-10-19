@@ -1,7 +1,5 @@
-# Ham veri ASLA GitHub'a gitmesin
+# GitHub'a gitmemesi gerekenler
 *.xlsx
-*.xls
-*.xlsm
-*.csv
+panel_anahtar.txt
+panel_ayar.json
 __pycache__/
-*.pyc

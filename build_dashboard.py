@@ -55,7 +55,11 @@ class HizliExcel:
     def _parse_workbook(self):
         wbxml = self.z.read("xl/workbook.xml").decode("utf-8")
         rels = self.z.read("xl/_rels/workbook.xml.rels").decode("utf-8")
-        relmap = dict(re.findall(r'Id="(rId\d+)"[^>]*Target="([^"]+)"', rels))
+        relmap = {}
+        for t in re.findall(r'<Relationship\b[^>]*>', rels):   # öznitelik sırası dosyaya göre değişebilir
+            i, g = re.search(r'Id="([^"]+)"', t), re.search(r'Target="([^"]+)"', t)
+            if i and g:
+                relmap[i.group(1)] = g.group(1)
         for m in re.finditer(r'<sheet\b[^>]*/>', wbxml):
             tag = m.group(0)
             name = re.search(r'name="([^"]+)"', tag)
@@ -1561,17 +1565,143 @@ def _yuvarla(x):
     return x
 
 
-def _eski_eks(cikti_yolu):
-    """Ek satış dosyası yoksa mevcut index.html'deki ek satış verisini korur."""
+def _ayar():
+    """panel_ayar.json: {"giris_servisi": "https://script.google.com/macros/s/.../exec"} — boşsa eski ortak şifre kipi."""
+    yol = os.path.join(os.path.dirname(os.path.abspath(__file__)), "panel_ayar.json")
+    if not os.path.exists(yol):
+        return {}
+    with open(yol, encoding="utf-8-sig") as f:
+        return json.load(f)
+
+
+def _veri_anahtari(zorunlu):
+    yol = os.path.join(os.path.dirname(os.path.abspath(__file__)), "panel_anahtar.txt")
+    if not os.path.exists(yol):
+        if zorunlu:
+            raise SystemExit("HATA: panel_anahtar.txt bulunamadı. Apps Script'teki VERI_ANAHTARI değerini bu dosyaya yazın (KURULUM_GIRIS.md).")
+        return None
+    import base64
+    k = open(yol, encoding="utf-8-sig").read().strip()
+    try:
+        kb = base64.b64decode(k, validate=True)
+    except Exception:
+        kb = b""
+    if len(kb) != 32:
+        raise SystemExit("HATA: panel_anahtar.txt geçersiz (32 baytlık base64 anahtar bekleniyor).")
+    return kb
+
+
+def _sifrele(veri_json, anahtar):
+    try:
+        from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+    except ImportError:
+        raise SystemExit("HATA: şifreleme kütüphanesi yok. Komut satırında bir kez çalıştırın:  python -m pip install cryptography")
+    import base64
+    iv = os.urandom(12)
+    ct = AESGCM(anahtar).encrypt(iv, veri_json.encode("utf-8"), None)
+    return {"sifreli": 1, "iv": base64.b64encode(iv).decode(), "ct": base64.b64encode(ct).decode()}
+
+
+def _eski_D(cikti_yolu):
+    """Mevcut index.html'deki veriyi okur (açık, eski biçim ya da şifreli)."""
     if not os.path.exists(cikti_yolu):
         return None
-    m = re.search(r"const D=(\{.*?\});\n", open(cikti_yolu, encoding="utf-8").read(), re.S)
-    if not m:
-        return None
+    h = open(cikti_yolu, encoding="utf-8").read()
+    m = re.search(r'<script type="application/json" id="pdata">(.*?)</script>', h, re.S)
     try:
-        return json.loads(m.group(1)).get("eks")
-    except ValueError:
+        if m:
+            d = json.loads(m.group(1))
+            if d.get("sifreli"):
+                k = _veri_anahtari(False)
+                if not k:
+                    return None
+                import base64
+                from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+                d = json.loads(AESGCM(k).decrypt(base64.b64decode(d["iv"]), base64.b64decode(d["ct"]), None))
+            return d
+        m = re.search(r"const D=(\{.*?\});\n", h, re.S)
+        return json.loads(m.group(1)) if m else None
+    except Exception:
         return None
+
+
+def _eski_eks(cikti_yolu):
+    """Ek satış dosyası yoksa mevcut index.html'deki ek satış verisini korur."""
+    d = _eski_D(cikti_yolu)
+    return d.get("eks") if d else None
+
+# ---------- Garanti araç girişi (manuel dosya) ----------
+GARANTI_DOSYA = "garanti_arac_girisi.xlsx"
+_MARKA_ESLE = {"PEUGEOT": "Peugeot", "CITROEN": "Citroen", "CİTROEN": "Citroen", "CİTROËN": "Citroen", "OPEL": "Opel", "FİAT": "Fiat",
+               "ALFA ROMEO & JEEP": "Arj", "ALFA / JEEP": "Arj", "ALFA JEEP": "Arj", "ARJ": "Arj", "HONDA": "Honda",
+               "BMW & MİNİ": "Bmw", "BMW": "Bmw", "BMW MİNİ": "Bmw", "BMW MOTORRAD": "Motorrad", "MOTORRAD": "Motorrad",
+               "TESLA": "Tesla", "OMODA & JAECOO": "Jaecoo", "JAECOO / OMODA": "Jaecoo", "JAECOO": "Jaecoo", "OMODA": "Jaecoo"}
+
+
+def garanti_oku(dosya, markalar):
+    """garanti_arac_girisi.xlsx → {marka: {AY: {fiili, butce, g2025}}}. Boş hücre = girilmedi."""
+    x = HizliExcel(dosya)
+    try:
+        ad = next((n for n in x.sheetnames if "GARANT" in _tr_ust(n)), None) or x.sheetnames[0]
+        cells = x.read_sheet(ad)
+    finally:
+        x.close()
+    rc = {}
+    for ref, v in cells.items():
+        m = re.match(r"([A-Z]+)(\d+)$", ref)
+        if m and v not in (None, ""):
+            rc[(int(m.group(2)), _harf_no(m.group(1)))] = v
+    son = max((r for r, _ in rc), default=0)
+    out, say = {}, 0
+    r = 1
+    while r <= son:
+        t = rc.get((r, 1))
+        alan = None
+        if isinstance(t, str):
+            T = _tr_ust(t)
+            if "BÜTÇE" in T or "BUTCE" in T:
+                alan = "butce"
+            elif "GEÇEN" in T or "GECEN" in T or "2025" in T and "FİİLİ" in T:
+                alan = "g2025"
+            elif "FİİLİ" in T or "FIILI" in T:
+                alan = "fiili"
+        if not alan:
+            r += 1
+            continue
+        h = r + 1
+        kol = {}
+        for c in range(2, 30):
+            v = rc.get((h, c))
+            if isinstance(v, str) and _tr_ust(v.strip()) in AYLAR:
+                kol[c] = _tr_ust(v.strip())
+        r = h + 1
+        while r <= son:
+            n = rc.get((r, 1))
+            if not isinstance(n, str) or not n.strip():
+                break
+            N = _tr_ust(n.strip())
+            if any(k in N for k in ("FİİLİ", "BÜTÇE", "TOPLAM")):
+                break
+            nz = lambda z: _tr_ust(z).replace("İ", "I").replace("Ë", "E").replace("  ", " ")
+            ES = {nz(k): v for k, v in _MARKA_ESLE.items()}
+            key = ES.get(nz(n.strip())) or next((k for k, v in markalar.items() if nz(v.get("etiket", "")) == nz(n.strip()) or nz(k) == nz(n.strip())), None)
+            if key:
+                for c, ay in kol.items():
+                    v = rc.get((r, c))
+                    if isinstance(v, (int, float)):
+                        out.setdefault(key, {}).setdefault(ay, {})[alan] = float(v)
+                        if alan == "fiili":
+                            say += 1
+            else:
+                print(f"  ⚠ Garanti dosyasında tanınmayan marka: {n}")
+            r += 1
+    return out, say
+
+
+def _eski_garm(cikti_yolu):
+    """Garanti dosyası yoksa mevcut index.html'deki girişleri korur."""
+    d = _eski_D(cikti_yolu)
+    return d.get("garm") if d else None
 
 
 def panel_v7_uret(girdi, ek_yolu, sablon_yolu, cikti_yolu):
@@ -1590,11 +1720,31 @@ def panel_v7_uret(girdi, ek_yolu, sablon_yolu, cikti_yolu):
     else:
         D["eks"] = _eski_eks(cikti_yolu)
         print(f"  ⚠ {ek_yolu or 'ek_satis.xlsx'} bulunamadı — ek satış " + ("önceki haliyle korundu" if D["eks"] else "sayfası boş kaldı"))
+    gy = os.path.join(os.path.dirname(os.path.abspath(girdi)), GARANTI_DOSYA)
+    if os.path.exists(gy):
+        print(f"→ Garanti araç girişi okunuyor: {GARANTI_DOSYA}")
+        D["garm"], n = garanti_oku(gy, data["markalar"])
+        print(f"  ✓ {len(D['garm'])} marka · {n} ay/marka fiili girişi")
+    else:
+        D["garm"] = _eski_garm(cikti_yolu)
+        print(f"  ⚠ {GARANTI_DOSYA} yok — garanti araç girişi " + ("önceki haliyle korundu" if D["garm"] else "boş"))
     html = open(sablon_yolu, encoding="utf-8").read()
     js = json.dumps(D, ensure_ascii=False, separators=(",", ":"))
-    if html.count("const D=__DATA__;") != 1:
-        raise SystemExit("HATA: panel_sablon.html içinde veri alanı (const D=__DATA__;) bulunamadı.")
-    html = html.replace("const D=__DATA__;", "const D=" + js + ";", 1)
+    if 'id="pdata">__DATA__</script>' in html:
+        api = str(_ayar().get("giris_servisi", "")).strip()
+        if api and not re.match(r"^https://script\.google\.com/macros/s/[A-Za-z0-9_-]+/exec$", api):
+            raise SystemExit("HATA: panel_ayar.json içindeki giris_servisi adresi geçersiz (https://script.google.com/macros/s/.../exec olmalı).")
+        if api:
+            js = json.dumps(_sifrele(js, _veri_anahtari(True)), separators=(",", ":"))
+            print("  ✓ Kişiye özel giriş açık · veri şifreli yayınlanıyor")
+        else:
+            print("  ⚠ panel_ayar.json'da giris_servisi yok — ortak şifreli eski giriş, veri açık")
+        html = html.replace('id="pdata">__DATA__</script>', 'id="pdata">' + js.replace("</", "<\\/") + "</script>", 1)
+        html = html.replace('window.PANEL={api:"__API__"}', 'window.PANEL={api:' + json.dumps(api) + '}', 1)
+    else:   # eski şablon
+        if html.count("const D=__DATA__;") != 1:
+            raise SystemExit("HATA: panel_sablon.html içinde veri alanı bulunamadı.")
+        html = html.replace("const D=__DATA__;", "const D=" + js + ";", 1)
     if os.path.exists(cikti_yolu):   # şifre korunur
         m = re.search(r"const SIFRE_HASH='([0-9a-f]{64})';", open(cikti_yolu, encoding="utf-8").read())
         if m:
@@ -1608,7 +1758,8 @@ def main():
     cikti = sys.argv[2] if len(sys.argv) > 2 else "dashboard.html"
     ek = sys.argv[3] if len(sys.argv) > 3 else "ek_satis.xlsx"
     sablon = os.path.join(os.path.dirname(os.path.abspath(__file__)), "panel_sablon.html")
-    if os.path.exists(sablon) and "const D=__DATA__;" in open(sablon, encoding="utf-8").read():
+    sb = open(sablon, encoding="utf-8").read() if os.path.exists(sablon) else ""
+    if "const D=__DATA__;" in sb or 'id="pdata">__DATA__</script>' in sb:
         html = panel_v7_uret(girdi, ek, sablon, cikti)
     else:
         data = veriyi_topla(girdi)
