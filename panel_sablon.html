@@ -707,8 +707,8 @@ const MET=['adet','iscilik','yp','toplam'];
 const nf=new Intl.NumberFormat('tr-TR',{maximumFractionDigits:0}), nf1=new Intl.NumberFormat('tr-TR',{minimumFractionDigits:1,maximumFractionDigits:1}), nf2=new Intl.NumberFormat('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const ok=v=>v!=null&&isFinite(v);
 const FM={tl:v=>nf.format(Math.round(v))+' ₺',ad:v=>nf.format(Math.round(v)),ad1:v=>nf1.format(v),
-  mn:v=>Math.abs(v)>=1e8?nf1.format(v/1e6)+' Mn ₺':Math.abs(v)>=1e6?nf2.format(v/1e6)+' Mn ₺':Math.abs(v)>=1e3?nf.format(v/1e3)+' B ₺':nf.format(v)+' ₺',
-  ab:v=>nf1.format(v/1e3)+' B ₺',a1:v=>v?nf1.format(v/1e3):'–',p0:v=>'%'+nf1.format(v*100),mx:v=>v?FM.mn(v).replace(' ₺',''):'–',m2:v=>v?nf2.format(v/1e6):'–',ax:v=>v?nf.format(Math.round(v)):'–',
+  mn:v=>Math.abs(v)>=1e8?nf1.format(v/1e6)+' Mn ₺':Math.abs(v)>=1e6?nf2.format(v/1e6)+' Mn ₺':Math.abs(v)>=1e3?nf.format(v/1e3)+' bin ₺':nf.format(v)+' ₺',
+  ab:v=>nf1.format(v/1e3)+' bin ₺',a1:v=>v?nf1.format(v/1e3):'–',p0:v=>'%'+nf1.format(v*100),mx:v=>v?FM.mn(v).replace(' ₺',''):'–',m2:v=>v?nf2.format(v/1e6):'–',ax:v=>v?nf.format(Math.round(v)):'–',
   p:v=>Math.abs(v)>=10?'%999+':'%'+nf1.format(v*100),d:v=>Math.abs(v)>=10?(v>=0?'+':'−')+'%999+':(v>=0?'+':'−')+'%'+(Math.abs(v)>=1?nf:nf1).format(Math.abs(v*100))};
 const fmt=(v,f)=>ok(v)?FM[f](v):'–';
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -890,7 +890,7 @@ const KG={
     G:[['İş emri adedi','ax',o=>o.adet],['İşçilik cirosu · Mn ₺','m2',o=>o.iscilik],['Yedek parça cirosu · Mn ₺','m2',o=>o.yp],['Toplam ciro (işçilik + YP) · Mn ₺','m2',o=>o.toplam]],
     keep:(o)=>['adet','iscilik','yp','toplam'].some(m=>o[m].fiili||o[m].butce||o[m].g2025)},
   ab:{t:'Araç başı (AB) kırılım analizi',s:'kırılım cirosu ÷ kırılım iş emri adedi · Mekanik satırı = Mekanik AB',
-    G:[['AB işçilik · B ₺','a1',o=>rat(o.iscilik,o.adet)],['AB yedek parça · B ₺','a1',o=>rat(o.yp,o.adet)],['AB toplam · B ₺','a1',o=>rat(o.toplam,o.adet)]],
+    G:[['AB işçilik · bin ₺','a1',o=>rat(o.iscilik,o.adet)],['AB yedek parça · bin ₺','a1',o=>rat(o.yp,o.adet)],['AB toplam · bin ₺','a1',o=>rat(o.toplam,o.adet)]],
     keep:o=>o.adet.fiili||o.adet.butce}};
 function kirilimTablo(S,tip='ciro'){
   const K=KG[tip], G=K.G;
@@ -912,7 +912,7 @@ const PKAT=[['','Toplam (tüm kırılımlar)'],['Mekanik','Mekanik'],['Garanti',
 function markaTablo(bs,tip,id,fixKat){
   const kat=fixKat!==undefined?fixKat:(st.sort.pkat||''), NA=['Car Care','Aksesuar','Lastik'].includes(kat), katL=kat||'Toplam';
   const abKat=kat||'Mekanik';
-  const G=tip==='ab'?[['AB işçilik · B ₺','a1',o=>rat(o.iscilik,o.adet)],['AB yedek parça · B ₺','a1',o=>rat(o.yp,o.adet)],['AB toplam · B ₺','a1',o=>rat(o.toplam,o.adet)]]
+  const G=tip==='ab'?[['AB işçilik · bin ₺','a1',o=>rat(o.iscilik,o.adet)],['AB yedek parça · bin ₺','a1',o=>rat(o.yp,o.adet)],['AB toplam · bin ₺','a1',o=>rat(o.toplam,o.adet)]]
     :[...(NA?[]:[['İş emri adedi · '+katL,'ax',o=>o.adet]]),['İşçilik cirosu · Mn ₺','m2',o=>o.iscilik],['Yedek parça cirosu · Mn ₺','m2',o=>o.yp],['Toplam ciro (işçilik + YP) · Mn ₺','m2',o=>o.toplam]];
   if(tip==='ab'&&NA)return '';
   const pick=C=>tip==='ab'?C.kat[abKat]:(kat?C.kat[kat]:C.toplam);
@@ -1259,7 +1259,7 @@ async function vKaydet(al){
     D[al]=o.veri;VED[al]={};st[al+'Edit']=false;render();toast(o.kaydedilen+' değer kaydedildi · herkes için güncel');}
   catch(e){btn.disabled=false;btn.textContent='Kaydet';toast('Kaydedilemedi: '+e.message);}
 }
-const vBar=(al,izinli,metin)=>{if(!izinli)return '';const ed=st[al+'Edit'],n=Object.keys(VED[al]).length;
+const vBar=(al,izinli,metin)=>{if(!izinli)return KUL?'<div class="garbar"><span class="garn">Bu bölümü görüntüleyebilirsiniz; veri girişi yetkiniz yok. Yetki için yöneticinize başvurun.</span></div>':'';const ed=st[al+'Edit'],n=Object.keys(VED[al]).length;
   return '<div class="garbar">'+(ed?'<span class="garn" id="'+al+'n">'+(n?n+' hücre değişti · kaydedilmedi':'Değerleri yazın ya da Excel\'den yapıştırın')+'</span><button type="button" class="gbtn ghost" data-vvaz="'+al+'">Vazgeç</button><button type="button" class="gbtn" id="'+al+'kay" data-vkay="'+al+'"'+(n?'':' disabled')+'>Kaydet</button>'
     :'<span class="garn">'+metin+'</span><button type="button" class="gbtn" data-vduz="'+al+'">Değerleri güncelle</button>')+'</div>';};
 const vInp=(al,b,A,an,r,c,ph)=>{const k=b+'|'+A+'|'+an,e=k in VED[al],v=e?VED[al][k]:vV(al,b,A,an);
@@ -1883,7 +1883,11 @@ if(!API)g('gtYeniAl').hidden=true;
 if(API){
   const o=oku();
   if(o){g('gt').hidden=true;ac(o,false).catch(err=>{console.error(err);try{sessionStorage.removeItem(OT);}catch(_){}g('gt').hidden=false;});
-    api('oturum',{jeton:o.jeton}).then(r=>{if(r&&r.ok===false&&/Oturum|aktif/.test(r.hata||''))window.PANEL_CIKIS();});}   // listeden çıkarılan kişi sayfayı yenileyince düşer
+    api('oturum',{jeton:o.jeton}).then(r=>{
+      if(r&&r.ok===false&&/Oturum|aktif/.test(r.hata||''))return window.PANEL_CIKIS();
+      // yetkiler e-tablodan değiştiyse (rol, markalar, yedek parça) oturumu güncelle ve sayfayı yenile
+      if(r&&r.ok&&(r.rol!==o.rol||!!r.yp!==!!o.yp||JSON.stringify(r.markalar||[])!==JSON.stringify(o.markalar||[]))){
+        Object.assign(o,{rol:r.rol,yp:!!r.yp,markalar:r.markalar||[],ad:r.ad||o.ad});kaydet(o);location.reload();}});}   // listeden çıkarılan kişi sayfayı yenileyince düşer
 }else{
   baslat(ham);
   try{const e=sessionStorage.getItem('inc_oturum');if(e&&e.endsWith(ALAN))g('gt').hidden=true;}catch(_){}
