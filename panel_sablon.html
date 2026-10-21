@@ -23,8 +23,8 @@ button.pri{background:var(--navy);border-color:var(--navy);color:#fff}
 :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
 /* ---- sol panel ---- */
-.shell{display:grid;grid-template-columns:234px 1fr;min-height:100vh}.shell>div{min-width:0}
-nav{background:#fbfdff;border-right:1px solid #d9e3ee;padding:25px 16px 18px;position:sticky;top:0;height:100vh;overflow:auto;display:flex;flex-direction:column}
+.shell{display:grid;grid-template-columns:212px 1fr;min-height:100vh}.shell>div{min-width:0}
+nav{background:#fbfdff;border-right:1px solid #d9e3ee;padding:25px 12px 18px;position:sticky;top:0;height:100vh;overflow:auto;display:flex;flex-direction:column}
 nav .word{white-space:nowrap;font-size:21px;color:var(--navy);letter-spacing:-.6px;padding:0 4px 14px;border-bottom:1px solid #dce5ef}nav .word b{font-weight:700}
 nav .sec{font-size:12px;font-weight:650;letter-spacing:1.5px;text-transform:uppercase;color:#627ea2;padding:20px 5px 18px;line-height:1.5}
 nav a{display:flex;gap:12px;align-items:center;min-height:45px;padding:10px 12px;border-radius:7px;border:1px solid transparent;color:#234162;text-decoration:none;font-size:14px;font-weight:700;margin-bottom:4px}
@@ -330,6 +330,29 @@ nav a.fgm-l{border:1px solid #ead9b8;background:#fdf9f1;color:#5d4316}nav a.fgm-
 .fgt2 td.fgti input:focus{outline:0;border-color:#2f5d93;box-shadow:0 0 0 3px rgba(47,93,147,.15)}.fgt2 td.fgti.dolu input{background:#fffbea;border-color:#e2c48f}.fgt2 td.fgti.fg-uy input{border-color:#e0a23a;background:#fff4e0}
 .fgt2 td.fgtb{font-weight:700;min-width:62px}.fgt2 td.fgtb.g{color:#1a7f5a}.fgt2 td.fgtb.r{color:#c0392b}.fgt2 td.fgtb.son{opacity:.55;font-weight:600}
 .fgnot{margin:8px 2px 0;font-size:11.5px;color:#8a97a8}.fgbos{margin:4px 0;font-size:13px;color:#8a97a8}
+/* okunabilirlik: yatay ay bantları, sabit başlık ve marka sütunu, satır vurgusu, eşit sütunlar */
+table.band td.kd,table.band th.kd{display:none}
+tr.mband td{padding:9px 14px!important;background:linear-gradient(90deg,#122f59,#1d4677);color:#fff;text-align:left!important;border-top:10px solid #fff;white-space:nowrap}
+tbody tr.mband:first-child td{border-top:0}
+tr.mband td>span{position:sticky;left:14px;display:inline-flex;align-items:baseline;gap:12px}
+tr.mband b{font-size:13.5px;font-weight:700;letter-spacing:.01em;color:#fff}tr.mband em{font-style:normal;font-size:11.5px;color:#e2c48f;font-weight:600}
+tr.mband+tr td,tr.mband+tr.rh th{border-top:0}
+.anim tr.mband td>span{animation:mbin .5s cubic-bezier(.2,.8,.2,1) both}
+@keyframes mbin{from{opacity:0;transform:translateX(-14px)}}
+@media screen{
+  .box .scroll{max-height:calc(100vh - 150px);overflow:auto}
+  .box .scroll>table>thead{position:sticky;top:0;z-index:4}
+  .box .scroll td.kn,.box .scroll th.kn{position:sticky;left:0;z-index:2;background:#fff;box-shadow:inset -1px 0 0 var(--line)}
+  .box .scroll thead th.kn,.box .scroll table.band thead tr.per>th:nth-child(2),.box .scroll table:not(.band) thead tr.per>th:first-child{position:sticky;left:0;z-index:5;background:#fff}
+  .box .scroll thead th.kn{background:#f7f9fb}
+  .box .scroll tr.tot td.kn,.box .scroll tfoot td.kn{background:#f6f8fb}.box .scroll tr.cur td.kn{background:#fbf7ef}
+  .box tbody tr:not(.mband):not(.rh):hover>td:not(.pp):not(.kd){background-color:#eaf1fa}
+  .box tbody tr:not(.mband):not(.rh):hover>td.kn{color:#0b2545;box-shadow:inset 3px 0 0 var(--gold),inset -1px 0 0 var(--line)}
+  .box td[data-f="m2"],.box td[data-f="mn"],.box td[data-f="mx"],.box td[data-f="a1"],.box td[data-f="tl"],.box td[data-f="ab"]{min-width:92px}
+  .box td[data-f="p"],.box td[data-f="d"]{min-width:60px}.box td[data-f="ax"],.box td[data-f="ad"]{min-width:52px}
+  .hay td,.hay th{overflow:visible!important;text-overflow:clip!important}
+}
+@media print{tr.mband td{padding:3px 8px!important;border-top:5px solid #fff}tr.mband b{font-size:9px}tr.mband em{font-size:8px}tr.mband td>span{position:static}}
 th.nw{white-space:nowrap!important}
 @media print{.hay th.nw{white-space:normal!important}.hay td,.hay th{font-size:7.4px!important;padding-left:2px!important;padding-right:2px!important}}
 .spk.tall{display:none}
@@ -744,7 +767,7 @@ td.kn small.tz{display:block;font-size:9.5px;font-weight:600;color:#8a97a8;margi
     <div class="crumb"><span id="crumb"></span></div>
     <div class="dd" id="ddB"><button type="button" class="msb" aria-haspopup="true"><small>Marka</small><span></span></button><div class="pop" hidden></div></div>
     <div class="dd" id="ddM"><button type="button" class="msb" aria-haspopup="true"><small>Dönem</small><span></span></button><div class="pop" hidden></div></div>
-    <div class="seg" id="cmpT" title="Birden fazla ay seçiliyken"><button type="button" data-cmp="ay">Ay ay</button><button type="button" data-cmp="top">Toplam</button></div>
+    <div class="seg" id="cmpT" title="Tablo görünümü"><button type="button" data-cmp="ay">Ay ay</button><button type="button" data-cmp="top">Dönem + YTD</button><button type="button" data-cmp="ytd">Yalnız YTD</button></div>
     <div class="dd" id="ddK"><button type="button" class="msb" aria-haspopup="true"><small>Göstergeler</small><span></span></button><div class="pop" hidden></div></div>
     <div class="dd" id="ddX"><button type="button" class="msb pri" aria-haspopup="true"><small>Çıktı</small><span>Excel · PDF</span></button><div class="pop narrow" hidden>
       <button class="it" id="xOne">Bu raporu Excel’e aktar</button><button class="it" id="xAll">Yönetici paketi Excel (tüm sayfalar)</button><button class="it" id="pdf">Yazdır / PDF (A4 yatay)</button></div></div>
@@ -804,7 +827,7 @@ const ACT=ms=>ms.filter(m=>m<=CUT);
 const YM=()=>Array.from({length:Math.min(Math.max(...MS()),CUT)},(_,i)=>i+1);
 const isYtdSel=()=>MS().join(',')===YM().join(',');
 const PMS=()=>MS();
-const AYAY=()=>PMS().length>1&&(st.page==='homer'||(st.cmp||'ay')==='ay');   // çok ay seçiliyse ay ay karşılaştırma
+const AYAY=()=>PMS().length>1&&(st.cmp||'ay')==='ay', YTDO=()=>st.cmp==='ytd';   // çok ay seçiliyse ay ay · yalnız YTD görünümü   // çok ay seçiliyse ay ay karşılaştırma
 const TWO=()=>true;   // her zaman seçili dönem | YTD yan yana (sabit yapı)                         // seçili dönem YTD değilse YTD yanına eklenir
 const ayk=mi=>D.aylar[mi-1];
 const gun=mi=>D.ust.ay_is_gunu[ayk(mi)]||{donem:0,gecen:0,kalan:0};
@@ -880,11 +903,19 @@ function std(x,f,plan){
 const box=(h,sub,body,tools='',cls='')=>'<div class="box '+cls+'"><div class="boxhead"><h2>'+h+'</h2>'+(sub?'<span>'+sub+'</span>':'')+(tools?'<div class="tools noprint">'+tools+'</div>':'')+'</div>'+body+'</div>';
 const box2=(c,h,sub,body,tools='')=>box(h,sub,body,tools,c);
 const tbl=(h,b,f='')=>{const last=h.slice(h.lastIndexOf('<tr')),n=(last.match(/<th/g)||[]).length;   // dar ekranda kesmek yerine yatay kaydır
+  if(/<td class="kd[^"]*" rowspan/.test(b)){   // ay/dönem blokları: soldaki dikey şerit yerine her bloğun üstünde yatay bant
+    const at=[];let i=-1;while((i=b.indexOf('<td class="kd',i+1))>=0)if(/^<td class="kd[^"]*" rowspan/.test(b.slice(i,i+60)))at.push(i);
+    for(let j=at.length-1;j>=0;j--){const tr=b.lastIndexOf('<tr',at[j]),m=b.slice(at[j]).match(/^<td class="kd[^"]*" rowspan="\d+"><span>([\s\S]*?)<\/span><\/td>/);
+      b=b.slice(0,tr)+'<tr class="mband"><td colspan="'+Math.max(1,n-1)+'"><span>'+bandTxt(m?m[1]:'')+'</span></td></tr>'+b.slice(tr);}}
   if(AYAY()&&(b.match(/<td class="kd[^"]*" rowspan/g)||[]).length>1){   // ay ay: her ay bloğunun üstünde sütun başlıkları tekrar
     let k=0;const hr=h.replace(/<tr( class="([^"]*)")?/g,(m,x,c)=>'<tr class="rh'+(k++?'':' rh0')+(c?' '+c:'')+'"');
     const at=[];let i=-1;while((i=b.indexOf('<td class="kd',i+1))>=0)if(/^<td class="kd[^"]*" rowspan/.test(b.slice(i,i+60)))at.push(b.lastIndexOf('<tr',i));
     for(let j=at.length-1;j>0;j--)b=b.slice(0,at[j])+hr+b.slice(at[j]);}
-  return '<div class="scroll"><table style="min-width:'+(160+Math.max(0,n-1)*78)+'px"><thead>'+h+'</thead><tbody>'+b+'</tbody>'+(f?'<tfoot>'+f+'</tfoot>':'')+'</table></div>';};
+  return '<div class="scroll"><table'+(b.includes('class="mband"')?' class="band"':'')+' style="min-width:'+(160+Math.max(0,n-1)*78)+'px"><thead>'+h+'</thead><tbody>'+b+'</tbody>'+(f?'<tfoot>'+f+'</tfoot>':'')+'</table></div>';};
+// bant yazısı: "Temmuz" → "Temmuz 2026 · kapandı · 23 iş günü"
+function bandTxt(t){const ham=t.replace(/<[^>]+>/g,'').trim(),i=MONTHS.findIndex(x=>ham===x||ham.startsWith(x+' ')),G=i>=0?gun(i+1):null;
+  if(i<0){if(/^YTD/.test(ham))return '<b>'+t+'</b><em>yıl başından · '+D.ust.ytd_gecen_is_gunu+' / '+D.ust.ytd_donem_is_gunu+' iş günü</em>';if(/^Seçim/.test(ham))return '<b>'+t+'</b><em>'+esc(monthLabel(PMS()))+'</em>';return '<b>'+t+'</b>';}const mi=i+1;
+  return '<b>'+MONTHS[i]+' '+YEAR+'</b><em>'+(mi<CUT?'kapandı · '+G.donem+' iş günü':mi===CUT?'devam ediyor · '+G.gecen+' / '+G.donem+' iş günü':'plan')+'</em>';}
 /* üst sağ: içinde bulunulan ayın iş günü ilerlemesi (imleçli) + güncellenme tarihi rozeti — ek satış panelindeki gibi */
 function hwHtml(lab,g,dn,extra,dd,mm,yy,noBar){
   const p=dn?Math.min(100,g/dn*100):0;
@@ -974,7 +1005,7 @@ const KG={
   ciro:{t:'Kırılım analizi',s:'iş emri adedi, işçilik, yedek parça ve toplam ciro kırılım bazında',
     G:[['İş emri adedi','ax',o=>o.adet],['İşçilik cirosu','m2',o=>o.iscilik],['Yedek parça cirosu','m2',o=>o.yp],['Toplam ciro (işçilik + YP)','m2',o=>o.toplam]],
     keep:(o)=>['adet','iscilik','yp','toplam'].some(m=>o[m].fiili||o[m].butce||o[m].g2025)},
-  ab:{t:'Araç başı (AB) kırılım analizi',s:'kırılım cirosu ÷ kırılım iş emri adedi · Mekanik satırı = Mekanik AB',
+  ab:{t:'Araç başı (AB) kırılım analizi',s:'her kırılım kendi cirosu ÷ kendi iş emri adedi',
     G:[['AB işçilik','a1',o=>rat(o.iscilik,o.adet)],['AB yedek parça','a1',o=>rat(o.yp,o.adet)],['AB toplam','a1',o=>rat(o.toplam,o.adet)]],
     keep:o=>o.adet.fiili||o.adet.butce}};
 function kirilimTablo(S,tip='ciro'){
@@ -984,10 +1015,11 @@ function kirilimTablo(S,tip='ciro'){
   const blk=(ms,lab)=>{const a=ACT(ms), plan=!a.length, C=plan?agg(S,ms,false):agg(S,a);
     const kats=D.kategoriler.filter(k=>K.keep(C.kat[k]));
     const NA=['Car Care','Aksesuar','Lastik'];   // iş emri adedi olmayan kırılımlar: adet hücreleri boş
-    const row=(name,o,c,first)=>'<tr class="'+c+'">'+(first?'<td class="kd" rowspan="'+(kats.length+1)+'"><span>'+lab+'</span></td>':'')+'<td class="kn">'+name+'</td>'+G.map(([,f,get])=>f==='ax'&&NA.includes(name)?'<td class="sep na"></td><td class="na"></td><td class="na"></td><td class="na"></td><td class="na"></td>':std(get(o),f,plan)).join('')+'</tr>';
+    const row=(name,o,c,first)=>'<tr class="'+c+'">'+(first?'<td class="kd" rowspan="'+(kats.length+(tip==='ab'?0:1))+'"><span>'+lab+'</span></td>':'')+'<td class="kn">'+name+'</td>'+G.map(([,f,get])=>f==='ax'&&NA.includes(name)?'<td class="sep na"></td><td class="na"></td><td class="na"></td><td class="na"></td><td class="na"></td>':std(get(o),f,plan)).join('')+'</tr>';
+    if(tip==='ab')return kats.map((k,i)=>row(k,C.kat[k],i?'':'kt',!i)).join('');   // AB'de toplam satırı yok: her kırılım kendi cirosu ÷ kendi iş emri
     return row('<b>Toplam</b>',C.toplam,'main kt',1)+kats.map(k=>row(k,C.kat[k],'')).join('');};
   const pm=PMS(), ym=YM(), same=pm.join()===ym.join();
-  const body=AYAY()?pm.map(m=>blk([m],MONTHS[m-1]+(m===CUT?' · devam':''))).join('')+blk(pm,'Seçim toplamı'):blk(pm,esc(monthLabel(pm)))+(same?'':blk(ym,'YTD'));
+  const body=YTDO()?blk(ym,'YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+' '+YEAR):AYAY()?pm.map(m=>blk([m],MONTHS[m-1]+(m===CUT?' · devam':''))).join('')+blk(pm,'Seçim toplamı'):blk(pm,esc(monthLabel(pm)))+(same?'':blk(ym,'YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+' '+YEAR));
   const note=(pm.includes(CUT)||ym.includes(CUT))?' · bütçe ay tamamı, '+MONTHS[CUT-1]+' fiilisi '+esc(D.ust.veri_kesim)+' kesimine kadar, 2025 fiili geçen iş günü oranında ('+gun(CUT).gecen+'/'+gun(CUT).donem+')':'';
   return box2('dense krt'+(tip==='ab'?' krab':''),K.t,esc(brandLabel())+' · '+PL()+(AYAY()?' · ay ay':same?'':' ve '+ytdLabel())+' · '+K.s+(tip==='ciro'?note:''),
     tbl(hd,body).replace(/min-width:\d+px/,'min-width:'+(tip==='ab'?860:1100)+'px'));
@@ -995,7 +1027,7 @@ function kirilimTablo(S,tip='ciro'){
 /* marka karşılaştırma: Excel "MARKA KARŞILAŞTIRMA" formatı · markalar satırda, ay ve YTD blokları alt alta */
 const PKAT=[['','Toplam (tüm kırılımlar)'],['Mekanik','Mekanik'],['Garanti','Garanti'],['Kaporta Boya','Kaporta Boya'],['Banko','Banko'],['Car Care','Car Care'],['Aksesuar','Aksesuar'],['Lastik','Lastik']];
 function markaTablo(bs,tip,id,fixKat){
-  const kat=fixKat!==undefined?fixKat:(st.sort.pkat||''), NA=['Car Care','Aksesuar','Lastik'].includes(kat), katL=kat||'Toplam';
+  const kat=fixKat!==undefined?fixKat:tip==='ab'?(st.sort.pkatab||'Mekanik'):(st.sort.pkat||''), NA=['Car Care','Aksesuar','Lastik'].includes(kat), katL=kat||'Toplam';
   const abKat=kat||'Mekanik';
   const G=tip==='ab'?[['AB işçilik','a1',o=>rat(o.iscilik,o.adet)],['AB yedek parça','a1',o=>rat(o.yp,o.adet)],['AB toplam','a1',o=>rat(o.toplam,o.adet)]]
     :[...(NA?[]:[['İş emri adedi · '+katL,'ax',o=>o.adet]]),['İşçilik cirosu','m2',o=>o.iscilik],['Yedek parça cirosu','m2',o=>o.yp],['Toplam ciro (işçilik + YP)','m2',o=>o.toplam]];
@@ -1014,11 +1046,11 @@ function markaTablo(bs,tip,id,fixKat){
     const row=(name,o,c,first,tipB)=>'<tr class="'+c+'">'+(first?'<td class="kd" rowspan="'+n+'"><span>'+pl+'</span></td>':'')+'<td class="kn'+(tipB?' bn':'')+'"'+(tipB?' data-tip="'+tipB+'|toplam|'+(tip==='ab'?abKat:kat)+'|mn"':'')+'>'+name+'</td>'+G.map(([,f,get])=>std(get(o),f,plan)).join('')+'</tr>';
     return rows.map((r,i)=>row((srt?'<span class="rk">'+(i+1)+'</span>':'')+'<b>'+esc(lab(r.b))+'</b>',r.o,i?'':'kt',!i,r.b)).join('')+(rows.length>1?row('<b>Toplam</b>',A(rows.map(r=>r.b)),'main tot',0,''):'');};
   const pm=PMS(), ym=YM(), same=pm.join()===ym.join();
-  const body=AYAY()?pm.map(m=>blk([m],MONTHS[m-1]+(m===CUT?' · devam':''))).join('')+blk(pm,'Seçim toplamı'):blk(pm,esc(monthLabel(pm)))+(same?'':blk(ym,'YTD'));
-  const kSel=fixKat!==undefined?'':'<label class="srt">Kırılım <select data-sort="pkat">'+PKAT.map(([v,t])=>'<option value="'+v+'"'+(kat===v?' selected':'')+'>'+t+'</option>').join('')+'</select></label> ';
+  const body=YTDO()?blk(ym,'YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+' '+YEAR):AYAY()?pm.map(m=>blk([m],MONTHS[m-1]+(m===CUT?' · devam':''))).join('')+blk(pm,'Seçim toplamı'):blk(pm,esc(monthLabel(pm)))+(same?'':blk(ym,'YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+' '+YEAR));
+  const kSel=fixKat!==undefined?'':'<label class="srt">Kırılım <select data-sort="'+(tip==='ab'?'pkatab':'pkat')+'">'+(tip==='ab'?PKAT.filter(x=>x[0]&&!['Car Care','Aksesuar','Lastik'].includes(x[0])):PKAT).map(([v,t])=>'<option value="'+v+'"'+(kat===v?' selected':'')+'>'+t+'</option>').join('')+'</select></label> ';
   const sSel='<label class="srt">Sıralama <select data-sort="'+id+'">'+[['','Sabit marka sırası'],['fiili','En yüksek '+(tip==='ab'?'AB toplam':'toplam ciro')],['pct','En yüksek gerçekleşme %'],['delta','En yüksek Δ %']].map(([v,t])=>'<option value="'+v+'"'+(srt===v?' selected':'')+'>'+t+'</option>').join('')+'</select></label>';
   const title=tip==='ab'?'Marka karşılaştırması · '+abKat+' araç başı (AB)':'Marka karşılaştırması · '+(kat||'Toplam (tüm kırılımlar)');
-  const sub=tip==='ab'?abKat+' cirosu ÷ '+abKat.toLowerCase()+' iş emri adedi'+(kat?'':' · Toplam seçiliyken Mekanik AB')
+  const sub=tip==='ab'?abKat+' cirosu ÷ '+abKat.toLowerCase()+' iş emri adedi'
     :(kat?kat+' kırılımı':'İş emri adedi ve cirolar tüm kırılımların toplamı · araç girişi (mekanik) için Kırılım: Mekanik')+(NA?' · bu kırılımda iş emri adedi yok':'');
   const note=(pm.includes(CUT)||ym.includes(CUT))?(tip==='ab'?' · AB oran olduğu için bütçe ve 2025 ayın tamamının AB\'si ile kıyaslanır':' · bütçe ay tamamı, 2025 fiili geçen iş günü oranında ('+gun(CUT).gecen+'/'+gun(CUT).donem+')'):'';
   if(!rows0.length)return box(title,sub,'<div class="empty">Bu kırılımda seçili markalar için veri yok.</div>',kSel);
@@ -1048,7 +1080,7 @@ function gunlukTablo(bs,id,kats){
     const row=(name,B,c,first,b)=>'<tr class="'+c+'">'+(first?'<td class="kd gkd" rowspan="'+n+'">'+lab2+'</td>':'')+'<td class="kn'+(b?' bn':'')+'"'+(b?' data-tip="'+b+'|gunAdet|'+kats[0]+'|ad1"':'')+'>'+name+'</td>'+kats.map(k=>cells(B,ms,k,plan)).join('')+'</tr>';
     return rows.map((b,i)=>row((srt?'<span class="rk">'+(i+1)+'</span>':'')+'<b>'+esc(lab(b))+'</b>',[b],i?'':'kt',!i,b)).join('')+(rows.length>1?row('<b>Toplam</b>',rows,'main tot',0,''):'');};
   const pm=PMS(), ym=YM(), same=pm.join()===ym.join();
-  const body=AYAY()?pm.map(m=>blk([m],MONTHS[m-1]+(m===CUT?' · devam':''))).join('')+blk(pm,'Seçim toplamı'):blk(pm,esc(monthLabel(pm)))+(same?'':blk(ym,'YTD'));
+  const body=YTDO()?blk(ym,'YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+' '+YEAR):AYAY()?pm.map(m=>blk([m],MONTHS[m-1]+(m===CUT?' · devam':''))).join('')+blk(pm,'Seçim toplamı'):blk(pm,esc(monthLabel(pm)))+(same?'':blk(ym,'YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+' '+YEAR));
   const sSel='<label class="srt">Sıralama <select data-sort="'+id+'">'+[['','Sabit marka sırası'],['fiili','En yüksek günlük '+(kats[0]==='Mekanik'?'mekanik':'iş emri')],['pct','En yüksek gerçekleşme %'],['delta','En yüksek Δ %']].map(([v,t])=>'<option value="'+v+'"'+(srt===v?' selected':'')+'>'+t+'</option>').join('')+'</select></label>';
   const note=(pm.includes(CUT)||ym.includes(CUT))?' · '+MONTHS[CUT-1]+': fiili ÷ geçen iş günü, bütçe ÷ ayın iş günü':'';
   const gn=kats.includes(GK)?' · garanti araç girişi: markaların girişi (BMW & MINI, Motorrad ve Tesla servis verisinden)':'';
@@ -1248,7 +1280,7 @@ function homerAy(S,K,GL){
   const multi=pm.length>1;let body='';if(multi)for(const m of pm)body+=row(MONTHS[m-1]+(m===CUT?' · devam':m>CUT?' · plan':''),[m],m>CUT?'plan':'');else for(let m=1;m<=12;m++)body+=row(MONTHS[m-1]+(m===CUT?' · devam':m>CUT?' · plan':''),[m],(m>CUT?'plan ':'')+(pm.includes(m)?'cur':''));
   const all=Array.from({length:CUT},(_,i)=>i+1);
   return box2('dense krt hay','HOMER · ay ay seyir'+(GL?' · '+GL:''),(GL||esc(brandLabel()))+' · '+YEAR+' · kaporta-boya iş emri adedi, işçilik, yedek parça ve toplam ciro '+(PMS().length>1?' · seçili aylar':' · seçili dönem ayları vurgulu'),
-    tbl(hd,body,multi?row('<b>Seçim toplamı</b>',pm,'main tot'):row('<b>YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+'</b>',all,'main tot')).replace(/min-width:\d+px/,'min-width:1240px;table-layout:fixed').replace('<thead>','<colgroup><col style="width:120px">'+'<col>'.repeat(20)+'</colgroup><thead>'));
+    tbl(hd,body,multi?row('<b>Seçim toplamı</b>',pm,'main tot'):row('<b>YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+'</b>',all,'main tot')).replace(/min-width:\d+px/,'min-width:1240px').replace('<thead>','<colgroup><col style="width:120px">'+'<col>'.repeat(20)+'</colgroup><thead>'));
 }
 function homerIsi(bs,K,GL){
   const multi=PMS().length>1, ms=multi?PMS():Array.from({length:CUT},(_,i)=>i+1), k=st.sort.hhm||'adet';
@@ -1272,7 +1304,7 @@ function homerGrupOzet(K,gs){
   const blk=(ms,pl)=>{const R=[...gs.map(g=>[g[1],g[3],'']),...(gs.length>1?[['HOMER toplam',all,'main tot']]:[])];
     return R.map((r,i)=>'<tr class="'+(i?r[2]:'kt')+'">'+(i?'':'<td class="kd" rowspan="'+R.length+'"><span>'+pl+'</span></td>')+'<td class="kn"><b>'+r[0]+'</b></td>'+G.map(([m,,f])=>{const q=val(r[1],ms,m,K);return std(q.x,f,q.plan);}).join('')+'</tr>').join('');};
   const pm=PMS(), ym=YM(), same=pm.join()===ym.join();
-  const body=AYAY()?pm.map(m=>blk([m],MONTHS[m-1].slice(0,3)+(m===CUT?' · devam':''))).join('')+blk(pm,'Seçim'):blk(pm,esc(monthLabel(pm)))+(same?'':blk(ym,'YTD'));
+  const body=YTDO()?blk(ym,'YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+' '+YEAR):AYAY()?pm.map(m=>blk([m],MONTHS[m-1]+(m===CUT?' · devam':''))).join('')+blk(pm,'Seçim toplamı'):blk(pm,esc(monthLabel(pm)))+(same?'':blk(ym,'YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+' '+YEAR));
   return box2('dense krt mtb','HOMER · grup özeti','Kaporta-boya · BMW & MINI · Tesla ile diğer markalar ayrı gruplar',tbl(hd,body).replace(/min-width:\d+px/,'min-width:1130px'));
 }
 function pHomer(){
@@ -1833,7 +1865,7 @@ function scopeRender(){
   $('ddB').querySelector('.msb span').textContent=st.brands.length?brandLabel():'Tüm markalar ('+BR.length+')';
   $('ddM').querySelector('.msb span').textContent=monthLabel();
   $('ddK').querySelector('.msb span').textContent=st.kpis.map(k=>KP[k][1].replace(' cirosu','').replace('Yedek parça','YP').replace(' (iş emri)','')).join(' · ');
-  $('ddK').style.display='none';const cm=$('cmpT');cm.style.display=PMS().length>1&&st.page!=='ek'&&st.page!=='garanti'&&st.page!=='yp'&&st.page!=='kt'&&st.page!=='aie'&&st.page!=='durum'&&st.page!=='giris'&&st.page!=='veri'&&st.page!=='homer'?'':'none';cm.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.cmp===(st.cmp||'ay')));$('ddB').style.display=$('ddM').style.display=['ek','garanti','yp','kt','aie','durum','giris'].includes(st.page)?'none':'';$('ddX').style.display=st.page==='giris'?'none':'';
+  $('ddK').style.display='none';const cm=$('cmpT');cm.style.display=['ozet','perf','homer'].includes(st.page)?'':'none';{const multi=PMS().length>1,cur=st.cmp==='ytd'?'ytd':multi&&(st.cmp||'ay')==='ay'?'ay':'top';cm.querySelector('[data-cmp="ay"]').style.display=multi?'':'none';cm.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.cmp===cur));}$('ddB').style.display=$('ddM').style.display=['ek','garanti','yp','kt','aie','durum','giris'].includes(st.page)?'none':'';$('ddX').style.display=st.page==='giris'?'none':'';
 }
 
 /* ---------- ipucu (hover) ---------- */
