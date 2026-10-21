@@ -373,6 +373,11 @@ tr.mband+tr td,tr.mband+tr.rh th{border-top:0}
 .card.hgc.hsel{box-shadow:0 0 0 2px var(--gold),0 10px 24px -16px rgba(18,47,89,.4)}.card.hgc .t small{font-weight:600;letter-spacing:0;text-transform:none;color:#8a97a8;margin-left:4px}
 .card.hgc .hgsec{display:block;margin-top:8px;font-style:normal;font-size:11.5px;font-weight:700;color:#2f5d93}.card.hgc.hsel .hgsec{color:#9a6f2e}
 @media (max-width:900px){.hgcards{grid-template-columns:1fr!important}}@media print{.card.hgc .hgsec{display:none}}
+@media screen{
+  .box .scroll>table.dar{border-right:1px solid var(--line)}
+  .box .scroll td:not(.kn):not(.kd),.box .scroll th:not(.kn):not(.kd){padding-left:14px;padding-right:12px}
+  .hmb .scroll td.hmc,.hmb .scroll td.hm0,.hmb .scroll th{padding-left:8px;padding-right:8px}
+}
 th.nw{white-space:nowrap!important}
 @media print{.hay th.nw{white-space:normal!important}.hay td,.hay th{font-size:7.4px!important;padding-left:2px!important;padding-right:2px!important}}
 .spk.tall{display:none}
@@ -1084,6 +1089,12 @@ function markaTablo(bs,tip,id,fixKat){
 }
 /* günlük araç girişi: mekanik · hasar · garanti (garanti araç girişi manuel dosyadan) */
 const garVar=(bs,ms)=>bs.some(b=>(b===KON?BR:[b]).some(x=>GVERI.includes(x)||ms.some(m=>D.garm&&D.garm[x]&&D.garm[x][ayk(m)]&&D.garm[x][ayk(m)].fiili!=null)));
+// önceki yılın iş günleri (Cmt dahil, Pazar ve resmi tatil hariç): günlük ortalamayı 2025'in kendi iş günüyle kıyaslamak için
+const TATIL={2025:['2025-01-01','2025-03-30','2025-03-31','2025-04-01','2025-04-23','2025-05-01','2025-05-19','2025-06-06','2025-06-07','2025-06-08','2025-06-09','2025-07-15','2025-08-30','2025-10-29'],
+  2026:['2026-01-01','2026-03-20','2026-03-21','2026-03-22','2026-04-23','2026-05-01','2026-05-19','2026-05-27','2026-05-28','2026-05-29','2026-05-30','2026-07-15','2026-08-30','2026-10-29']};
+const gunOnce=m=>{const y=YEAR-1,T=TATIL[y]||[],n=new Date(y,m,0).getDate();let c=0;for(let d=1;d<=n;d++){if(new Date(y,m-1,d).getDay()===0)continue;if(T.includes(y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0')))continue;c++;}return c;};
+// 2025 günlük ortalama = 2025 ay toplamı ÷ 2025 iş günü (devam eden ayda da tam ay; tempo kıyası)
+function gOnceGun(bs,ms,kat,met){const a=ACT(ms);if(!a.length)return null;const o=agg(bs,a,false),A=kat?o.kat[kat]:(met==='adet'?o.kat.Mekanik:o.toplam),v=A[met==='adet'?'adet':'toplam'].g2025,d=a.reduce((s,m)=>s+gunOnce(m),0);return d&&v?v/d:null;}
 function gunlukTablo(bs,id,kats){
   kats=kats||['Mekanik','Kaporta Boya',GK];
   const KL={'Mekanik':'Mekanik araç girişi','Kaporta Boya':'Hasar · kaporta-boya iş emri',[GK]:'Garanti araç girişi'};   // garanti: yalnız toplam ve günlük fiili
@@ -1093,13 +1104,13 @@ function gunlukTablo(bs,id,kats){
   const srt=st.sort[id]||'';
   const hd='<tr class="per"><th class="kd"></th><th></th>'+kats.map(k=>'<th colspan="'+(k===GK?2:5)+'" class="cur sep">'+KL[k]+'</th>').join('')+'</tr>'+
     '<tr><th class="kd"></th><th class="kn">Marka</th>'+kats.map(k=>k===GK?'<th class="sep">Toplam</th><th title="Günlük ortalama">Günlük</th>':'<th class="sep">Toplam</th><th title="Günlük bütçe">Bütçe/gün</th><th title="Günlük fiili">Fiili/gün</th><th>Gerç.</th><th title="2025 aynı döneme göre değişim">Δ \'25</th>').join('')+'</tr>';
-  const cells=(b,ms,k,plan)=>{const x=val(b,ms,'gunAdet',k).x, t=val(b,ms,'adet',k).x;
+  const cells=(b,ms,k,plan)=>{const x=Object.assign({},val(b,ms,'gunAdet',k).x), t=val(b,ms,'adet',k).x;x.g2025=gOnceGun(b,ms,k,'adet');
     if(k===GK)return plan||!garVar(b,ms)?'<td class="sep na">–</td><td class="na">–</td>':td(t.fiili,'ax','sep')+td(x.fiili,'ad1','v');
     if(plan)return '<td class="sep">–</td>'+td(x.butce,'ad1')+'<td>–</td><td>–</td><td>–</td>';
     return td(t.fiili,'ax','sep')+td(x.butce,'ad1')+td(x.fiili,'ad1','v')+td(bud(x),'p')+td(del(x),'d');};
   const blk=(ms,pl)=>{const a=ACT(ms), plan=!a.length, g=plan?0:gecen(a), d=ms.reduce((s,m)=>s+gun(m).donem,0);
     let rows=rows0.slice();
-    const key=b=>{const x=val([b],ms,'gunAdet',kats[0]).x;return srt==='fiili'?x.fiili:srt==='pct'?bud(x):srt==='delta'?del(x):0;};
+    const key=b=>{const x=Object.assign({},val([b],ms,'gunAdet',kats[0]).x);x.g2025=gOnceGun([b],ms,kats[0],'adet');return srt==='fiili'?x.fiili:srt==='pct'?bud(x):srt==='delta'?del(x):0;};
     if(srt)rows.sort((p,q)=>(ok(key(q))?key(q):-1e18)-(ok(key(p))?key(p):-1e18));
     const n=rows.length+(rows.length>1?1:0);
     const lab2='<span>'+pl+'<small>'+(plan?d+' iş günü':g+' / '+d+' iş günü')+'</small></span>';
@@ -1108,7 +1119,7 @@ function gunlukTablo(bs,id,kats){
   const pm=PMS(), ym=YM(), same=pm.join()===ym.join();
   const body=YTDO()?blk(ym,'YTD · Oca–'+MONTHS[Math.max(...YM())-1].slice(0,3)+' '+YEAR):AYAY()?pm.map(m=>blk([m],MONTHS[m-1]+(m===CUT?' · devam':''))).join('')+blk(pm,'Seçim toplamı'):blk(pm,esc(monthLabel(pm)))+(same?'':blk(ym,'YTD · Oca–'+MONTHS[Math.max(...YM())-1].slice(0,3)+' '+YEAR));
   const sSel='<label class="srt">Sıralama <select data-sort="'+id+'">'+[['','Sabit marka sırası'],['fiili','En yüksek günlük '+(kats[0]==='Mekanik'?'mekanik':'iş emri')],['pct','En yüksek gerçekleşme %'],['delta','En yüksek Δ %']].map(([v,t])=>'<option value="'+v+'"'+(srt===v?' selected':'')+'>'+t+'</option>').join('')+'</select></label>';
-  const note=(pm.includes(CUT)||ym.includes(CUT))?' · '+MONTHS[CUT-1]+': fiili ÷ geçen iş günü, bütçe ÷ ayın iş günü':'';
+  const note=((pm.includes(CUT)||ym.includes(CUT))?' · '+MONTHS[CUT-1]+': fiili ÷ geçen iş günü, bütçe ÷ ayın iş günü':'')+' · Δ \'25: günlük ortalama, '+(YEAR-1)+' ay toplamı ÷ '+(YEAR-1)+' iş günü';
   const gn=kats.includes(GK)?' · garanti araç girişi: markaların girişi (BMW & MINI, Motorrad ve Tesla servis verisinden)':'';
   return box2('dense krt mtb gnt','Günlük araç girişi','adet ÷ iş günü'+note+gn,tbl(hd,body).replace(/min-width:\d+px/,'min-width:'+(kats.reduce((a,k)=>a+(k===GK?110:250),0)+150)+'px;width:100%'),sSel);
 }
@@ -1226,7 +1237,7 @@ function yorum(S,C,ms,plan){
   // 6 · araç girişi ve AB
   L.push('Araç girişi (mekanik) <b>'+FM.ad(a.fiili)+'</b> (bütçe '+fmt(bud(a),'p')+', 2025 '+Dl(del(a))+'); Mekanik AB toplam '+fmt(ab.fiili,'ab')+' (2025 '+Dl(del(ab))+')'+
     (ok(del(a))&&ok(del(ab))?(del(a)<0&&del(ab)>0?' — araç sayısı düşerken araç başı ciro artıyor.':del(a)>0&&del(ab)<0?' — araç sayısı artarken araç başı ciro düşüyor.':'.'):'.'));
-  {const gc=gecen(am), gd=am.reduce((x,m)=>x+gun(m).donem,0), ga=kv(C,'gunAdet','',gc,gd), gt=kv(C,'gunCiro','',gc,gd);
+  {const gc=gecen(am), gd=am.reduce((x,m)=>x+gun(m).donem,0), ga=Object.assign({},kv(C,'gunAdet','',gc,gd),{g2025:gOnceGun(S,am,'','adet')}), gt=Object.assign({},kv(C,'gunCiro','',gc,gd),{g2025:gOnceGun(S,am,'','toplam')});
     if(gc)L.push('Günlük ortalama: <b>'+fmt(ga.fiili,'ad1')+'</b> araç girişi (mekanik) ve <b>'+FM.mn(gt.fiili)+'</b> ciro; bütçe günlük '+fmt(ga.butce,'ad1')+' araç / '+FM.mn(gt.butce)+', 2025 günlük '+fmt(ga.g2025,'ad1')+' araç / '+FM.mn(gt.g2025)+'.');}
   if(AYAY()){const a2=am.filter(m=>m<CUT).slice(-2);
     if(a2.length===2){const [m1,m2]=a2, x1=val(S,[m1],'toplam','').x, x2=val(S,[m2],'toplam','').x, ch=x1.fiili?x2.fiili/x1.fiili-1:null;
@@ -1591,9 +1602,19 @@ function pYP(){
     '<p class="note">Her hafta güncel değerler, ay sonunda "Ay kapanışı" dönemi seçilerek kesin değerler girilir. Ay kapanışındaki güncel toplam stok, stok devir hızında dönem sonu stoğu olarak kullanılır. Ölü stok oranı = ölü stok 12 ay ÷ güncel toplam stok.</p>'+'<div class="pb"></div>'+sdBolum();
 }
 /* ---------- 05 · Car Care ---------- */
+// Car Care · marka × ay ısı haritası (Oca → içinde bulunulan ay + YTD)
+function carIsi(){
+  const K='Car Care', ms=Array.from({length:CUT},(_,i)=>i+1), S=SEL(), bs=rowsOf().filter(b=>{const x=val([b],ms,'toplam',K).x;return x.fiili||x.butce;});
+  const cell=(x,plan)=>{const p=bud(x);if(plan||!ok(p))return '<td class="hm0">'+(!plan&&x.fiili?'<b>bütçe yok</b><small>'+FM.mn(x.fiili)+'</small>':'–')+'</td>';
+    return '<td class="hmc '+hmSinif(p)+'" data-v="'+p+'" data-f="p"><b>'+fmt(p,'p')+'</b><small>'+FM.mn(x.fiili)+'</small></td>';};
+  const satir=(ad,B,c,tip)=>'<tr class="'+c+'"><td'+(tip?' class="bn" data-tip="'+tip+'|toplam|'+K+'|mn"':'')+'><b>'+ad+'</b></td>'+ms.map(m=>{const q=val(B,[m],'toplam',K);return cell(q.x,q.plan);}).join('')+(()=>{const q=val(B,ms,'toplam',K);return cell(q.x,q.plan).replace('<td class="','<td class="sep ');})()+'</tr>';
+  const rows=bs.map(b=>satir(esc(lab(b)),[b],'',b)).join('')+(bs.length>1?satir('Toplam',bs,'tot',''):'');
+  return box2('hmb','Car Care · marka × ay',esc(brandLabel())+' · '+YEAR+' · bütçe gerçekleşmesi ve fiili · bütçe ay tamamı'+(ms.includes(CUT)?' · '+MONTHS[CUT-1]+' devam ediyor':''),
+    HMKEY+tbl('<tr><th>Marka</th>'+ms.map(m=>'<th>'+MONTHS[m-1].slice(0,3)+(m===CUT?' · devam':'')+'</th>').join('')+'<th class="sep">YTD</th></tr>',rows));
+}
 function pCar(){
   return head('Servis Performans Yönetimi','Car Care','Car Care cirosu · '+PL())+'<div class="grid2">'+
-    brandBlock('cc','Car Care cirosu','','toplam','Car Care','mn')+monthBlock('Car Care cirosu · 12 ay','toplam','Car Care','mn')+'</div>'+notes();
+    brandBlock('cc','Car Care cirosu','','toplam','Car Care','mn')+carIsi()+'</div>'+notes();
 }
 /* ---------- 06 · Ek Satış (ek_satis.xlsx · "Konsolide Hedef") ----------
    ek-satis-dashboard panelinin aynısı: Marka Detayı + Marka Karşılaştırma, Q4 planı ve fiili.
@@ -2019,6 +2040,25 @@ $('xAll').onclick=()=>{closeDD();if(!needX())return;const wb=XLSX.utils.book_new
 
 /* ---------- çizim ---------- */
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2600);}
+// tablo sütunları: rakam sütunları içeriği kadar; tablo kutudan darsa artan genişlik marka/etiket sütununa verilir (sütunlar arası dağınık boşluk olmasın)
+function sutunSik(){
+  if(window.__yazdir||matchMedia('print').matches)return;
+  document.querySelectorAll('#app .box:not(.hmb) .scroll>table').forEach(t=>{
+    const w=t.parentNode.clientWidth;if(!w)return;
+    const ilk=[...t.querySelectorAll('thead tr:last-child>th, tbody tr:not(.mband):not(.rh)>td')].find(c=>c.offsetParent&&!c.classList.contains('kd'));
+    t.style.width='max-content';t.style.minWidth='0';
+    const nat=t.offsetWidth;
+    if(nat>=w-2||!ilk){t.style.width='';t.style.minWidth='';return;}   // geniş tablo: yatay kaydırma
+    const ths=[...t.querySelectorAll('thead tr:last-child>th')].filter(c=>c.offsetParent&&!c.classList.contains('kd'));
+    if(ths.length<2){t.style.width='';t.style.minWidth='';return;}
+    const W=ths.map(c=>c.offsetWidth);let ek=w-nat;
+    for(let i=1;i<W.length;i++){const a=Math.min(ek,Math.max(0,104-W[i]));W[i]+=a;ek-=a;}   // rakam sütunları en az ~104 px
+    {const a=Math.min(ek,Math.max(0,260-W[0]));W[0]+=a;ek-=a;}                            // marka sütunu en fazla ~260 px
+    for(let i=1;i<W.length;i++){const a=Math.min(ek/(W.length-i),Math.max(0,132-W[i]));W[i]+=a;ek-=a;}   // rakam sütunları en fazla ~132 px
+    ths.forEach((c,i)=>c.style.width=Math.floor(W[i])+'px');
+    t.style.width=ek>4?Math.floor(w-ek)+'px':'100%';t.classList.toggle('dar',ek>4);});
+}
+window.addEventListener('resize',()=>{clearTimeout(window.__ss);window.__ss=setTimeout(()=>{document.querySelectorAll('#app .box .scroll>table thead th[style*="width"]').forEach(x=>x.style.width='');sutunSik();},150);});
 function render(){
   const P=PAGES.find(p=>p[0]===st.page)||PAGES[0];st.page=P[0];ls.set('inc_panel_v5',st);
   const link=(p,i)=>{const nb=p[0]==='giris'?fgEksikSay():0;return '<a href="#'+p[0]+'" class="'+(p[0]===st.page?'on':'')+(p[0]==='giris'?' fgm-l':'')+'" data-p="'+p[0]+'">'+(i!=null?'<span>'+String(i).padStart(2,'0')+'</span>':'')+p[1]+(nb?'<em class="fgnb" title="Bu hafta girişi eksik marka sayısı">'+nb+'</em>':'')+'</a>';};
@@ -2030,6 +2070,7 @@ function render(){
   $('app').innerHTML='<table class="pw"><thead><tr><td><div class="phead"><div class="plogo">'+LOGO+'</div><div class="ptx"><b>'+P[1]+'</b><span>'+(st.page==='ek'&&EK?esc(EK.meta.donem)+' · ek satış planı ve gerçekleşme':esc(brandLabel())+' · '+PL()+(TWO()?' ve '+ytdLabel():''))+'</span></div><div class="pk">'+(st.page==='ek'&&EK?'Güncellenme <b>'+esc(EK.meta.veriTarihi)+'</b>':'Veri kesimi <b>'+esc(D.ust.veri_kesim)+'</b>')+'<br>Servis Performans Yönetimi</div></div></td></tr></thead><tbody><tr><td>'+P[2]()+'</td></tr></tbody></table><div class="prt">İnciroğlu Otomotiv · Hazırlayan: CEO Ofis · İş Geliştirme ve Strateji · '+P[1]+' · '+esc(brandLabel())+' · '+PL()+' · veri kesimi '+esc(D.ust.veri_kesim)+' · yazdırma '+new Date().toLocaleDateString('tr-TR')+'</div>';
   document.title=P[1]+' · İnciroğlu Otomotiv';
   const AK=[st.page,st.brands,st.months,st.hkat,st.ekKat,st.hmet,st.kpis,st.ek.tab,st.ek.cp,st.ek.brand,st.ek.kal].join('|'), still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  sutunSik();
   document.querySelectorAll('#app .hmb tbody tr').forEach((tr,r)=>[...tr.cells].forEach((c,ci)=>{c.style.setProperty('--c',ci);c.style.setProperty('--r',r);}));
   const anim=AK!==window.__ak&&!still;window.__ak=AK;$('app').classList.toggle('anim',anim);
   if(anim){[...document.querySelectorAll('#app .box,#app .card,#app .hc,#app .lbr')].forEach((el,i)=>el.style.animationDelay=Math.min(i,10)*55+'ms');
@@ -2045,7 +2086,7 @@ const LOGO=document.querySelector('nav .word').innerHTML;
 document.querySelector('nav').onclick=e=>{const a=e.target.closest('a[data-p]');if(!a)return;e.preventDefault();st.page=a.dataset.p;OPEN.clear();history.replaceState(null,'','#'+st.page);render();window.scrollTo(0,0);};
 $('pdf').onclick=()=>{closeDD();render();setTimeout(()=>window.print(),50);};
 // yazdırırken animasyon ortasında kalmasın: son değerlerle statik yeniden çiz
-window.addEventListener('beforeprint',()=>render());
+window.addEventListener('beforeprint',()=>{window.__yazdir=1;render();});window.addEventListener('afterprint',()=>{window.__yazdir=0;render();});
 if(location.hash&&PAGES.some(p=>p[0]===location.hash.slice(1)))st.page=location.hash.slice(1);
 $('pfy').textContent=YEAR;
 render();
