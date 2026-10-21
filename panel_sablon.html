@@ -333,26 +333,46 @@ nav a.fgm-l{border:1px solid #ead9b8;background:#fdf9f1;color:#5d4316}nav a.fgm-
 /* okunabilirlik: yatay ay bantları, sabit başlık ve marka sütunu, satır vurgusu, eşit sütunlar */
 table.band td.kd,table.band th.kd{display:none}
 tr.mband td{padding:9px 14px!important;background:linear-gradient(90deg,#122f59,#1d4677);color:#fff;text-align:left!important;border-top:10px solid #fff;white-space:nowrap}
-tbody tr.mband:first-child td{border-top:0}
+tbody tr.mband:first-child td,thead tr.mband td{border-top:0}
 tr.mband td>span{position:sticky;left:14px;display:inline-flex;align-items:baseline;gap:12px}
 tr.mband b{font-size:13.5px;font-weight:700;letter-spacing:.01em;color:#fff}tr.mband em{font-style:normal;font-size:11.5px;color:#e2c48f;font-weight:600}
 tr.mband+tr td,tr.mband+tr.rh th{border-top:0}
 .anim tr.mband td>span{animation:mbin .5s cubic-bezier(.2,.8,.2,1) both}
 @keyframes mbin{from{opacity:0;transform:translateX(-14px)}}
 @media screen{
-  .box .scroll{max-height:calc(100vh - 150px);overflow:auto}
-  .box .scroll>table>thead{position:sticky;top:0;z-index:4}
   .box .scroll td.kn,.box .scroll th.kn{position:sticky;left:0;z-index:2;background:#fff;box-shadow:inset -1px 0 0 var(--line)}
   .box .scroll thead th.kn,.box .scroll table.band thead tr.per>th:nth-child(2),.box .scroll table:not(.band) thead tr.per>th:first-child{position:sticky;left:0;z-index:5;background:#fff}
   .box .scroll thead th.kn{background:#f7f9fb}
   .box .scroll tr.tot td.kn,.box .scroll tfoot td.kn{background:#f6f8fb}.box .scroll tr.cur td.kn{background:#fbf7ef}
-  .box tbody tr:not(.mband):not(.rh):hover>td:not(.pp):not(.kd){background-color:#eaf1fa}
+  .box tbody tr:not(.mband):not(.rh):hover>td:not(.pp):not(.kd):not(.hmc):not(.hm0){background-color:#eaf1fa}
   .box tbody tr:not(.mband):not(.rh):hover>td.kn{color:#0b2545;box-shadow:inset 3px 0 0 var(--gold),inset -1px 0 0 var(--line)}
   .box td[data-f="m2"],.box td[data-f="mn"],.box td[data-f="mx"],.box td[data-f="a1"],.box td[data-f="tl"],.box td[data-f="ab"]{min-width:92px}
   .box td[data-f="p"],.box td[data-f="d"]{min-width:60px}.box td[data-f="ax"],.box td[data-f="ad"]{min-width:52px}
   .hay td,.hay th{overflow:visible!important;text-overflow:clip!important}
 }
 @media print{tr.mband td{padding:3px 8px!important;border-top:5px solid #fff}tr.mband b{font-size:9px}tr.mband em{font-size:8px}tr.mband td>span{position:static}}
+/* ısı haritası: net kırmızı/yeşil kademeler, dalga ile belirme, satır+sütun vurgusu */
+.hmb td.hmc.hn2{background:rgba(180,73,72,.50);color:#4a1514}.hmb td.hmc.hn2 small{color:#5b2a29}
+.hmb td.hmc.hn1{background:rgba(180,73,72,.20);color:#7a2a28}.hmb td.hmc.hn1 small{color:#6b4140}
+.hmb td.hmc.hp1{background:rgba(8,117,101,.17);color:#0b5a4d}.hmb td.hmc.hp1 small{color:#3d6158}
+.hmb td.hmc.hp2{background:rgba(8,117,101,.46);color:#063f36}.hmb td.hmc.hp2 small{color:#244d45}
+.hmb td.hm0{background:#f3f5f8}
+.hmb td.hmc,.hmb td.hm0{border:2px solid #fff;border-radius:6px;transition:box-shadow .15s,transform .15s}
+.hmb tbody tr:hover>td.hmc,.hmb tbody tr:hover>td.hm0{box-shadow:inset 0 0 0 2px rgba(18,47,89,.45)}
+.hmb td.hcol{box-shadow:inset 0 0 0 2px rgba(18,47,89,.45)}
+.hmb td.hmc:hover{transform:scale(1.04);z-index:1;position:relative;box-shadow:0 4px 12px -4px rgba(11,37,69,.45)}
+.hmkey{display:flex;flex-wrap:wrap;gap:6px;padding:10px 18px 6px;font-size:11.5px;font-weight:600}
+.hmkey span{padding:3px 10px;border-radius:12px}.hmkey .hn2{background:rgba(180,73,72,.50);color:#4a1514}.hmkey .hn1{background:rgba(180,73,72,.20);color:#7a2a28}.hmkey .hp1{background:rgba(8,117,101,.17);color:#0b5a4d}.hmkey .hp2{background:rgba(8,117,101,.46);color:#063f36}.hmkey .hm0k{background:#f3f5f8;color:#7d8da1}
+.anim .hmb td.hmc,.anim .hmb td.hm0{animation:hmw .55s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--c,0)*70ms + var(--r,0)*25ms)}
+@keyframes hmw{from{opacity:0;transform:scale(.82)}}
+@media (prefers-reduced-motion:reduce){.anim .hmb td.hmc,.anim .hmb td.hm0{animation:none}}
+@media print{.hmb td.hmc,.hmb td.hm0{border-width:1px}.hmkey{padding:3px 8px;font-size:8px}}
+/* HOMER grup kartları */
+.hgcards{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.card.hgc[data-hgr]{cursor:pointer;transition:box-shadow .18s,transform .18s}.card.hgc[data-hgr]:hover{transform:translateY(-2px);box-shadow:0 10px 24px -14px rgba(18,47,89,.45)}
+.card.hgc.hsel{box-shadow:0 0 0 2px var(--gold),0 10px 24px -16px rgba(18,47,89,.4)}.card.hgc .t small{font-weight:600;letter-spacing:0;text-transform:none;color:#8a97a8;margin-left:4px}
+.card.hgc .hgsec{display:block;margin-top:8px;font-style:normal;font-size:11.5px;font-weight:700;color:#2f5d93}.card.hgc.hsel .hgsec{color:#9a6f2e}
+@media (max-width:900px){.hgcards{grid-template-columns:1fr!important}}@media print{.card.hgc .hgsec{display:none}}
 th.nw{white-space:nowrap!important}
 @media print{.hay th.nw{white-space:normal!important}.hay td,.hay th{font-size:7.4px!important;padding-left:2px!important;padding-right:2px!important}}
 .spk.tall{display:none}
@@ -903,18 +923,24 @@ function std(x,f,plan){
 const box=(h,sub,body,tools='',cls='')=>'<div class="box '+cls+'"><div class="boxhead"><h2>'+h+'</h2>'+(sub?'<span>'+sub+'</span>':'')+(tools?'<div class="tools noprint">'+tools+'</div>':'')+'</div>'+body+'</div>';
 const box2=(c,h,sub,body,tools='')=>box(h,sub,body,tools,c);
 const tbl=(h,b,f='')=>{const last=h.slice(h.lastIndexOf('<tr')),n=(last.match(/<th/g)||[]).length;   // dar ekranda kesmek yerine yatay kaydır
-  if(/<td class="kd[^"]*" rowspan/.test(b)){   // ay/dönem blokları: soldaki dikey şerit yerine her bloğun üstünde yatay bant
-    const at=[];let i=-1;while((i=b.indexOf('<td class="kd',i+1))>=0)if(/^<td class="kd[^"]*" rowspan/.test(b.slice(i,i+60)))at.push(i);
-    for(let j=at.length-1;j>=0;j--){const tr=b.lastIndexOf('<tr',at[j]),m=b.slice(at[j]).match(/^<td class="kd[^"]*" rowspan="\d+"><span>([\s\S]*?)<\/span><\/td>/);
-      b=b.slice(0,tr)+'<tr class="mband"><td colspan="'+Math.max(1,n-1)+'"><span>'+bandTxt(m?m[1]:'')+'</span></td></tr>'+b.slice(tr);}}
-  if(AYAY()&&(b.match(/<td class="kd[^"]*" rowspan/g)||[]).length>1){   // ay ay: her ay bloğunun üstünde sütun başlıkları tekrar
+  if(/<td class="kd[^"]*" rowspan/.test(b)){   // ay/dönem blokları: her bloğun üstünde yatay bant + sütun başlıkları
     let k=0;const hr=h.replace(/<tr( class="([^"]*)")?/g,(m,x,c)=>'<tr class="rh'+(k++?'':' rh0')+(c?' '+c:'')+'"');
-    const at=[];let i=-1;while((i=b.indexOf('<td class="kd',i+1))>=0)if(/^<td class="kd[^"]*" rowspan/.test(b.slice(i,i+60)))at.push(b.lastIndexOf('<tr',i));
-    for(let j=at.length-1;j>0;j--)b=b.slice(0,at[j])+hr+b.slice(at[j]);}
-  return '<div class="scroll"><table'+(b.includes('class="mband"')?' class="band"':'')+' style="min-width:'+(160+Math.max(0,n-1)*78)+'px"><thead>'+h+'</thead><tbody>'+b+'</tbody>'+(f?'<tfoot>'+f+'</tfoot>':'')+'</table></div>';};
+    const at=[];let i=-1;while((i=b.indexOf('<td class="kd',i+1))>=0)if(/^<td class="kd[^"]*" rowspan/.test(b.slice(i,i+60)))at.push(i);
+    const band=x=>{const m=b.slice(x).match(/^<td class="kd[^"]*" rowspan="\d+"><span>([\s\S]*?)<\/span><\/td>/);return '<tr class="mband"><td colspan="'+Math.max(1,n-1)+'"><span>'+bandTxt(m?m[1]:'')+'</span></td></tr>';};
+    const b0=band(at[0]);
+    for(let j=at.length-1;j>0;j--){const tr=b.lastIndexOf('<tr',at[j]);b=b.slice(0,tr)+band(at[j])+hr+b.slice(tr);}
+    h=b0+h;}
+  return '<div class="scroll"><table'+((b+h).includes('class="mband"')?' class="band"':'')+' style="min-width:'+(160+Math.max(0,n-1)*78)+'px"><thead>'+h+'</thead><tbody>'+b+'</tbody>'+(f?'<tfoot>'+f+'</tfoot>':'')+'</table></div>';};
 // bant yazısı: "Temmuz" → "Temmuz 2026 · kapandı · 23 iş günü"
-function bandTxt(t){const ham=t.replace(/<[^>]+>/g,'').trim(),i=MONTHS.findIndex(x=>ham===x||ham.startsWith(x+' ')),G=i>=0?gun(i+1):null;
-  if(i<0){if(/^YTD/.test(ham))return '<b>'+t+'</b><em>yıl başından · '+D.ust.ytd_gecen_is_gunu+' / '+D.ust.ytd_donem_is_gunu+' iş günü</em>';if(/^Seçim/.test(ham))return '<b>'+t+'</b><em>'+esc(monthLabel(PMS()))+'</em>';return '<b>'+t+'</b>';}const mi=i+1;
+function bandTxt(t){
+  const ham=t.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim(),harf=/[A-Za-zÇĞİÖŞÜçğıöşü]/;
+  const i=MONTHS.findIndex(x=>ham.startsWith(x)&&!harf.test(ham.charAt(x.length)));
+  const ig=ms=>{let g=0,d=0;for(const m of ms){const G=gun(m);d+=G.donem;g+=m<CUT?G.donem:m===CUT?G.gecen:0;}return g+' / '+d+' iş günü';};
+  if(i<0){const bas=t.replace(/<small[\s\S]*$/,'').replace(/<[^>]+>/g,'').trim();
+    if(/^YTD/.test(ham))return '<b>'+bas+'</b><em>yıl başından · '+ig(YM())+'</em>';
+    if(/^Seçim/.test(ham))return '<b>'+bas+'</b><em>'+PMS().map(m=>MONTHS[m-1].slice(0,3)).join(' · ')+' · '+ig(PMS())+'</em>';
+    return '<b>'+bas+'</b>';}
+  const mi=i+1,G=gun(mi);
   return '<b>'+MONTHS[i]+' '+YEAR+'</b><em>'+(mi<CUT?'kapandı · '+G.donem+' iş günü':mi===CUT?'devam ediyor · '+G.gecen+' / '+G.donem+' iş günü':'plan')+'</em>';}
 /* üst sağ: içinde bulunulan ayın iş günü ilerlemesi (imleçli) + güncellenme tarihi rozeti — ek satış panelindeki gibi */
 function hwHtml(lab,g,dn,extra,dd,mm,yy,noBar){
@@ -1019,7 +1045,7 @@ function kirilimTablo(S,tip='ciro'){
     if(tip==='ab')return kats.map((k,i)=>row(k,C.kat[k],i?'':'kt',!i)).join('');   // AB'de toplam satırı yok: her kırılım kendi cirosu ÷ kendi iş emri
     return row('<b>Toplam</b>',C.toplam,'main kt',1)+kats.map(k=>row(k,C.kat[k],'')).join('');};
   const pm=PMS(), ym=YM(), same=pm.join()===ym.join();
-  const body=YTDO()?blk(ym,'YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+' '+YEAR):AYAY()?pm.map(m=>blk([m],MONTHS[m-1]+(m===CUT?' · devam':''))).join('')+blk(pm,'Seçim toplamı'):blk(pm,esc(monthLabel(pm)))+(same?'':blk(ym,'YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+' '+YEAR));
+  const body=YTDO()?blk(ym,'YTD · Oca–'+MONTHS[Math.max(...YM())-1].slice(0,3)+' '+YEAR):AYAY()?pm.map(m=>blk([m],MONTHS[m-1]+(m===CUT?' · devam':''))).join('')+blk(pm,'Seçim toplamı'):blk(pm,esc(monthLabel(pm)))+(same?'':blk(ym,'YTD · Oca–'+MONTHS[Math.max(...YM())-1].slice(0,3)+' '+YEAR));
   const note=(pm.includes(CUT)||ym.includes(CUT))?' · bütçe ay tamamı, '+MONTHS[CUT-1]+' fiilisi '+esc(D.ust.veri_kesim)+' kesimine kadar, 2025 fiili geçen iş günü oranında ('+gun(CUT).gecen+'/'+gun(CUT).donem+')':'';
   return box2('dense krt'+(tip==='ab'?' krab':''),K.t,esc(brandLabel())+' · '+PL()+(AYAY()?' · ay ay':same?'':' ve '+ytdLabel())+' · '+K.s+(tip==='ciro'?note:''),
     tbl(hd,body).replace(/min-width:\d+px/,'min-width:'+(tip==='ab'?860:1100)+'px'));
@@ -1046,7 +1072,7 @@ function markaTablo(bs,tip,id,fixKat){
     const row=(name,o,c,first,tipB)=>'<tr class="'+c+'">'+(first?'<td class="kd" rowspan="'+n+'"><span>'+pl+'</span></td>':'')+'<td class="kn'+(tipB?' bn':'')+'"'+(tipB?' data-tip="'+tipB+'|toplam|'+(tip==='ab'?abKat:kat)+'|mn"':'')+'>'+name+'</td>'+G.map(([,f,get])=>std(get(o),f,plan)).join('')+'</tr>';
     return rows.map((r,i)=>row((srt?'<span class="rk">'+(i+1)+'</span>':'')+'<b>'+esc(lab(r.b))+'</b>',r.o,i?'':'kt',!i,r.b)).join('')+(rows.length>1?row('<b>Toplam</b>',A(rows.map(r=>r.b)),'main tot',0,''):'');};
   const pm=PMS(), ym=YM(), same=pm.join()===ym.join();
-  const body=YTDO()?blk(ym,'YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+' '+YEAR):AYAY()?pm.map(m=>blk([m],MONTHS[m-1]+(m===CUT?' · devam':''))).join('')+blk(pm,'Seçim toplamı'):blk(pm,esc(monthLabel(pm)))+(same?'':blk(ym,'YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+' '+YEAR));
+  const body=YTDO()?blk(ym,'YTD · Oca–'+MONTHS[Math.max(...YM())-1].slice(0,3)+' '+YEAR):AYAY()?pm.map(m=>blk([m],MONTHS[m-1]+(m===CUT?' · devam':''))).join('')+blk(pm,'Seçim toplamı'):blk(pm,esc(monthLabel(pm)))+(same?'':blk(ym,'YTD · Oca–'+MONTHS[Math.max(...YM())-1].slice(0,3)+' '+YEAR));
   const kSel=fixKat!==undefined?'':'<label class="srt">Kırılım <select data-sort="'+(tip==='ab'?'pkatab':'pkat')+'">'+(tip==='ab'?PKAT.filter(x=>x[0]&&!['Car Care','Aksesuar','Lastik'].includes(x[0])):PKAT).map(([v,t])=>'<option value="'+v+'"'+(kat===v?' selected':'')+'>'+t+'</option>').join('')+'</select></label> ';
   const sSel='<label class="srt">Sıralama <select data-sort="'+id+'">'+[['','Sabit marka sırası'],['fiili','En yüksek '+(tip==='ab'?'AB toplam':'toplam ciro')],['pct','En yüksek gerçekleşme %'],['delta','En yüksek Δ %']].map(([v,t])=>'<option value="'+v+'"'+(srt===v?' selected':'')+'>'+t+'</option>').join('')+'</select></label>';
   const title=tip==='ab'?'Marka karşılaştırması · '+abKat+' araç başı (AB)':'Marka karşılaştırması · '+(kat||'Toplam (tüm kırılımlar)');
@@ -1080,27 +1106,30 @@ function gunlukTablo(bs,id,kats){
     const row=(name,B,c,first,b)=>'<tr class="'+c+'">'+(first?'<td class="kd gkd" rowspan="'+n+'">'+lab2+'</td>':'')+'<td class="kn'+(b?' bn':'')+'"'+(b?' data-tip="'+b+'|gunAdet|'+kats[0]+'|ad1"':'')+'>'+name+'</td>'+kats.map(k=>cells(B,ms,k,plan)).join('')+'</tr>';
     return rows.map((b,i)=>row((srt?'<span class="rk">'+(i+1)+'</span>':'')+'<b>'+esc(lab(b))+'</b>',[b],i?'':'kt',!i,b)).join('')+(rows.length>1?row('<b>Toplam</b>',rows,'main tot',0,''):'');};
   const pm=PMS(), ym=YM(), same=pm.join()===ym.join();
-  const body=YTDO()?blk(ym,'YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+' '+YEAR):AYAY()?pm.map(m=>blk([m],MONTHS[m-1]+(m===CUT?' · devam':''))).join('')+blk(pm,'Seçim toplamı'):blk(pm,esc(monthLabel(pm)))+(same?'':blk(ym,'YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+' '+YEAR));
+  const body=YTDO()?blk(ym,'YTD · Oca–'+MONTHS[Math.max(...YM())-1].slice(0,3)+' '+YEAR):AYAY()?pm.map(m=>blk([m],MONTHS[m-1]+(m===CUT?' · devam':''))).join('')+blk(pm,'Seçim toplamı'):blk(pm,esc(monthLabel(pm)))+(same?'':blk(ym,'YTD · Oca–'+MONTHS[Math.max(...YM())-1].slice(0,3)+' '+YEAR));
   const sSel='<label class="srt">Sıralama <select data-sort="'+id+'">'+[['','Sabit marka sırası'],['fiili','En yüksek günlük '+(kats[0]==='Mekanik'?'mekanik':'iş emri')],['pct','En yüksek gerçekleşme %'],['delta','En yüksek Δ %']].map(([v,t])=>'<option value="'+v+'"'+(srt===v?' selected':'')+'>'+t+'</option>').join('')+'</select></label>';
   const note=(pm.includes(CUT)||ym.includes(CUT))?' · '+MONTHS[CUT-1]+': fiili ÷ geçen iş günü, bütçe ÷ ayın iş günü':'';
   const gn=kats.includes(GK)?' · garanti araç girişi: markaların girişi (BMW & MINI, Motorrad ve Tesla servis verisinden)':'';
   return box2('dense krt mtb gnt','Günlük araç girişi','adet ÷ iş günü'+note+gn,tbl(hd,body).replace(/min-width:\d+px/,'min-width:'+(kats.reduce((a,k)=>a+(k===GK?110:250),0)+150)+'px;width:100%'),sSel);
 }
 /* çok ay seçiliyse: marka × ay ısı haritası (bütçe gerçekleşmesi); tek marka seçiliyse kırılım × ay */
+// ısı haritası: 4 kademe kırmızı / yeşil (bütçe gerçekleşmesine göre)
+const hmSinif=p=>p<.85?'hn2':p<1?'hn1':p<1.15?'hp1':'hp2';
+const HMKEY='<div class="hmkey"><span class="hn2">%85 altı</span><span class="hn1">%85–100</span><span class="hp1">%100–115</span><span class="hp2">%115 üstü</span><span class="hm0k">bütçe yok</span></div>';
 const HMK=[['toplam','Toplam ciro (işçilik + YP)'],['iscilik','İşçilik cirosu'],['yp','Yedek parça cirosu'],['adet','Araç girişi (mekanik)']];
 function seyir(S){
   const pm=PMS();if(!AYAY())return '';
   const k=st.sort.hm||'toplam', kl=(HMK.find(x=>x[0]===k)||HMK[0])[1], one=st.brands.length===1;
-  const cell=(x,plan)=>{const p=bud(x);if(plan||!ok(p))return '<td class="hm0">'+(!plan&&x.fiili?'<b>bütçe yok</b><small>'+(k==='adet'?FM.ad(x.fiili)+' araç':FM.mn(x.fiili))+'</small>':'–')+'</td>';const a=Math.min(1,Math.abs(p-1)/.4),bg=p>=1?'rgba(8,117,101,'+(.08+.5*a).toFixed(2)+')':'rgba(180,73,72,'+(.08+.5*a).toFixed(2)+')';
-    return '<td class="hmc" style="background:'+bg+'" data-v="'+p+'" data-f="p"><b>'+fmt(p,'p')+'</b><small>'+(k==='adet'?FM.ad(x.fiili)+' araç':FM.mn(x.fiili))+'</small></td>';};
+  const cell=(x,plan)=>{const p=bud(x);if(plan||!ok(p))return '<td class="hm0">'+(!plan&&x.fiili?'<b>bütçe yok</b><small>'+(k==='adet'?FM.ad(x.fiili)+' araç':FM.mn(x.fiili))+'</small>':'–')+'</td>';
+    return '<td class="hmc '+hmSinif(p)+'" data-v="'+p+'" data-f="p"><b>'+fmt(p,'p')+'</b><small>'+(k==='adet'?FM.ad(x.fiili)+' araç':FM.mn(x.fiili))+'</small></td>';};
   const v=(bs,ms,kat)=>val(bs,ms,k==='adet'&&kat?'adet':k,kat);
   const rowsDef=one?['',...['Mekanik','Garanti','Kaporta Boya','Banko','Car Care','Aksesuar','Lastik'].filter(c=>k!=='adet'||!['Car Care','Aksesuar','Lastik'].includes(c))].map(c=>({n:c||'Toplam',bs:S,kat:c})).filter(r=>{const t=v(r.bs,pm,r.kat).x;return t.fiili||t.butce;})
     :(st.brands.length?st.brands:BR).map(b=>({n:esc(lab(b)),bs:[b],kat:''}));
   const rows=rowsDef.map(r=>'<tr><td'+(one?'':' class="bn" data-tip="'+r.bs[0]+'|'+k+'||'+(k==='adet'?'ad':'mn')+'"')+'><b>'+r.n+'</b></td>'+pm.map(m=>{const q=v(r.bs,[m],r.kat);return cell(q.x,q.plan);}).join('')+(()=>{const q=v(r.bs,pm,r.kat);return cell(q.x,q.plan);})()+'</tr>').join('');
   const tot=one?'':'<tr class="tot"><td><b>Toplam</b></td>'+pm.map(m=>{const q=v(S,[m],'');return cell(q.x,q.plan);}).join('')+(()=>{const q=v(S,pm,'');return cell(q.x,q.plan);})()+'</tr>';
   const sel='<label class="srt">Gösterge <select data-sort="hm">'+HMK.map(([x,t])=>'<option value="'+x+'"'+(x===k?' selected':'')+'>'+t+'</option>').join('')+'</select></label>';
-  return box2('hmb','Ay ay karşılaştırma · '+(one?esc(lab(st.brands[0]))+' · kırılım × ay':'marka × ay'),kl+' · bütçe gerçekleşmesi ve fiili · koyu yeşil bütçenin üstü, koyu kırmızı altı · bütçe ay tamamı',
-    tbl('<tr><th>'+(one?'Kırılım':'Marka')+'</th>'+pm.map(m=>'<th>'+MONTHS[m-1]+(m===CUT?' · devam':'')+'</th>').join('')+'<th class="sep">Seçim toplamı</th></tr>',rows,tot),sel);
+  return box2('hmb','Ay ay karşılaştırma · '+(one?esc(lab(st.brands[0]))+' · kırılım × ay':'marka × ay'),kl+' · bütçe gerçekleşmesi ve fiili · bütçe ay tamamı',
+    HMKEY+tbl('<tr><th>'+(one?'Kırılım':'Marka')+'</th>'+pm.map(m=>'<th>'+MONTHS[m-1]+(m===CUT?' · devam':'')+'</th>').join('')+'<th class="sep">Seçim toplamı</th></tr>',rows,tot),sel);
 }
 /* ---------- 01 · Yönetici Özeti ---------- */
 // dikkat gerektirenler: üst üste bütçe altı, 2025'e göre en çok düşen kırılımlar, araç girişi kaybı
@@ -1286,26 +1315,24 @@ function homerIsi(bs,K,GL){
   const multi=PMS().length>1, ms=multi?PMS():Array.from({length:CUT},(_,i)=>i+1), k=st.sort.hhm||'adet';
   const HK=[['adet','İş emri adedi'],['toplam','Toplam ciro'],['iscilik','İşçilik cirosu'],['yp','Yedek parça cirosu']];
   const cell=(x,plan)=>{const p=bud(x);if(plan||!ok(p))return '<td class="hm0">'+(!plan&&x.fiili?'<b>bütçe yok</b><small>'+(k==='adet'?FM.ad(x.fiili):FM.mn(x.fiili))+'</small>':'–')+'</td>';
-    const a=Math.min(1,Math.abs(p-1)/.4),bg=p>=1?'rgba(8,117,101,'+(.08+.5*a).toFixed(2)+')':'rgba(180,73,72,'+(.08+.5*a).toFixed(2)+')';
-    return '<td class="hmc" style="background:'+bg+'" data-v="'+p+'" data-f="p"><b>'+fmt(p,'p')+'</b><small>'+(k==='adet'?FM.ad(x.fiili):FM.mn(x.fiili))+'</small></td>';};
+    
+    return '<td class="hmc '+hmSinif(p)+'" data-v="'+p+'" data-f="p"><b>'+fmt(p,'p')+'</b><small>'+(k==='adet'?FM.ad(x.fiili):FM.mn(x.fiili))+'</small></td>';};
   const rows=bs.filter(b=>{const t=val([b],ms,k,K).x;return t.fiili||t.butce;}).map(b=>'<tr><td class="bn" data-tip="'+b+'|'+k+'|'+K+'|'+(k==='adet'?'ad':'mn')+'"><b>'+esc(lab(b))+'</b></td>'+ms.map(m=>{const q=val([b],[m],k,K);return cell(q.x,q.plan);}).join('')+(()=>{const q=val([b],ms,k,K);return cell(q.x,q.plan);})()+'</tr>').join('');
   const tot='<tr class="tot"><td><b>Toplam</b></td>'+ms.map(m=>{const q=val(bs,[m],k,K);return cell(q.x,q.plan);}).join('')+(()=>{const q=val(bs,ms,k,K);return cell(q.x,q.plan);})()+'</tr>';
   const sel='<label class="srt">Gösterge <select data-sort="hhm">'+HK.map(([x,t])=>'<option value="'+x+'"'+(x===k?' selected':'')+'>'+t+'</option>').join('')+'</select></label>';
   return box2('hmb','HOMER · marka × ay'+(GL?' · '+GL:''),(HK.find(x=>x[0]===k)||HK[0])[1]+' · kaporta-boya · bütçe gerçekleşmesi ve fiili · '+(multi?esc(monthLabel()):'Oca–'+MONTHS[CUT-1].slice(0,3)+' '+YEAR),
-    tbl('<tr><th>Marka</th>'+ms.map(m=>'<th>'+MONTHS[m-1].slice(0,3)+(m===CUT?' · devam':'')+'</th>').join('')+'<th class="sep">'+(multi?'Seçim toplamı':'YTD')+'</th></tr>',rows,tot).replace(/min-width:\d+px/,'min-width:'+(150+ms.length*84)+'px'),sel);
+    HMKEY+tbl('<tr><th>Marka</th>'+ms.map(m=>'<th>'+MONTHS[m-1].slice(0,3)+(m===CUT?' · devam':'')+'</th>').join('')+'<th class="sep">'+(multi?'Seçim toplamı':'YTD')+'</th></tr>',rows,tot).replace(/min-width:\d+px/,'min-width:'+(150+ms.length*84)+'px'),sel);
 }
 const HPREM=['Bmw','Motorrad','Tesla'];
 const HGR=[['diger','Diğer markalar',b=>!HPREM.includes(b)],['prem','BMW & MINI · Tesla',b=>HPREM.includes(b)]];
-function homerGrupOzet(K,gs){
-  const G=[['adet','İş emri adedi','ax'],['iscilik','İşçilik cirosu','m2'],['yp','Yedek parça cirosu','m2'],['toplam','Toplam ciro','m2']];
-  const H='<th class="sep">Bütçe</th><th>Fiili</th><th>Gerç. %</th><th class="nw">2025 Fiili</th><th>Δ %</th>';
-  const hd='<tr class="per"><th class="kd"></th><th></th>'+G.map(g=>'<th colspan="5" class="cur sep">'+g[1]+'</th>').join('')+'</tr><tr><th class="kd"></th><th class="kn">Grup</th>'+G.map(()=>H).join('')+'</tr>';
-  const all=gs.flatMap(g=>g[3]);
-  const blk=(ms,pl)=>{const R=[...gs.map(g=>[g[1],g[3],'']),...(gs.length>1?[['HOMER toplam',all,'main tot']]:[])];
-    return R.map((r,i)=>'<tr class="'+(i?r[2]:'kt')+'">'+(i?'':'<td class="kd" rowspan="'+R.length+'"><span>'+pl+'</span></td>')+'<td class="kn"><b>'+r[0]+'</b></td>'+G.map(([m,,f])=>{const q=val(r[1],ms,m,K);return std(q.x,f,q.plan);}).join('')+'</tr>').join('');};
-  const pm=PMS(), ym=YM(), same=pm.join()===ym.join();
-  const body=YTDO()?blk(ym,'YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+' '+YEAR):AYAY()?pm.map(m=>blk([m],MONTHS[m-1]+(m===CUT?' · devam':''))).join('')+blk(pm,'Seçim toplamı'):blk(pm,esc(monthLabel(pm)))+(same?'':blk(ym,'YTD · Oca–'+MONTHS[CUT-1].slice(0,3)+' '+YEAR));
-  return box2('dense krt mtb','HOMER · grup özeti','Kaporta-boya · BMW & MINI · Tesla ile diğer markalar ayrı gruplar',tbl(hd,body).replace(/min-width:\d+px/,'min-width:1130px'));
+function homerGrupOzet(K,gs,cur){   // grup kartları: tıklayınca o grup seçilir; HOMER toplamı koyu kart
+  const ms=YTDO()?YM():PMS(), all=gs.flatMap(g=>g[3]);
+  const kart=(ad,bs,key,dark)=>{const q=val(bs,ms,'toplam',K), a=val(bs,ms,'adet',K), x=q.x, big=Math.abs(x.fiili)>=1e6?[nf2.format(x.fiili/1e6),'Mln ₺']:[nf1.format(x.fiili/1e3),'Bin ₺'];
+    return '<div class="card hgc'+(dark?' dark':'')+(key&&cur&&key===cur[0]?' hsel':'')+'"'+(key?' data-hgr="'+key+'" role="button" tabindex="0"':'')+'><div class="t">'+ad+(key?' <small>'+bs.length+' marka</small>':'')+'</div>'+
+      '<div class="v">'+(q.plan?'–':big[0])+'</div><div class="u">'+big[1]+' · toplam ciro · '+FM.ad(a.x.fiili)+' iş emri</div>'+
+      '<div class="b"><span>Bütçe '+fmt(x.butce,'mn')+'</span><span>2025 '+fmt(x.g2025,'mn')+'</span></div><div class="f">'+chip(q.plan?null:bud(x))+'<span class="y">'+(q.plan?'':pDel(del(x))+' 25/26')+'</span></div>'+
+      (key?'<em class="hgsec">'+(key===cur[0]?'Seçili grup':'Görüntüle →')+'</em>':'')+'</div>';};
+  return '<div class="cards hgcards">'+gs.map(g=>kart(g[1],g[3],g[0],0)).join('')+(gs.length>1?kart('HOMER toplam',all,'',1):'')+'</div>';
 }
 function pHomer(){
   const K='Kaporta Boya', S=SEL(), bs=rowsOf();
@@ -1315,7 +1342,7 @@ function pHomer(){
   let cur=gs.find(g=>g[0]===(st.hgr||'diger'))||gs[0];
   const seg='<div class="hgrbar"><span>Grup</span><div class="seg" id="hgr">'+gs.map(g=>'<button type="button" data-k="'+g[0]+'" class="'+(g===cur?'on':'')+'">'+g[1]+' <small>'+g[3].length+' marka</small></button>').join('')+'</div></div>';
   const gb=cur[3], GL=cur[1];
-  return head('Servis Performans Yönetimi','HOMER · Hasar Onarım','Kaporta-boya · '+PL())+homerGrupOzet(K,gs)+seg+
+  return head('Servis Performans Yönetimi','HOMER · Hasar Onarım','Kaporta-boya · '+(YTDO()?ytdLabel():PL()))+homerGrupOzet(K,gs,cur)+
     markaTablo(gb,'ciro','h_mt',K).replace('Marka karşılaştırması · Kaporta Boya','HOMER · '+GL)+markaTablo(gb,'ab','h_ab',K).replace('Marka karşılaştırması · Kaporta Boya','HOMER · '+GL)+gunlukTablo(gb,'h_gn',[K]).replace('>Günlük araç girişi<','>HOMER · günlük iş emri · '+GL+'<')+
     '<div class="pb"></div>'+homerAy(gb,K,GL)+'<div class="pb"></div>'+homerIsi(gb,K,GL)+notes();
 }
@@ -1892,7 +1919,7 @@ $('app').addEventListener('mouseout',e=>{const el=e.target.closest('[data-tip],[
 $('app').addEventListener('click',e=>{
   const bh=e.target.closest('.boxhead h2');if(bh){bh.closest('.box').classList.toggle('fold');return;}
   const r=e.target.closest('tr[data-open]');if(r){const k=r.dataset.open;OPEN.has(k)?OPEN.delete(k):OPEN.add(k);TIP.hidden=true;render();return;}
-  const hg=e.target.closest('#hgr button');if(hg){st.hgr=hg.dataset.k;render();return;}
+  const hg=e.target.closest('#hgr button,[data-hgr]');if(hg){st.hgr=hg.dataset.k||hg.dataset.hgr;render();return;}
   const h=e.target.closest('#hkat button');if(h){st.hkat=h.dataset.k;render();}
   const q=e.target.closest('#ekkat button');if(q){st.ekKat=q.dataset.k;render();}
   const hm2=e.target.closest('#hmet button');if(hm2){st.hmet=hm2.dataset.k;render();}
@@ -1901,6 +1928,7 @@ $('app').addEventListener('click',e=>{
     const t=[...document.querySelectorAll('#app .box')].find(b=>b.querySelector('h2')?.textContent===KP[k][1]);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});}
   if(e.target.closest('#ekAll')){st.ekAll=!st.ekAll;render();}
 });
+$('app').addEventListener('mouseover',e=>{const c=e.target.closest('.hmb td');document.querySelectorAll('#app .hmb td.hcol').forEach(x=>x.classList.remove('hcol'));if(!c||!c.classList.contains('hmc')&&!c.classList.contains('hm0'))return;const t=c.closest('table'),ci=c.cellIndex;t.querySelectorAll('tbody tr').forEach(tr=>{const x=tr.cells[ci];if(x&&x!==c)x.classList.add('hcol');});});
 $('app').addEventListener('input',e=>{const fi=e.target.closest('input[data-fg]');if(fi){fgGir(fi);return;}const i=e.target.closest('input[data-gk]');if(i){garGir(i,i.value);garSay();}const v=e.target.closest('input[data-vk]');if(v)vGir(v);});
 $('app').addEventListener('paste',e=>{const i=e.target.closest('input[data-fg]');if(!i)return;const t=(e.clipboardData||window.clipboardData).getData('text');if(!/[\t\n]/.test(t.trim()))return;e.preventDefault();
   const all=[...i.closest('.fgb').querySelectorAll('input[data-fg]')],at=all.indexOf(i),vs=t.replace(/\r/g,'').replace(/\n$/,'').split('\n').flatMap(l=>l.split('\t'));
@@ -2002,6 +2030,7 @@ function render(){
   $('app').innerHTML='<table class="pw"><thead><tr><td><div class="phead"><div class="plogo">'+LOGO+'</div><div class="ptx"><b>'+P[1]+'</b><span>'+(st.page==='ek'&&EK?esc(EK.meta.donem)+' · ek satış planı ve gerçekleşme':esc(brandLabel())+' · '+PL()+(TWO()?' ve '+ytdLabel():''))+'</span></div><div class="pk">'+(st.page==='ek'&&EK?'Güncellenme <b>'+esc(EK.meta.veriTarihi)+'</b>':'Veri kesimi <b>'+esc(D.ust.veri_kesim)+'</b>')+'<br>Servis Performans Yönetimi</div></div></td></tr></thead><tbody><tr><td>'+P[2]()+'</td></tr></tbody></table><div class="prt">İnciroğlu Otomotiv · Hazırlayan: CEO Ofis · İş Geliştirme ve Strateji · '+P[1]+' · '+esc(brandLabel())+' · '+PL()+' · veri kesimi '+esc(D.ust.veri_kesim)+' · yazdırma '+new Date().toLocaleDateString('tr-TR')+'</div>';
   document.title=P[1]+' · İnciroğlu Otomotiv';
   const AK=[st.page,st.brands,st.months,st.hkat,st.ekKat,st.hmet,st.kpis,st.ek.tab,st.ek.cp,st.ek.brand,st.ek.kal].join('|'), still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('#app .hmb tbody tr').forEach((tr,r)=>[...tr.cells].forEach((c,ci)=>{c.style.setProperty('--c',ci);c.style.setProperty('--r',r);}));
   const anim=AK!==window.__ak&&!still;window.__ak=AK;$('app').classList.toggle('anim',anim);
   if(anim){[...document.querySelectorAll('#app .box,#app .card,#app .hc,#app .lbr')].forEach((el,i)=>el.style.animationDelay=Math.min(i,10)*55+'ms');
     document.querySelectorAll('#app .ctr').forEach(el=>{const to=+el.dataset.to,t0=performance.now();const s3=t=>{const p=Math.max(0,Math.min(1,(t-t0)/1200)),e=1-Math.pow(1-p,3);el.textContent=Math.round(to*e);if(p<1)requestAnimationFrame(s3);};requestAnimationFrame(s3);});
