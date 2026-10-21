@@ -374,6 +374,8 @@ tr.mband+tr td,tr.mband+tr.rh th{border-top:0}
 .card.hgc .hgsec{display:block;margin-top:8px;font-style:normal;font-size:11.5px;font-weight:700;color:#2f5d93}.card.hgc.hsel .hgsec{color:#9a6f2e}
 @media (max-width:900px){.hgcards{grid-template-columns:1fr!important}}@media print{.card.hgc .hgsec{display:none}}
 @media screen{
+  .box .scroll{max-height:calc(100vh - 170px);overflow:auto;overscroll-behavior:contain}   /* her tablo kendi kutusunda kayar */
+  .box .scroll tr.mband td{position:sticky;top:0;z-index:6}                                  /* kaydırırken o bloğun ay bandı üstte kalır */
   .box .scroll>table.dar{border-right:1px solid var(--line)}
   .box .scroll td:not(.kn):not(.kd),.box .scroll th:not(.kn):not(.kd){padding-left:14px;padding-right:12px}
   .hmb .scroll td.hmc,.hmb .scroll td.hm0,.hmb .scroll th{padding-left:8px;padding-right:8px}
