@@ -2440,7 +2440,10 @@ function gwShow(ad){
   addEventListener('beforeinstallprompt',e=>{e.preventDefault();istem=e;});
   addEventListener('appinstalled',()=>{kutu.hidden=true;});
   btn.addEventListener('click',async()=>{
+    if(!istem&&'BeforeInstallPromptEvent' in window){   // tarayıcı destekliyor ama izin henüz gelmediyse kısa süre bekle
+      btn.textContent='Hazırlanıyor…';for(let i=0;i<15&&!istem;i++)await new Promise(r=>setTimeout(r,200));btn.textContent='Uygulamayı yükle';}
     if(istem){istem.prompt();try{const r=await istem.userChoice;if(r&&r.outcome==='accepted')kutu.hidden=true;}catch(e){}istem=null;return;}
+    if('BeforeInstallPromptEvent' in window&&!ios){bilgi.textContent='Uygulama bu tarayıcıda zaten yüklü olabilir. Değilse: '+tarif();bilgi.hidden=false;return;}
     bilgi.textContent=tarif();bilgi.hidden=!bilgi.hidden;});
 })();
 </script>
