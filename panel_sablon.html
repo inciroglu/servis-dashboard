@@ -291,8 +291,10 @@ nav .sec:not(.sec2)::after{content:"";display:block;width:44px;height:2px;margin
 @keyframes secshine{0%,70%{background-position:100% 0}100%{background-position:0 0}}
 @media (prefers-reduced-motion:reduce){nav .sec:not(.sec2)::after{animation:none}}
 /* haftalık veri girişi formu */
-nav a.fgm-l{border:1px solid #ead9b8;background:#fdf9f1;color:#5d4316}nav a.fgm-l.on{background:#f6ead2;border-color:#e2c48f;box-shadow:inset 3px 0 var(--gold)}
-.fgnb{margin-left:auto;font-style:normal;font-size:11px;font-weight:700;min-width:20px;height:20px;line-height:20px;text-align:center;border-radius:10px;background:#c0392b;color:#fff;padding:0 6px}
+nav a.fgm-l{border:1px solid #c6e4d9;background:#eef8f4;color:#0b5a4d}nav a.fgm-l:hover{background:#e2f3ec}nav a.fgm-l.on{background:#dff1e9;border-color:#9fd2bf;color:#084a3f;box-shadow:inset 3px 0 #0b7a66}
+nav .mgh{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a98aa;margin:14px 0 4px 14px}nav .mgh:first-child{margin-top:4px}nav a.mg{font-size:14px}
+@media (max-width:1050px){nav .mgh{display:none}}
+.fgnb{margin-left:auto;font-style:normal;font-size:11px;font-weight:700;min-width:20px;height:20px;line-height:20px;text-align:center;border-radius:10px;background:#0b7a66;color:#fff;padding:0 6px}.fgnb.ok{background:#d3ede3;color:#0b6b59}
 .fgt{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}.fgt button{display:flex;flex-direction:column;align-items:flex-start;gap:1px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 14px;font:inherit;font-size:13.5px;font-weight:700;color:var(--navy);cursor:pointer;transition:.15s}
 .fgt button small{font-size:11px;font-weight:600;color:#8a97a8}.fgt button.ok small{color:#1a7f5a}.fgt button.on{background:var(--navy);border-color:var(--navy);color:#fff}.fgt button.on small{color:#d9b97c}.fgt button:hover:not(.on){border-color:#b9c7d8}
 .fgp{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 18px;margin:0 0 14px;font-size:13.5px;color:var(--navy)}
@@ -675,6 +677,13 @@ body.pg-perf #app td.bn[data-tip]:hover>b::after{opacity:1}
 .oto.bek{color:#a8423f!important;font-weight:600}.fgc[data-s="ypk"]:not(.ok){border-color:#e7c9a0}.fgc[data-s="ypk"] .fgd.w{background:#fbeee0;color:#8a4b12}
 
 .eks .bchip.psa{border-style:dashed}.eks .psat{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--navy);margin-left:12px;cursor:pointer}.eks .psat input{accent-color:#122f59}@media print{.eks .psat{display:none}}
+
+/* Satış · yakında: beyaz kart, altın şerit, nabız atan nokta */
+nav .soonm{border:1px solid #d9e2ec!important;border-style:solid!important;background:#fff;color:#122f59!important;box-shadow:inset 3px 0 var(--gold)}
+nav .soonm em{background:transparent!important;color:#9a6f2e!important;display:inline-flex;align-items:center;gap:6px;padding:2px 0!important}
+nav .soonm em::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--gold);animation:soonPuls 2.2s ease-out infinite}
+@keyframes soonPuls{0%{box-shadow:0 0 0 0 rgba(183,141,76,.55)}70%{box-shadow:0 0 0 8px rgba(183,141,76,0)}100%{box-shadow:0 0 0 0 rgba(183,141,76,0)}}
+@media (prefers-reduced-motion:reduce){nav .soonm em::before{animation:none;box-shadow:0 0 0 3px rgba(183,141,76,.25)}}
 /* ---------- giriş (açık zemin, sade kart · ek satış paneliyle aynı aile) + hoş geldiniz ---------- */
 #gt{position:fixed;inset:0;z-index:200;overflow:auto;font-family:"Segoe UI",Inter,system-ui,sans-serif;color:#192c44;background:#f4f6f9 radial-gradient(900px 520px at 50% -5%,#e3eaf4,transparent)}
 #gt[hidden],#gw[hidden]{display:none!important}
@@ -774,6 +783,11 @@ body.pg-perf #app td.bn[data-tip]:hover>b::after{opacity:1}
 #gt input[readonly]{background:#f6f8fb;color:#4a5a6e}
 @keyframes gtspin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){#gt .gt-btn.yuk::before{animation-duration:2s}}
+
+#gt .gt-app button{border:0;background:none;padding:0;font:inherit;color:#8a6a3a;cursor:pointer;text-decoration:underline;text-decoration-color:rgba(183,141,76,.45);text-underline-offset:2px}
+#gt .gt-app button:hover{color:#122f59}
+#gt .gt-appi{display:block;margin-top:4px;color:#5b6b7d}#gt .gt-appi[hidden]{display:none}
+@media print{#gt .gt-app,#gt .gt-appi{display:none}}
 </style>
 </head>
 <body>
@@ -809,7 +823,7 @@ body.pg-perf #app td.bn[data-tip]:hover>b::after{opacity:1}
    <div class="gt-err" id="gte" role="alert"></div><div class="gt-ok" id="gtok" role="status"></div>
    <div class="gt-nojs" id="gtnj">Sayfa bu pencerede çalışmıyor. Dosyayı Chrome veya Edge ile açın: indirdiğiniz dosyaya çift tıklayın ya da sağ tık → Birlikte aç → Chrome.</div>
   </form>
-  <div class="gt-foot"><span class="gt-imza">CEO Ofis · İş Geliştirme ve Strateji</span><span>© 2026 İnciroğlu Otomotiv</span></div>
+  <div class="gt-foot"><span class="gt-imza">CEO Ofis · İş Geliştirme ve Strateji</span><span>© 2026 İnciroğlu Otomotiv<span class="gt-app" id="gtApp" hidden> · <button type="button" id="gtAppB">Uygulamayı yükle</button></span></span><span class="gt-appi" id="gtAppI" hidden></span></div>
  </div>
 </section>
 <section id="gw" hidden aria-label="Hoş geldiniz">
@@ -1169,7 +1183,8 @@ const hmSinif=p=>p<.85?'hn2':p<1?'hn1':p<1.15?'hp1':'hp2';
 const HMKEY='<div class="hmkey"><span class="hn2">%85 altı</span><span class="hn1">%85–100</span><span class="hp1">%100–115</span><span class="hp2">%115 üstü</span><span class="hm0k">bütçe yok</span></div>';
 const HMK=[['toplam','Toplam ciro (işçilik + YP)'],['iscilik','İşçilik cirosu'],['yp','Yedek parça cirosu'],['adet','Araç girişi (mekanik)']];
 function seyir(S){
-  const pm=PMS();if(!AYAY())return '';
+  // Ay ay görünümünde seçili aylar; diğer görünümlerde yıl başından bugüne tüm aylar (harita her zaman görünür)
+  const ay=AYAY(), pm=ay?PMS():Array.from({length:Math.max(...YM())},(_,i)=>i+1);if(pm.length<2)return '';
   const k=st.sort.hm||'toplam', kl=(HMK.find(x=>x[0]===k)||HMK[0])[1], one=st.brands.length===1;
   const cell=(x,plan)=>{const p=bud(x);if(plan||!ok(p))return '<td class="hm0">'+(!plan&&x.fiili?'<b>bütçe yok</b><small>'+(k==='adet'?FM.ad(x.fiili)+' araç':FM.mn(x.fiili))+'</small>':'–')+'</td>';
     return '<td class="hmc '+hmSinif(p)+'" data-v="'+p+'" data-f="p"><b>'+fmt(p,'p')+'</b><small>'+(k==='adet'?FM.ad(x.fiili)+' araç':FM.mn(x.fiili))+'</small></td>';};
@@ -1179,8 +1194,8 @@ function seyir(S){
   const rows=rowsDef.map(r=>'<tr><td'+(one?'':' class="bn" data-tip="'+r.bs[0]+'|'+k+'||'+(k==='adet'?'ad':'mn')+'"')+'><b>'+r.n+'</b></td>'+pm.map(m=>{const q=v(r.bs,[m],r.kat);return cell(q.x,q.plan);}).join('')+(()=>{const q=v(r.bs,pm,r.kat);return cell(q.x,q.plan);})()+'</tr>').join('');
   const tot=one?'':'<tr class="tot"><td><b>Toplam</b></td>'+pm.map(m=>{const q=v(S,[m],'');return cell(q.x,q.plan);}).join('')+(()=>{const q=v(S,pm,'');return cell(q.x,q.plan);})()+'</tr>';
   const sel='<label class="srt">Gösterge <select data-sort="hm">'+HMK.map(([x,t])=>'<option value="'+x+'"'+(x===k?' selected':'')+'>'+t+'</option>').join('')+'</select></label>';
-  return box2('hmb','Ay ay karşılaştırma · '+(one?esc(lab(st.brands[0]))+' · kırılım × ay':'marka × ay'),kl+' · bütçe gerçekleşmesi ve fiili · bütçe ay tamamı',
-    HMKEY+tbl('<tr><th>'+(one?'Kırılım':'Marka')+'</th>'+pm.map(m=>'<th>'+MONTHS[m-1]+(m===CUT?' · devam':'')+'</th>').join('')+'<th class="sep">Seçim toplamı</th></tr>',rows,tot),sel);
+  return box2('hmb','Ay ay karşılaştırma · '+(one?esc(lab(st.brands[0]))+' · kırılım × ay':'marka × ay'),kl+' · bütçe gerçekleşmesi ve fiili · bütçe ay tamamı'+(ay?'':' · yıl başından bugüne (Oca–'+MONTHS[pm.length-1].slice(0,3)+')'),
+    HMKEY+tbl('<tr><th>'+(one?'Kırılım':'Marka')+'</th>'+pm.map(m=>'<th>'+MONTHS[m-1]+(m===CUT?' · devam':'')+'</th>').join('')+'<th class="sep">'+(ay?'Seçim toplamı':'YTD toplamı')+'</th></tr>',rows,tot),sel);
 }
 /* ---------- 01 · Yönetici Özeti ---------- */
 // dikkat gerektirenler: üst üste bütçe altı, 2025'e göre en çok düşen kırılımlar, araç girişi kaybı
@@ -1455,7 +1470,7 @@ async function vKaydet(al){
   catch(e){btn.disabled=false;btn.textContent='Kaydet';toast('Kaydedilemedi: '+e.message);}
 }
 const fgYon=()=>KUL&&KUL.rol==='giris'?'<div class="garbar"><span class="garn">Haftalık verilerinizi tek ekrandan, tek kayıtla girebilirsiniz.</span><button type="button" class="gbtn" data-git="giris">Haftalık veri girişine git →</button></div>':'';
-const vBar=(al,izinli,metin)=>{if(izinli&&KUL&&KUL.rol!=='yonetici')return fgYon();if(!izinli)return KUL?'<div class="garbar"><span class="garn">Bu bölümü görüntüleyebilirsiniz; veri girişi yetkiniz yok. Yetki için yöneticinize başvurun.</span></div>':'';const ed=st[al+'Edit'],n=Object.keys(VED[al]).length;
+const vBar=(al,izinli,metin)=>{if(izinli&&KUL&&KUL.rol!=='yonetici')return fgYon();if(!izinli)return KUL&&KUL.rol!=='izleyici'?'<div class="garbar"><span class="garn">Bu bölümü görüntüleyebilirsiniz; veri girişi yetkiniz yok. Yetki için yöneticinize başvurun.</span></div>':'';const ed=st[al+'Edit'],n=Object.keys(VED[al]).length;
   return '<div class="garbar">'+(ed?'<span class="garn" id="'+al+'n">'+(n?n+' hücre değişti · kaydedilmedi':'Değerleri yazın ya da Excel\'den yapıştırın')+'</span><button type="button" class="gbtn ghost" data-vvaz="'+al+'">Vazgeç</button><button type="button" class="gbtn" id="'+al+'kay" data-vkay="'+al+'"'+(n?'':' disabled')+'>Kaydet</button>'
     :'<span class="garn">'+metin+'</span><button type="button" class="gbtn" data-vduz="'+al+'">Değerleri güncelle</button>')+'</div>';};
 const vInp=(al,b,A,an,r,c,ph)=>{const k=b+'|'+A+'|'+an,e=k in VED[al],v=e?VED[al][k]:vV(al,b,A,an);
@@ -1937,10 +1952,10 @@ async function fgKaydet(){
   catch(e){btn.disabled=false;btn.classList.remove('yuk');btn.textContent='Kaydet ve gönder';toast('Kaydedilemedi: '+e.message+' · Girdiğiniz değerler ekranda duruyor, tekrar deneyin.');}
 }
 const PAGES=[['ozet','Yönetici Özeti',pOzet,'S'],['perf','Servis Performansı',pPerf,'S'],['homer','HOMER · Hasar',pHomer,'S'],['carcare','Car Care',pCar,'S'],['ek','Ek Satış',pEk,'S'],...(KUL?[['kt','Kapanış Tahmini',pKT,'S'],['aie','Açık İş Emri',pAIE,'S'],['yp','Yedek Parça',pYP,'S']]:[]),['veri','Veri & hesap kontrolü',pVeri,'F']];
-if(KUL&&KUL.rol!=='izleyici')PAGES.splice(PAGES.length-1,0,['giris','Haftalık veri girişi',pGiris,'F']);
-if(KUL&&KUL.rol==='yonetici')PAGES.splice(PAGES.length-1,0,['garanti','Garanti araç girişi',pGar,'F']);
+if(KUL&&KUL.rol!=='izleyici')PAGES.splice(PAGES.length-1,0,['giris','Haftalık veri girişi',pGiris,'G']);
+if(KUL&&KUL.rol==='yonetici')PAGES.splice(PAGES.length-1,0,['garanti','Garanti araç girişi',pGar,'G']);
 {const h=location.hash.slice(1);if(h&&PAGES.some(p=>p[0]===h))st.page=h;}
-if(KUL&&KUL.rol==='yonetici')PAGES.splice(PAGES.length-1,0,['durum','Veri giriş durumu',pDurum,'F']);
+if(KUL&&KUL.rol==='yonetici')PAGES.splice(PAGES.length-1,0,['durum','Veri giriş durumu',pDurum,'G']);
 
 /* ---------- açılır seçiciler ---------- */
 function ddInit(id,build,apply){
@@ -2150,8 +2165,12 @@ function mdpKapat(){if(!MDP)return;MDP=null;const P=$('mdp');P.classList.remove(
 function mdpYenile(){if(!MDP)return;if(st.page!=='perf'||!rowsOf().includes(MDP.b))return mdpKapat();$('mdp').innerHTML=mdpHtml();}
 function render(){
   const P=PAGES.find(p=>p[0]===st.page)||PAGES[0];st.page=P[0];ls.set('inc_panel_v5',st);
-  const link=(p,i)=>{const nb=p[0]==='giris'?fgEksikSay():0;return '<a href="#'+p[0]+'" class="'+(p[0]===st.page?'on':'')+(p[0]==='giris'?' fgm-l':'')+'" data-p="'+p[0]+'">'+(i!=null?'<span>'+String(i).padStart(2,'0')+'</span>':'')+p[1]+(nb?'<em class="fgnb" title="Bu hafta girişi eksik marka sayısı">'+nb+'</em>':'')+'</a>';};
-  $('menuS').innerHTML=PAGES.filter(p=>p[3]==='S').map((p,i)=>link(p,i+1)).join('');
+  const link=(p,i)=>{const nb=p[0]==='giris'?fgEksikSay():0;return '<a href="#'+p[0]+'" class="'+(p[0]===st.page?'on':'')+(p[0]==='giris'?' fgm-l':'')+'" data-p="'+p[0]+'">'+(i!=null?'<span>'+String(i).padStart(2,'0')+'</span>':'')+p[1]+(p[0]==='giris'?(nb?'<em class="fgnb" title="Bu hafta girişi eksik marka sayısı">'+nb+'</em>':'<em class="fgnb ok" title="Bu haftanın girişleri tamam">✓</em>'):'')+'</a>';};
+  {const S=PAGES.filter(p=>p[3]==='S'),no=p=>S.indexOf(p)+1,TK=['kt','aie','yp'],gh=t=>'<div class="mgh">'+t+'</div>';
+    const rap=S.filter(p=>!TK.includes(p[0])),tak=S.filter(p=>TK.includes(p[0])),gir=PAGES.filter(p=>p[3]==='G');
+    const bl={rap:gh('Raporlar')+rap.map(p=>link(p,no(p))).join(''),tak:tak.length?gh('Haftalık takip')+tak.map(p=>link(p,no(p))).join(''):'',gir:gir.length?gh('Veri girişi')+gir.map(p=>link(p,null).replace('class="','class="mg ')).join(''):''};
+    // yetkiye göre: veri girişi yapan müdürlerde giriş grubu en üstte; izleyicide giriş grubu hiç yok
+    $('menuS').innerHTML=(KUL&&KUL.rol==='giris'?[bl.gir,bl.rap,bl.tak]:[bl.rap,bl.tak,bl.gir]).join('');}
   $('menuF').innerHTML=PAGES.filter(p=>p[3]==='F').map(p=>link(p,null)).join('');
   $('kul').innerHTML=KUL?'<div class="kul"><span><b>'+esc(KUL.ad||KUL.email||'')+'</b>'+({yonetici:'Yönetici',giris:'Veri girişi',izleyici:'İzleyici'}[KUL.rol]||'')+'</span><button type="button" id="cikis">Çıkış</button></div>':'';
   $('crumb').innerHTML='Servis Performans Yönetimi / <b>'+P[1]+'</b>';
@@ -2361,6 +2380,24 @@ function gwShow(ad){
     gwTimer=setTimeout(()=>{gwOpen(location.hash==='#giris'&&PAGES.some(p=>p[0]==='giris')?'giris':'ozet');$('gw').classList.add('out');setTimeout(()=>{$('gw').hidden=true;$('gw').classList.remove('out');},still?0:1000);},still?0:700);};
   gwTimer=setTimeout(step,still?0:1500);
 }
+
+/* uygulama olarak yükleme (ana ekrana / masaüstüne ekle) */
+(function(){
+  const q=id=>document.getElementById(id), kutu=q('gtApp'),btn=q('gtAppB'),bilgi=q('gtAppI');if(!kutu)return;
+  const yuklu=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;if(yuklu)return;
+  let istem=null;const ua=navigator.userAgent, ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1),
+    android=/Android/.test(ua), edge=/Edg\//.test(ua);
+  const tarif=()=>ios?'Safari → Paylaş → Ana Ekrana Ekle'
+    :android?'Chrome ⋮ → Ana ekrana ekle'
+    :edge?'Edge … → Uygulamalar → Bu siteyi uygulama olarak yükle'
+    :'Chrome ⋮ → Yayınla, kaydet ve paylaş → Uygulama olarak yükle';
+  kutu.hidden=false;
+  addEventListener('beforeinstallprompt',e=>{e.preventDefault();istem=e;});
+  addEventListener('appinstalled',()=>{kutu.hidden=true;});
+  btn.addEventListener('click',async()=>{
+    if(istem){istem.prompt();try{const r=await istem.userChoice;if(r&&r.outcome==='accepted')kutu.hidden=true;}catch(e){}istem=null;return;}
+    bilgi.textContent=tarif();bilgi.hidden=!bilgi.hidden;});
+})();
 </script>
 </body>
 </html>
