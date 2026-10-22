@@ -12,7 +12,7 @@ python build_dashboard.py servis_rapor.xlsx index.html ek_satis.xlsx
 if errorlevel 1 ( echo HATA: servis_rapor.xlsx bu klasorde mi, Excel dosyalari kapali mi? & pause & exit /b 1 )
 echo.
 echo === 2/3 Paketleniyor (Excel dosyalari GitHub'a GONDERILMEZ) ===
-git add index.html panel_sablon.html build_dashboard.py ek_veri.py sifre_degistir.py robots.txt GUNCELLE.bat .gitignore manifest.webmanifest uygulama
+git add index.html panel_sablon.html build_dashboard.py ek_veri.py sifre_degistir.py robots.txt GUNCELLE.bat .gitignore manifest.webmanifest uygulama sw.js
 git commit -m "panel guncelleme %date% %time%"
 echo.
 echo === 3/3 GitHub'a gonderiliyor... ===

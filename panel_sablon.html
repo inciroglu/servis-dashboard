@@ -293,7 +293,7 @@ nav .sec:not(.sec2)::after{content:"";display:block;width:44px;height:2px;margin
 /* haftalık veri girişi formu */
 nav a.fgm-l{border:1px solid #c6e4d9;background:#eef8f4;color:#0b5a4d}nav a.fgm-l:hover{background:#e2f3ec}nav a.fgm-l.on{background:#dff1e9;border-color:#9fd2bf;color:#084a3f;box-shadow:inset 3px 0 #0b7a66}
 nav a.mg0{margin-top:14px}nav a.mgs{margin-bottom:14px}nav a.mg{font-size:14px}
-.fgnb{margin-left:auto;font-style:normal;font-size:11px;font-weight:700;min-width:20px;height:20px;line-height:20px;text-align:center;border-radius:10px;background:#0b7a66;color:#fff;padding:0 6px}.fgnb.ok{background:#d3ede3;color:#0b6b59}
+.fgnb{margin-left:auto;font-style:normal;font-size:11px;font-weight:700;min-width:20px;height:20px;line-height:20px;text-align:center;border-radius:10px;background:#0b7a66;color:#fff;padding:0 6px}.fgnb.ok{background:#d3ede3;color:#0b6b59}.fgnb.ak{background:var(--gold)}
 .fgt{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}.fgt button{display:flex;flex-direction:column;align-items:flex-start;gap:1px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 14px;font:inherit;font-size:13.5px;font-weight:700;color:var(--navy);cursor:pointer;transition:.15s}
 .fgt button small{font-size:11px;font-weight:600;color:#8a97a8}.fgt button.ok small{color:#1a7f5a}.fgt button.on{background:var(--navy);border-color:var(--navy);color:#fff}.fgt button.on small{color:#d9b97c}.fgt button:hover:not(.on){border-color:#b9c7d8}
 .fgp{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 18px;margin:0 0 14px;font-size:13.5px;color:var(--navy)}
@@ -688,6 +688,11 @@ nav .soonm em::before{content:'';width:7px;height:7px;border-radius:50%;backgrou
 .fgak{background:#fbf7ef;border:1px solid #ead9b8;border-radius:14px;padding:4px 14px 14px;margin-bottom:6px}
 .fgsh{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;padding:14px 4px 8px;margin-bottom:12px;border-bottom:2px solid var(--navy)}
 .fgsh.ak{border-bottom-color:var(--gold)}.fgsh b{font-size:16px;color:var(--navy)}.fgsh span{font-size:12.5px;color:var(--muted)}
+
+.fgw1{display:grid;gap:14px;margin-bottom:14px}
+.fgcol{columns:2;column-gap:14px;margin-bottom:6px}.fgcol>.fgc{break-inside:avoid;display:inline-block;width:100%;margin-bottom:14px;vertical-align:top}
+@media (max-width:1200px){.fgcol{columns:1}}
+.fgak{margin-top:10px}.fgsh .srt{margin-left:auto}.fgsh select{font:inherit;font-size:13px;padding:5px 8px;border:1px solid #d5dee8;border-radius:8px;background:#fff;color:var(--navy)}
 /* ---------- giriş (açık zemin, sade kart · ek satış paneliyle aynı aile) + hoş geldiniz ---------- */
 #gt{position:fixed;inset:0;z-index:200;overflow:auto;font-family:"Segoe UI",Inter,system-ui,sans-serif;color:#192c44;background:#f4f6f9 radial-gradient(900px 520px at 50% -5%,#e3eaf4,transparent)}
 #gt[hidden],#gw[hidden]{display:none!important}
@@ -1155,12 +1160,12 @@ const gunOnce=m=>{const y=YEAR-1,T=TATIL[y]||[],n=new Date(y,m,0).getDate();let 
 function gOnceGun(bs,ms,kat,met){const a=ACT(ms);if(!a.length)return null;const o=agg(bs,a,false),A=kat?o.kat[kat]:(met==='adet'?o.kat.Mekanik:o.toplam),v=A[met==='adet'?'adet':'toplam'].g2025,d=a.reduce((s,m)=>s+gunOnce(m),0);return d&&v?v/d:null;}
 function gunlukTablo(bs,id,kats){
   kats=kats||['Mekanik','Kaporta Boya',GK];
-  const KL={'Mekanik':'Mekanik araç girişi','Kaporta Boya':'Hasar · kaporta-boya iş emri',[GK]:'Garanti araç girişi'};   // garanti: yalnız toplam ve günlük fiili
+  const KL={'Mekanik':'Mekanik araç girişi','Kaporta Boya':'Hasar · kaporta-boya iş emri',[GK]:'Garanti iş emri'};   // garanti: yalnız toplam ve günlük fiili
   const ALL=Array.from({length:12},(_,i)=>i+1);
   const rows0=bs.filter(b=>kats.some(k=>{const x=val([b],ALL,'adet',k).x;return x.fiili||x.butce||x.g2025;}));
   if(!rows0.length)return '';
   const srt=st.sort[id]||'';
-  const hd='<tr class="per"><th class="kd"></th><th></th>'+kats.map(k=>'<th colspan="'+(k===GK?2:5)+'" class="cur sep">'+KL[k]+'</th>').join('')+'</tr>'+
+  const hd='<tr class="per"><th class="kd"></th><th></th>'+kats.map(k=>'<th colspan="'+(k===GK?2:5)+'" class="cur sep" style="white-space:nowrap">'+KL[k]+'</th>').join('')+'</tr>'+
     '<tr><th class="kd"></th><th class="kn">Marka</th>'+kats.map(k=>k===GK?'<th class="sep">Toplam</th><th title="Günlük ortalama">Günlük</th>':'<th class="sep">Toplam</th><th title="Günlük bütçe">Bütçe/gün</th><th title="Günlük fiili">Fiili/gün</th><th>Gerç.</th><th title="2025 aynı döneme göre değişim">Δ \'25</th>').join('')+'</tr>';
   const cells=(b,ms,k,plan)=>{const x=Object.assign({},val(b,ms,'gunAdet',k).x), t=val(b,ms,'adet',k).x;x.g2025=gOnceGun(b,ms,k,'adet');
     if(k===GK)return plan||!garVar(b,ms)?'<td class="sep na">–</td><td class="na">–</td>':td(t.fiili,'ax','sep')+td(x.fiili,'ad1','v');
@@ -1769,6 +1774,9 @@ function pEk(){
 }
 let EKFLIP=false;
 // ek satış etkileşimleri: sekme, dönem, marka, kalem, sıralama (sıralamada satırlar yer değiştirerek kayar)
+document.addEventListener('change',async e=>{if(!e.target.matches('#app [data-fgay]'))return;const m=+e.target.value,bek=Object.keys(FG).filter(k=>FGAK.includes(k.split('|')[0]));
+  if(bek.length&&!(await fgOnay(bek.length+' ay kapanışı değeri henüz kaydedilmedi. Ay değişirse bu değerler silinecek. Devam edilsin mi?'))){e.target.value=FGAKM;return;}
+  bek.forEach(k=>delete FG[k]);FGAKM=m;render();});
 document.addEventListener('change',e=>{if(e.target.matches('#app .eks [data-epsa]')){st.ek.psa=e.target.checked;render();}});
 document.addEventListener('click',e=>{const t=e.target.closest('#app .eks [data-et],#app .eks [data-ecp],#app .eks [data-eb],#app .eks [data-ekal],#app .eks [data-esort]');if(!t)return;
   const d=t.dataset, wasKars=st.ek.tab==='kars', old={};
@@ -1806,7 +1814,9 @@ const KUL=window.KULLANICI||null, GARYETKI=!!(KUL&&KUL.rol!=='izleyici');
 let FG={}, FGB=null;   // kaydedilmemiş form değerleri 'bölüm|marka|anahtar' → metin · seçili marka
 const FGN=new Date(), FGH=isoH(FGN), FGW='H'+FGH.w, FGWP='H'+(FGH.w-1);
 const FGA=FGN.getFullYear()===YEAR?D.aylar[FGN.getMonth()]:ayk(CUT), FGAI=D.aylar.indexOf(FGA), FGM=FGAI+1;
-const FGPA=FGM>1&&FGN.getFullYear()===YEAR?ayk(FGM-1):null;   // yedek parça ay kapanışı beklenen ay (önceki ay)
+const FGPA=FGM>1&&FGN.getFullYear()===YEAR?ayk(FGM-1):null;   // beklenen ay kapanışı (önceki ay)
+let FGAKM=FGM-1;   // ay kapanışı bölümünde seçili ay (geçmiş aylar da seçilebilir)
+const fgAkA=()=>FGPA?ayk(FGAKM):null;
 const FGPZT=new Date(FGH.pzt.getUTCFullYear(),FGH.pzt.getUTCMonth(),FGH.pzt.getUTCDate()).getTime();   // bu haftanın Pazartesi 00:00 (yerel)
 const FGMET=[['isc','İşçilik','₺'],['yp','Yedek parça','₺'],['adet','Araç girişi','adet']];
 // kırılım yetkisi: Kullanicilar · "Yetkili kırılımlar" (boş = hepsi)
@@ -1817,7 +1827,7 @@ const fgIzin={kt:b=>vIzin('kt',b)&&KIR.some(k=>kirOk(k[0])),aie:b=>vIzin('aie',b
   gar:b=>!!(KUL&&KUL.rol!=='izleyici')&&!GVERI.includes(b)&&kirOk('gar')&&(!KUL.markalar||!KUL.markalar.length||KUL.markalar.includes(b))};
 fgIzin.gark=b=>!!FGPA&&fgIzin.gar(b);
 const FGAYBAS=new Date(FGN.getFullYear(),FGN.getMonth(),1).getTime();   // bu ayın 1'i: önceki ayın kapanışı bundan sonra girilir
-const fgMarkalar=()=>BR.filter(b=>b!==KON&&['kt','aie','yps','gar'].some(s=>fgIzin[s](b)));
+const fgMarkalar=(tip='w')=>BR.filter(b=>b!==KON&&(tip==='a'?FGAK:['kt','aie','yps']).some(s=>fgIzin[s](b)));
 // tek kırılımdan sorumlu ve birden fazla markası olan kişi (ör. yalnız Hasar): markalar alt alta tek tabloda
 const fgMod=()=>{const s=fgKir();return s&&s.length===1&&fgMarkalar().length>1?'kir':'marka';};
 const fgSon=(al,b,A,k)=>{const c=D[al]&&D[al][b]&&D[al][b][A]&&D[al][b][A][k];return c||null;};
@@ -1826,17 +1836,20 @@ const fgDone={
   kt:b=>fgKendi(D.kt&&D.kt[b]&&D.kt[b][FGA],x=>new Date(x.z).getTime()>=FGPZT),
   aie:b=>fgKendi(D.aie&&D.aie[b]&&D.aie[b][FGW]),
   yps:b=>!!fgSon('yps',b,FGW,'stok'),
-  ypk:b=>!!FGPA&&!!fgSon('yps',b,FGPA,'stok'),
-  aiek:b=>!!FGPA&&fgKendi(D.aie&&D.aie[b]&&D.aie[b][FGPA]),
-  gark:b=>{const z=FGPA&&D.garmz&&D.garmz[b]&&D.garmz[b][FGPA];return !!z&&new Date(z).getTime()>=FGAYBAS;},
+  ypk:b=>akDone('ypk',b,FGPA),aiek:b=>akDone('aiek',b,FGPA),gark:b=>akDone('gark',b,FGPA),
   gar:b=>!!(D.garz&&D.garz[b]&&new Date(D.garz[b].z).getTime()>=FGPZT)};
 const fgPend=(s,b)=>Object.keys(FG).some(k=>k.startsWith(s+'|'+b+'|')&&FG[k]!=='');
 // ay kapanışı: ayın ilk 7 günü her zaman, sonrasında girilene kadar formda kalır
+function akDone(s,b,A){if(!A)return false;
+  if(s==='ypk')return !!fgSon('yps',b,A,'stok');
+  if(s==='aiek')return fgKendi(D.aie&&D.aie[b]&&D.aie[b][A]);
+  const z=D.garmz&&D.garmz[b]&&D.garmz[b][A],m=D.aylar.indexOf(A);return !!z&&new Date(z).getTime()>=new Date(YEAR,m+1,1).getTime();}   // garanti: ay bittikten sonra girildiyse kesin
 const FGAK=['gark','aiek','ypk'];   // ay kapanışı bölümleri: ayın ilk 7 günü her zaman, sonra girilene kadar
 const fgAkAcik=(s,b)=>FGN.getDate()<=7||!fgDone[s](b)||fgPend(s,b);
-const fgSecs=b=>(fgMod()==='kir'?['gark','aiek','kt','aie','gar']:['gark','aiek','ypk','kt','aie','yps','gar']).filter(s=>fgIzin[s](b)&&(!FGAK.includes(s)||fgAkAcik(s,b)));
-const fgTamam=b=>fgSecs(b).filter(s=>fgDone[s](b)).length;
-const fgEksikSay=()=>fgMarkalar().filter(b=>fgTamam(b)<fgSecs(b).length).length;
+// haftalık ('w'): kapanış tahmini, açık iş emri, yedek parça stok · ay kapanışı ('a'): garanti, açık iş emri ay sonu, yedek parça ay kapanışı
+const fgSecs=(b,tip='w')=>tip==='a'?FGAK.filter(s=>fgIzin[s](b)&&fgAkAcik(s,b)):(fgMod()==='kir'?['kt','aie']:['kt','aie','yps']).filter(s=>fgIzin[s](b));
+const fgTamam=(b,tip='w')=>fgSecs(b,tip).filter(s=>fgDone[s](b)).length;
+const fgEksikSay=(tip='w')=>fgMarkalar(tip).filter(b=>fgTamam(b,tip)<fgSecs(b,tip).length).length;
 // kapanış tahmini referansları: bütçe, fiili, gidişat (bugünkü tempoyla ay sonu)
 function fgKtRef(b,kir,met){const h=ktHucre(b,FGM,kir,met),G=gun(FGM),son=fgSon('kt',b,FGA,kir+'.'+met);
   const gid=FGM===CUT&&G.gecen?h.fiili/G.gecen*G.donem:FGM<CUT?h.fiili:null;return {butce:h.butce,fiili:h.fiili,gid,son};}
@@ -1845,9 +1858,10 @@ const kisaAd=m=>{const p=String(m||'').split('@')[0].split(/[._-]/).filter(Boole
 function fgIpucu(s,b,k){
   if(s==='kt'){const [kir,met]=k.split('.'),r=fgKtRef(b,kir,met);return r.son?{v:r.son.v,t:'son tahmin',z:r.son.z}:r.gid?{v:r.gid,t:'gidişat'}:null;}
   if(s==='gar'){const c=((D.garm||{})[b]||{})[FGA];return c&&c.fiili!=null?{v:c.fiili,t:'şu an kayıtlı'}:null;}
-  if(s==='gark'){const c=((D.garm||{})[b]||{})[FGPA];return c&&c.fiili!=null?{v:c.fiili,t:'şu an kayıtlı'}:null;}
-  if(s==='aiek'){const c=fgSon('aie',b,FGPA,k);if(c)return {v:c.v,t:'kayıtlı ay sonu'+(c.k?' · '+kisaAd(c.k):''),z:c.z};const w=fgSon('aie',b,FGW,k)||fgSon('aie',b,FGWP,k);return w?{v:w.v,t:'son haftalık'}:null;}
-  if(s==='ypk'){const c=fgSon('yps',b,FGPA,k);if(c)return {v:c.v,t:'kayıtlı kapanış',z:c.z};const w=fgSon('yps',b,FGW,k)||fgSon('yps',b,FGWP,k);return w?{v:w.v,t:'son haftalık'}:null;}
+  const AK=fgAkA(), sonAy=AK===FGPA;
+  if(s==='gark'){const c=((D.garm||{})[b]||{})[AK];return c&&c.fiili!=null?{v:c.fiili,t:'şu an kayıtlı'}:null;}
+  if(s==='aiek'){const c=fgSon('aie',b,AK,k);if(c)return {v:c.v,t:'kayıtlı ay sonu'+(c.k?' · '+kisaAd(c.k):''),z:c.z};if(!sonAy)return null;const w=fgSon('aie',b,FGW,k)||fgSon('aie',b,FGWP,k);return w?{v:w.v,t:'son haftalık'}:null;}
+  if(s==='ypk'){const c=fgSon('yps',b,AK,k);if(c)return {v:c.v,t:'kayıtlı kapanış',z:c.z};if(!sonAy)return null;const w=fgSon('yps',b,FGW,k)||fgSon('yps',b,FGWP,k);return w?{v:w.v,t:'son haftalık'}:null;}
   const c=fgSon(s,b,FGW,k);if(c)return {v:c.v,t:'bu hafta girildi'+(c.k?' · '+kisaAd(c.k):''),z:c.z};
   const p=fgSon(s,b,FGWP,k);return p?{v:p.v,t:'geçen hafta'}:null;}
 const fgFmt=(v,adet)=>adet?FM.ad(v):TLT(v);
@@ -1873,55 +1887,62 @@ function fgKtTablo(gruplar){   // [{b,kir,ad}]
   const G=gun(FGM);
   return '<div class="fgtw"><table class="fgt2"><thead><tr><th></th><th>Bütçe <small>ay</small></th><th>Fiili <small>bugüne</small></th><th title="Fiili ÷ geçen iş günü × ayın iş günü">Gidişat <small>ay sonu</small></th><th>Son tahmin</th><th class="fgti">Yeni tahmin</th><th>T/B</th></tr></thead><tbody>'+body+'</tbody></table></div>'+
     '<p class="fgnot">Gidişat = bugüne kadarki fiili ÷ geçen iş günü ('+G.gecen+') × ayın iş günü ('+G.donem+'). Yeni tahmin boş bırakılırsa son tahmin geçerli kalır; T/B yeni tahmin ya da son tahmin ÷ bütçe.</p>';}
+const fgDn=(s,b)=>FGAK.includes(s)?akDone(s,b,fgAkA()):fgDone[s](b);
 function fgKart(no,s,bs,baslik,alt,govde,ekBtn){
-  const d=bs.every(b=>fgDone[s](b)), p=bs.some(b=>fgPend(s,b));
+  const d=bs.every(b=>fgDn(s,b)), p=bs.some(b=>fgPend(s,b));
   return '<section class="fgc'+(d?' ok':'')+(s==='kt'?' genis':'')+'" data-s="'+s+'" data-bs="'+bs.join(',')+'"><header><span class="fgno">'+(d&&!p?'✓':no)+'</span><div><h3>'+baslik+'</h3><span>'+alt+'</span></div>'+
     '<em class="fgd '+(p?'p':d?'d':'w')+'">'+(p?'Kaydedilmedi':d?(FGAK.includes(s)?'Girildi':'Bu hafta girildi'):'Bekliyor')+'</em>'+(ekBtn||'')+
     '<button type="button" class="fgk" data-fgk="'+s+'">'+(s==='kt'?'Son tahminleri yaz':FGAK.includes(s)?'Son değerleri yaz':'Geçen değerleri yaz')+'</button></header><div class="fgb">'+govde+'</div></section>';}
-function pGiris(){
-  const bs=fgMarkalar(), mod=fgMod(), hl=hEtiket(FGH.y,FGH.w), ayAd=MONTHS[FGAI];
-  if(!bs.length)return head('Servis Performans Yönetimi','Haftalık veri girişi','')+'<div class="empty">Veri girişi yetkiniz tanımlı değil. Yetki için CEO Ofis ile iletişime geçin.</div>';
+// kartlar arasında boşluk kalmasın: geniş kart (kapanış tahmini) tam satır, diğerleri iki sütunda alt alta
+const fgDuzen=kk=>{const g=kk.filter(x=>/class="fgc[^"]*genis/.test(x)),d=kk.filter(x=>!/class="fgc[^"]*genis/.test(x));
+  return (g.length?'<div class="fgw1">'+g.join('')+'</div>':'')+(d.length?'<div class="fgcol">'+d.join('')+'</div>':'');};
+let FGTIP='w';
+function pGiris(tip='w'){
+  FGTIP=tip;const A=tip==='a';
+  const bs=fgMarkalar(tip), mod=fgMod(), hl=hEtiket(FGH.y,FGH.w), ayAd=MONTHS[FGAI], pAd=FGPA?MONTHS[FGAKM-1]:'';
+  const baslik=A?'Ay kapanışı girişi':'Haftalık veri girişi';
+  if(!bs.length||(A&&!FGPA))return head('Servis Performans Yönetimi',baslik,'')+'<div class="empty">'+(A&&!FGPA?'Bu yıl için kapanmış ay henüz yok.':'Veri girişi yetkiniz tanımlı değil. Yetki için CEO Ofis ile iletişime geçin.')+'</div>';
   const ktAlt=ayAd+' sonu için beklenen kapanış · referans olarak bütçe, bugüne kadarki fiili ve gidişat';
   const gidBtn='<button type="button" class="fgk" data-fggid="1">Gidişatı yaz</button>';
-  let no=0;const kartlar=[],ak=[];let ust='',prog='';const pAd=FGPA?MONTHS[FGM-2]:'';
   const aiGrid=(s,rows)=>'<div class="fgg fg2"><div></div><div class="fgh">Açık iş emri</div><div class="fgh">45 gün üzeri</div>'+rows.map(([b,k,ad])=>'<div class="fgr">'+ad+'</div>'+fgInp(s,b,k+'.acik',1)+fgInp(s,b,k+'.g45',1)).join('')+'</div>';
+  const ypGrid=(s,b)=>'<div class="fgg fg1">'+YPK.map(k=>'<div class="fgr">'+k[1]+(k[2]?' <small>('+k[2]+')</small>':'')+'</div>'+fgInp(s,b,k[0],0)).join('')+'</div>';
+  // sayfadaki bölümler ve tamamlanma (ay kapanışında seçili aya göre)
+  const secsP=b=>A?FGAK.filter(s=>fgIzin[s](b)):fgSecs(b,'w'), tamP=b=>secsP(b).filter(s=>fgDn(s,b)).length;
+  let no=0;const kartlar=[];let ust='',prog='';
+  const donem=A?pAd+' '+YEAR+' kapanışı':hl;
   if(mod==='kir'){
     const k=fgKir()[0], kad=(KIR.find(x=>x[0]===k)||AIK.find(x=>x[0]===k)||[k,k])[1];
-    const ktB=bs.filter(b=>fgIzin.kt(b)), aiB=bs.filter(b=>fgIzin.aie(b)&&AIK.some(x=>x[0]===k)), gaB=bs.filter(b=>fgIzin.gar(b));
-    const tot=bs.reduce((a,b)=>a+fgSecs(b).length,0), tam=bs.reduce((a,b)=>a+fgTamam(b),0);
-    prog='<div class="fgp"><div><b>'+esc(kad)+'</b> · '+bs.length+' marka · '+esc(hl)+'</div><div class="fgpb"><i style="width:'+(tot?tam/tot*100:0)+'%"></i></div><span>'+tam+' / '+tot+' giriş tamam</span></div>';
-    const gaK=bs.filter(b=>fgIzin.gark(b)&&fgAkAcik('gark',b)), aiK=bs.filter(b=>fgIzin.aiek(b)&&AIK.some(x=>x[0]===k)&&fgAkAcik('aiek',b));
-    if(gaK.length)ak.push(fgKart(++no,'gark',gaK,'Garanti araç girişi · '+pAd+' toplamı',pAd+' ayının kesin orijinal garanti araç girişi · adet','<div class="fgg fg1">'+gaK.map(b=>'<div class="fgr">'+esc(lab(b))+'</div>'+fgInp('gark',b,'fiili',1)).join('')+'</div>'));
-    if(aiK.length)ak.push(fgKart(++no,'aiek',aiK,'Açık iş emri · '+pAd+' sonu · '+kad,pAd+' ayının son iş günündeki değerler · adet',aiGrid('aiek',aiK.map(b=>[b,k,esc(lab(b))]))));
-    if(ktB.length)kartlar.push(fgKart(++no,'kt',ktB,'Kapanış tahmini · '+kad,ktAlt,fgKtTablo(ktB.map(b=>({b,kir:k,ad:lab(b)}))),gidBtn));
-    if(aiB.length)kartlar.push(fgKart(++no,'aie',aiB,'Açık iş emri · '+kad,FGH.w+'. hafta · adet',
-      '<div class="fgg fg2"><div></div><div class="fgh">Açık iş emri</div><div class="fgh">45 gün üzeri</div>'+aiB.map(b=>'<div class="fgr">'+esc(lab(b))+'</div>'+fgInp('aie',b,k+'.acik',1)+fgInp('aie',b,k+'.g45',1)).join('')+'</div>'));
-    if(gaB.length)kartlar.push(fgKart(++no,'gar',gaB,'Garanti araç girişi',ayAd+' · ay başından bugüne orijinal garanti araç girişi · adet',
-      '<div class="fgg fg1">'+gaB.map(b=>'<div class="fgr">'+esc(lab(b))+'</div>'+fgInp('gar',b,'fiili',1)).join('')+'</div>'));
+    const tot=bs.reduce((a,b)=>a+secsP(b).length,0), tam=bs.reduce((a,b)=>a+tamP(b),0);
+    prog='<div class="fgp"><div><b>'+esc(kad)+'</b> · '+bs.length+' marka · '+esc(donem)+'</div><div class="fgpb"><i style="width:'+(tot?tam/tot*100:0)+'%"></i></div><span>'+tam+' / '+tot+' giriş tamam</span></div>';
+    if(A){const gaK=bs.filter(b=>fgIzin.gark(b)), aiK=bs.filter(b=>fgIzin.aiek(b)&&AIK.some(x=>x[0]===k));
+      if(gaK.length)kartlar.push(fgKart(++no,'gark',gaK,'Garanti araç girişi · '+pAd+' toplamı',pAd+' ayının kesin orijinal garanti araç girişi · adet','<div class="fgg fg1">'+gaK.map(b=>'<div class="fgr">'+esc(lab(b))+'</div>'+fgInp('gark',b,'fiili',1)).join('')+'</div>'));
+      if(aiK.length)kartlar.push(fgKart(++no,'aiek',aiK,'Açık iş emri · '+pAd+' sonu · '+kad,pAd+' ayının son iş günündeki değerler · adet',aiGrid('aiek',aiK.map(b=>[b,k,esc(lab(b))]))));}
+    else{const ktB=bs.filter(b=>fgIzin.kt(b)), aiB=bs.filter(b=>fgIzin.aie(b)&&AIK.some(x=>x[0]===k));
+      if(ktB.length)kartlar.push(fgKart(++no,'kt',ktB,'Kapanış tahmini · '+kad,ktAlt,fgKtTablo(ktB.map(b=>({b,kir:k,ad:lab(b)}))),gidBtn));
+      if(aiB.length)kartlar.push(fgKart(++no,'aie',aiB,'Açık iş emri · '+kad,FGH.w+'. hafta · adet',aiGrid('aie',aiB.map(b=>[b,k,esc(lab(b))]))));}
   }else{
-    if(!FGB||!bs.includes(FGB))FGB=bs.find(b=>fgTamam(b)<fgSecs(b).length)||bs[0];
-    const b=FGB, secs=fgSecs(b), tam=fgTamam(b);
-    ust=bs.length>1?'<div class="fgt">'+bs.map(x=>{const t=fgTamam(x),n=fgSecs(x).length,ok=t===n;return '<button type="button" data-fgb="'+x+'" class="'+(x===b?'on':'')+(ok?' ok':'')+'">'+esc(lab(x))+'<small>'+(ok?'✓ tamam':t+'/'+n+' bölüm')+'</small></button>';}).join('')+'</div>':'';
-    prog='<div class="fgp"><div><b>'+esc(lab(b))+'</b> · '+esc(hl)+'</div><div class="fgpb"><i style="width:'+(secs.length?tam/secs.length*100:0)+'%"></i></div><span>'+tam+' / '+secs.length+' bölüm tamam</span></div>';
+    if(!FGB||!bs.includes(FGB))FGB=bs.find(b=>tamP(b)<secsP(b).length)||bs[0];
+    const b=FGB, secs=secsP(b), tam=tamP(b);
+    ust=bs.length>1?'<div class="fgt">'+bs.map(x=>{const t=tamP(x),n=secsP(x).length,ok=t===n;return '<button type="button" data-fgb="'+x+'" class="'+(x===b?'on':'')+(ok?' ok':'')+'">'+esc(lab(x))+'<small>'+(ok?'✓ tamam':t+'/'+n+' bölüm')+'</small></button>';}).join('')+'</div>':'';
+    prog='<div class="fgp"><div><b>'+esc(lab(b))+'</b> · '+esc(donem)+'</div><div class="fgpb"><i style="width:'+(secs.length?tam/secs.length*100:0)+'%"></i></div><span>'+tam+' / '+secs.length+' bölüm tamam</span></div>';
     const kirs=KIR.filter(k=>kirOk(k[0])), aiks=AIK.filter(k=>kirOkAie(k[0]));
-    if(secs.includes('gark'))ak.push(fgKart(++no,'gark',[b],'Garanti araç girişi · '+pAd+' toplamı',pAd+' ayının kesin orijinal garanti araç girişi · adet',
-      '<div class="fgg fg1"><div class="fgr">'+pAd+' toplamı</div>'+fgInp('gark',b,'fiili',1)+'</div>'));
-    if(secs.includes('aiek'))ak.push(fgKart(++no,'aiek',[b],'Açık iş emri · '+pAd+' sonu',pAd+' ayının son iş günündeki değerler · adet',aiGrid('aiek',aiks.map(k=>[b,k[0],k[1]]))));
-    if(secs.includes('ypk'))ak.push(fgKart(++no,'ypk',[b],'Yedek parça ay kapanışı · '+pAd,pAd+' ayının kesin kapanış değerleri · ₺ · stok devir hızı için',
-      '<div class="fgg fg1">'+YPK.map(k=>'<div class="fgr">'+k[1]+(k[2]?' <small>('+k[2]+')</small>':'')+'</div>'+fgInp('ypk',b,k[0],0)).join('')+'</div>'));
-    if(secs.includes('kt'))kartlar.push(fgKart(++no,'kt',[b],'Kapanış tahmini',ktAlt,fgKtTablo(kirs.map(k=>({b,kir:k[0],ad:k[1]}))),gidBtn));
-    if(secs.includes('aie'))kartlar.push(fgKart(++no,'aie',[b],'Açık iş emri',FGH.w+'. hafta · adet',
-      '<div class="fgg fg2"><div></div><div class="fgh">Açık iş emri</div><div class="fgh">45 gün üzeri</div>'+aiks.map(k=>'<div class="fgr">'+k[1]+'</div>'+fgInp('aie',b,k[0]+'.acik',1)+fgInp('aie',b,k[0]+'.g45',1)).join('')+'</div>'));
-    if(secs.includes('yps'))kartlar.push(fgKart(++no,'yps',[b],'Yedek parça stok',FGH.w+'. hafta · ₺',
-      '<div class="fgg fg1">'+YPK.map(k=>'<div class="fgr">'+k[1]+(k[2]?' <small>('+k[2]+')</small>':'')+'</div>'+fgInp('yps',b,k[0],0)).join('')+'</div>'));
-    if(secs.includes('gar'))kartlar.push(fgKart(++no,'gar',[b],'Garanti araç girişi',ayAd+' · ay başından bugüne orijinal garanti araç girişi · adet',
-      '<div class="fgg fg1"><div class="fgr">'+ayAd+' toplamı</div>'+fgInp('gar',b,'fiili',1)+'</div>'));
+    if(A){
+      if(secs.includes('gark'))kartlar.push(fgKart(++no,'gark',[b],'Garanti araç girişi · '+pAd+' toplamı',pAd+' ayının kesin orijinal garanti araç girişi · adet','<div class="fgg fg1"><div class="fgr">'+pAd+' toplamı</div>'+fgInp('gark',b,'fiili',1)+'</div>'));
+      if(secs.includes('aiek'))kartlar.push(fgKart(++no,'aiek',[b],'Açık iş emri · '+pAd+' sonu',pAd+' ayının son iş günündeki değerler · adet',aiGrid('aiek',aiks.map(k=>[b,k[0],k[1]]))));
+      if(secs.includes('ypk'))kartlar.push(fgKart(++no,'ypk',[b],'Yedek parça · '+pAd+' kapanışı',pAd+' ayının kesin kapanış değerleri · ₺ · stok devir hızı için',ypGrid('ypk',b)));
+    }else{
+      if(secs.includes('kt'))kartlar.push(fgKart(++no,'kt',[b],'Kapanış tahmini',ktAlt,fgKtTablo(kirs.map(k=>({b,kir:k[0],ad:k[1]}))),gidBtn));
+      if(secs.includes('aie'))kartlar.push(fgKart(++no,'aie',[b],'Açık iş emri',FGH.w+'. hafta · adet',aiGrid('aie',aiks.map(k=>[b,k[0],k[1]]))));
+      if(secs.includes('yps'))kartlar.push(fgKart(++no,'yps',[b],'Yedek parça stok',FGH.w+'. hafta · ₺',ypGrid('yps',b)));
+    }
   }
   const n=Object.values(FG).filter(v=>v!=='').length;
   const foot='<div class="fgf"><span id="fgn">'+(n?n+' değer girildi · henüz kaydedilmedi':'Değerleri yazın; yalnızca doldurduğunuz alanlar kaydedilir, boş alanlar değişmez.')+'</span>'+
     '<button type="button" class="gbtn ghost" id="fgvaz"'+(n?'':' disabled')+'>Temizle</button><button type="button" class="gbtn fgs" id="fgkay"'+(n?'':' disabled')+'>Kaydet ve gönder</button></div>';
-  return head('Servis Performans Yönetimi','Haftalık veri girişi',esc(hl)+' · her Pazartesi 12:00\'ye kadar · tüm haftalık veriler tek yerden')+ust+prog+(ak.length?'<section class="fgak"><div class="fgsh ak"><b>Ay kapanışı · '+pAd+' '+(FGM===1?YEAR-1:YEAR)+'</b><span>kesin ay sonu değerleri · ayın ilk 7 günü, girilene kadar açık kalır</span></div><div class="fgw">'+ak.join('')+'</div></section>'+(kartlar.length?'<div class="fgsh"><b>Bu hafta · '+FGH.w+'. hafta</b><span>her Pazartesi 12:00\'ye kadar</span></div>':''):'')+'<div class="fgw">'+kartlar.join('')+'</div>'+foot+
-    '<p class="note">Kaydedilen değerler anında tüm raporlara yansır. Değerleri Excel\'den kopyalayıp yapıştırabilirsiniz (bir sütunu yapıştırınca alt alta dolar); ₺ işareti ve binlik noktalar otomatik temizlenir. Son değerden %50\'den fazla farklı değerler sarı işaretlenir. Kapanış Tahmini, Açık İş Emri ve Yedek Parça sayfaları raporlama içindir.</p>';
+  const aySec=A?'<div class="fgsh ak"><b>'+pAd+' '+YEAR+' kapanışı</b><span>kesin ay sonu değerleri · geçmiş aylar için de girilebilir</span><label class="srt">Ay <select data-fgay>'+Array.from({length:FGM-1},(_,i)=>FGM-1-i).map(m=>'<option value="'+m+'"'+(m===FGAKM?' selected':'')+'>'+MONTHS[m-1]+' '+YEAR+(m===FGM-1?' · son kapanan ay':'')+'</option>').join('')+'</select></label></div>':'';
+  return head('Servis Performans Yönetimi',baslik,A?'Ay kapanışı · garanti araç girişi, açık iş emri ve yedek parça kesin değerleri · ayın ilk iş günlerinde':esc(hl)+' · her Pazartesi 12:00\'ye kadar · kapanış tahmini, açık iş emri, yedek parça stok')+
+    ust+prog+(A?'<section class="fgak">'+aySec+fgDuzen(kartlar)+'</section>':fgDuzen(kartlar))+foot+
+    '<p class="note">Kaydedilen değerler anında tüm raporlara yansır. Değerleri Excel\'den kopyalayıp yapıştırabilirsiniz (bir sütunu yapıştırınca alt alta dolar); ₺ işareti ve binlik noktalar otomatik temizlenir. Son değerden %50\'den fazla farklı değerler sarı işaretlenir.'+(A?' Garanti araç girişi yalnızca ay kapanışında girilir; açık iş emri ve yedek parça stoku haftalık girişe ek olarak ay sonu değerleriyle de girilir.':' Ay sonu değerleri ve garanti araç girişi Ay kapanışı girişi sayfasından girilir.')+'</p>';
 }
 function fgSay(){const n=Object.keys(FG).length,e=$('fgn');
   if(e){e.textContent=n?n+' değer girildi · henüz kaydedilmedi':'Değerleri yazın; yalnızca doldurduğunuz alanlar kaydedilir, boş alanlar değişmez.';$('fgkay').disabled=$('fgvaz').disabled=!n;}}
@@ -1934,7 +1955,7 @@ function fgGir(inp){const t=String(inp.value).replace(/[₺\s.]/g,'').replace(',
   const cell=inp.closest('td.fgti');
   if(cell){cell.classList.toggle('dolu',t!=='');cell.classList.toggle('fg-uy',uy);const tr=cell.parentNode,bud=+tr.dataset.bud,son=tr.dataset.son,v=t!==''?+t:son!==''?+son:null,tb=v!=null&&bud?v/bud:null,c=tr.querySelector('.fgtb');
     c.className='fgtb '+(tb==null?'':tb>=1?'g':'r')+(t!==''?'':' son');c.textContent=tb==null?'–':'%'+nf1.format(tb*100);}
-  const sec=inp.closest('.fgc'),d=sec.querySelector('.fgd'),bs=sec.dataset.bs.split(','),p=bs.some(x=>fgPend(sc,x)),dn=bs.every(x=>fgDone[sc](x));
+  const sec=inp.closest('.fgc'),d=sec.querySelector('.fgd'),bs=sec.dataset.bs.split(','),p=bs.some(x=>fgPend(sc,x)),dn=bs.every(x=>fgDn(sc,x));
   d.className='fgd '+(p?'p':dn?'d':'w');d.textContent=p?'Kaydedilmedi':dn?(FGAK.includes(sc)?'Girildi':'Bu hafta girildi'):'Bekliyor';fgSay();}
 function fgKopya(btn){const sec=btn.closest('.fgc');sec.querySelectorAll('input[data-fg]').forEach(i=>{const [s,b,k]=i.dataset.fg.split('|');
   const v=s==='kt'?(fgSon('kt',b,FGA,k)||{}).v:(fgIpucu(s,b,k)||{}).v;if(v!=null&&!(i.dataset.fg in FG))FG[i.dataset.fg]=String(Math.round(v));});render();}
@@ -1945,10 +1966,10 @@ function fgModal(h){const m=document.createElement('div');m.className='fgm';m.in
 function fgTesekkur(markalar,bolumler,adet){
   const ad=String(KUL&&KUL.ad||'').trim().split(/\s+/),h=KUL&&KUL.hitap, kim=h&&ad.length>1?ad.slice(0,-1).join(' ')+' '+h:(KUL&&KUL.ad)||'';
   const AD={kt:'Kapanış tahmini',aie:'Açık iş emri',yps:'Yedek parça stok',gar:'Garanti araç girişi'};
-  const sonraki=fgMod()==='marka'?fgMarkalar().find(x=>!markalar.includes(x)&&fgTamam(x)<fgSecs(x).length):null;
+  const sonraki=fgMod()==='marka'?fgMarkalar(FGTIP).find(x=>!markalar.includes(x)&&fgTamam(x,FGTIP)<fgSecs(x,FGTIP).length):null;
   const mk=markalar.length>3?markalar.length+' marka':markalar.map(lab).join(', ');
   fgModal('<svg class="fgok" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M15 27l7 7 15-16"/></svg>'+
-    '<h2>Teşekkürler'+(kim?' '+esc(kim):'')+'!</h2><p>'+esc(mk)+' · '+FGH.w+'. hafta verileriniz kaydedildi ve tüm raporlarda herkes için güncellendi.</p>'+
+    '<h2>Teşekkürler'+(kim?' '+esc(kim):'')+'!</h2><p>'+esc(mk)+' · '+(FGTIP==='a'?MONTHS[FGAKM-1]+' kapanışı':FGH.w+'. hafta')+' verileriniz kaydedildi ve tüm raporlarda herkes için güncellendi.</p>'+
     '<ul>'+bolumler.map(x=>'<li>✓ '+AD[x]+'</li>').join('')+'</ul><small>'+adet+' değer kaydedildi · '+new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})+'</small>'+
     '<div class="fgmf">'+(sonraki?'<button type="button" class="gbtn ghost" data-fgx>Kapat</button><button type="button" class="gbtn" data-fgnext="'+sonraki+'">Sıradaki: '+esc(lab(sonraki))+' →</button>':'<button type="button" class="gbtn" data-fgx>Kapat</button>')+'</div>');}
 function fgOnay(metin){return new Promise(res=>{const m=fgModal('<h2 class="fgw2">Kontrol edelim</h2><p>'+metin+'</p><div class="fgmf"><button type="button" class="gbtn ghost" data-fgh>Geri dön</button><button type="button" class="gbtn" data-fge>Yine de kaydet</button></div>');
@@ -1959,7 +1980,7 @@ async function fgKaydet(){
   if(bad){toast('Geçersiz değer: '+bad[1]);return;}
   const uy=ent.filter(([k,v])=>{const [s,b,an]=k.split('|');return fgUy(v,fgIpucu(s,b,an));});
   if(uy.length&&!(await fgOnay(uy.length+' değer son değerden %50\'den fazla farklı (sarı işaretli alanlar). Fazladan ya da eksik bir sıfır olabilir. Yine de kaydedilsin mi?')))return;
-  const P={};const yil={kt:YEAR,aie:D.aieYil||FGH.y,yps:YEAR,ypk:YEAR,gar:YEAR,aiek:D.aieYil||FGH.y,gark:YEAR},ay={kt:FGA,aie:FGW,yps:FGW,ypk:FGPA,gar:FGA,aiek:FGPA,gark:FGPA};
+  const P={};const yil={kt:YEAR,aie:D.aieYil||FGH.y,yps:YEAR,ypk:YEAR,gar:YEAR,aiek:D.aieYil||FGH.y,gark:YEAR},ay={kt:FGA,aie:FGW,yps:FGW,ypk:fgAkA(),gar:FGA,aiek:fgAkA(),gark:fgAkA()};
   for(const [k,v] of ent){const [s0,b,an]=k.split('|'),s={ypk:'yps',aiek:'aie',gark:'gar'}[s0]||s0;P[s]=P[s]||{yil:yil[s0],satirlar:[]};
     if(s==='gar')P.gar.satirlar.push({kod:b,ay:ay[s0],fiili:Math.round(+v)});   // bütçe ve 2025 dosyadan gelmeye devam eder
     else P[s].satirlar.push({kod:b,ay:ay[s0],anahtar:an,deger:Math.round(+v)});}
@@ -1976,7 +1997,7 @@ async function fgKaydet(){
   catch(e){btn.disabled=false;btn.classList.remove('yuk');btn.textContent='Kaydet ve gönder';toast('Kaydedilemedi: '+e.message+' · Girdiğiniz değerler ekranda duruyor, tekrar deneyin.');}
 }
 const PAGES=[['ozet','Yönetici Özeti',pOzet,'S'],['perf','Servis Performansı',pPerf,'S'],['homer','HOMER · Hasar',pHomer,'S'],['carcare','Car Care',pCar,'S'],['ek','Ek Satış',pEk,'S'],...(KUL?[['kt','Kapanış Tahmini',pKT,'S'],['aie','Açık İş Emri',pAIE,'S'],['yp','Yedek Parça',pYP,'S']]:[]),['veri','Veri & hesap kontrolü',pVeri,'F']];
-if(KUL&&KUL.rol!=='izleyici')PAGES.splice(PAGES.length-1,0,['giris','Haftalık veri girişi',pGiris,'G']);
+if(KUL&&KUL.rol!=='izleyici')PAGES.splice(PAGES.length-1,0,['giris','Haftalık veri girişi',()=>pGiris('w'),'G'],['kapanis','Ay kapanışı girişi',()=>pGiris('a'),'G']);
 if(KUL&&KUL.rol==='yonetici')PAGES.splice(PAGES.length-1,0,['garanti','Garanti araç girişi',pGar,'G']);
 {const h=location.hash.slice(1);if(h&&PAGES.some(p=>p[0]===h))st.page=h;}
 if(KUL&&KUL.rol==='yonetici')PAGES.splice(PAGES.length-1,0,['durum','Veri giriş durumu',pDurum,'G']);
@@ -2136,7 +2157,7 @@ function needX(){if(window.XLSX)return true;toast('Excel kütüphanesi yüklenem
 $('xOne').onclick=()=>{closeDD();if(!needX())return;const P=PAGES.find(p=>p[0]===st.page);
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,sheetFrom($('app'),P[1]),sname(P[1]));XLSX.writeFile(wb,fname(P[1]));};
 $('xAll').onclick=()=>{closeDD();if(!needX())return;const wb=XLSX.utils.book_new(),tmp=document.createElement('div');
-  for(const p of PAGES){if(p[0]==='garanti'||p[0]==='durum'||p[0]==='giris')continue;tmp.innerHTML=p[2]();XLSX.utils.book_append_sheet(wb,sheetFrom(tmp,p[1]),sname(p[1]));}
+  for(const p of PAGES){if(['garanti','durum','giris','kapanis'].includes(p[0]))continue;tmp.innerHTML=p[2]();XLSX.utils.book_append_sheet(wb,sheetFrom(tmp,p[1]),sname(p[1]));}
   XLSX.writeFile(wb,fname('Yonetici_Paketi'));};
 
 /* ---------- çizim ---------- */
@@ -2189,7 +2210,7 @@ function mdpKapat(){if(!MDP)return;MDP=null;const P=$('mdp');P.classList.remove(
 function mdpYenile(){if(!MDP)return;if(st.page!=='perf'||!rowsOf().includes(MDP.b))return mdpKapat();$('mdp').innerHTML=mdpHtml();}
 function render(){
   const P=PAGES.find(p=>p[0]===st.page)||PAGES[0];st.page=P[0];ls.set('inc_panel_v5',st);
-  const link=(p,i)=>{const nb=p[0]==='giris'?fgEksikSay():0;return '<a href="#'+p[0]+'" class="'+(p[0]===st.page?'on':'')+(p[0]==='giris'?' fgm-l':'')+'" data-p="'+p[0]+'">'+(i!=null?'<span>'+String(i).padStart(2,'0')+'</span>':'')+p[1]+(p[0]==='giris'?(nb?'<em class="fgnb" title="Bu hafta girişi eksik marka sayısı">'+nb+'</em>':'<em class="fgnb ok" title="Bu haftanın girişleri tamam">✓</em>'):'')+'</a>';};
+  const link=(p,i)=>{const nb=p[0]==='giris'?fgEksikSay('w'):p[0]==='kapanis'?fgEksikSay('a'):0;return '<a href="#'+p[0]+'" class="'+(p[0]===st.page?'on':'')+(p[0]==='giris'?' fgm-l':'')+'" data-p="'+p[0]+'">'+(i!=null?'<span>'+String(i).padStart(2,'0')+'</span>':'')+p[1]+(p[0]==='giris'||p[0]==='kapanis'?(nb?'<em class="fgnb'+(p[0]==='kapanis'?' ak':'')+'" title="Girişi eksik marka sayısı">'+nb+'</em>':'<em class="fgnb ok" title="Girişler tamam">✓</em>'):'')+'</a>';};
   {const S=PAGES.filter(p=>p[3]==='S'),gir=PAGES.filter(p=>p[3]==='G'),ust=KUL&&KUL.rol==='giris';
     const rap=S.map((p,i)=>link(p,i+1)).join(''), g=gir.map((p,i)=>link(p,null).replace('class="','class="mg'+(i?'':ust?'':' mg0')+(ust&&i===gir.length-1?' mgs':'')+' ')).join('');
     // yetkiye göre: veri girişi yapan müdürlerde giriş en üstte; izleyicide giriş ekranları hiç yok
@@ -2400,7 +2421,7 @@ function gwShow(ad){
   let i=0;
   const step=()=>{i++;const p=Math.min(100,i*25);$('gwp').style.width=p+'%';$('gwpc').textContent='%'+p;$('gwpt').textContent=S[i];
     if(p<100){gwTimer=setTimeout(step,still?0:700);return;}
-    gwTimer=setTimeout(()=>{gwOpen(location.hash==='#giris'&&PAGES.some(p=>p[0]==='giris')?'giris':'ozet');$('gw').classList.add('out');setTimeout(()=>{$('gw').hidden=true;$('gw').classList.remove('out');},still?0:1000);},still?0:700);};
+    gwTimer=setTimeout(()=>{gwOpen(['#giris','#kapanis'].includes(location.hash)&&PAGES.some(p=>'#'+p[0]===location.hash)?location.hash.slice(1):'ozet');$('gw').classList.add('out');setTimeout(()=>{$('gw').hidden=true;$('gw').classList.remove('out');},still?0:1000);},still?0:700);};
   gwTimer=setTimeout(step,still?0:1500);
 }
 
@@ -2408,6 +2429,7 @@ function gwShow(ad){
 (function(){
   const q=id=>document.getElementById(id), kutu=q('gtApp'),btn=q('gtAppB'),bilgi=q('gtAppI');if(!kutu)return;
   const yuklu=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;if(yuklu)return;
+  try{if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}   // yükleme penceresi için gerekli
   let istem=null;const ua=navigator.userAgent, ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1),
     android=/Android/.test(ua), edge=/Edg\//.test(ua);
   const tarif=()=>ios?'Safari → Paylaş → Ana Ekrana Ekle'
