@@ -25,5 +25,12 @@
    "type": "image/png",
    "purpose": "maskable"
   }
+ ],
+ "id": "./",
+ "related_applications": [
+  {
+   "platform": "webapp",
+   "url": "https://inciroglu.github.io/servis-dashboard/manifest.webmanifest"
+  }
  ]
 }
