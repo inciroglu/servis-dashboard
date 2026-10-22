@@ -7,13 +7,13 @@
 <title>Servis Performans Yönetimi · İnciroğlu Otomotiv</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="uygulama/ikon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="uygulama/ikon-192.png?v=2"><link rel="shortcut icon" href="uygulama/ikon-192.png?v=2">
 <meta property="og:title" content="İnciroğlu Otomotiv · Servis Performans Yönetimi">
 <meta property="og:site_name" content="İnciroğlu Otomotiv">
 <meta name="application-name" content="İnciroğlu Otomotiv">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#122f59">
-<link rel="apple-touch-icon" href="uygulama/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="uygulama/apple-touch-icon.png?v=2">
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="CEO Ofis"><meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js" defer></script>
@@ -2208,6 +2208,7 @@ function mdpHtml(){
 function mdpAc(b,k,kat){MDP={b,k,kat};const P=$('mdp');P.innerHTML=mdpHtml();P.hidden=false;$('mdpS').hidden=false;TIP.hidden=true;requestAnimationFrame(()=>P.classList.add('in'));P.querySelector('[data-mdx]').focus({preventScroll:true});}
 function mdpKapat(){if(!MDP)return;MDP=null;const P=$('mdp');P.classList.remove('in');$('mdpS').hidden=true;setTimeout(()=>{if(!MDP)P.hidden=true;},260);}
 function mdpYenile(){if(!MDP)return;if(st.page!=='perf'||!rowsOf().includes(MDP.b))return mdpKapat();$('mdp').innerHTML=mdpHtml();}
+const UYG=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;   // yüklü uygulama olarak mı açıldı
 function render(){
   const P=PAGES.find(p=>p[0]===st.page)||PAGES[0];st.page=P[0];ls.set('inc_panel_v5',st);
   const link=(p,i)=>{const nb=p[0]==='giris'?fgEksikSay('w'):p[0]==='kapanis'?fgEksikSay('a'):0;return '<a href="#'+p[0]+'" class="'+(p[0]===st.page?'on':'')+(p[0]==='giris'?' fgm-l':'')+'" data-p="'+p[0]+'">'+(i!=null?'<span>'+String(i).padStart(2,'0')+'</span>':'')+p[1]+(p[0]==='giris'||p[0]==='kapanis'?(nb?'<em class="fgnb'+(p[0]==='kapanis'?' ak':'')+'" title="Girişi eksik marka sayısı">'+nb+'</em>':'<em class="fgnb ok" title="Girişler tamam">✓</em>'):'')+'</a>';};
@@ -2220,7 +2221,7 @@ function render(){
   $('crumb').innerHTML='Servis Performans Yönetimi / <b>'+P[1]+'</b>';
   scopeRender();TIP.hidden=true;
   $('app').innerHTML='<table class="pw"><thead><tr><td><div class="phead"><div class="plogo">'+LOGO+'</div><div class="ptx"><b>'+P[1]+'</b><span>'+(st.page==='ek'&&EK?esc(EK.meta.donem)+' · ek satış planı ve gerçekleşme':esc(brandLabel())+' · '+PL()+(TWO()?' ve '+ytdLabel():''))+'</span></div><div class="pk">'+(st.page==='ek'&&EK?'Güncellenme <b>'+esc(EK.meta.veriTarihi)+'</b>':'Veri kesimi <b>'+esc(D.ust.veri_kesim)+'</b>')+'<br>Servis Performans Yönetimi</div></div></td></tr></thead><tbody><tr><td>'+P[2]()+'</td></tr></tbody></table><div class="prt">İnciroğlu Otomotiv · Hazırlayan: CEO Ofis · İş Geliştirme ve Strateji · '+P[1]+' · '+esc(brandLabel())+' · '+PL()+' · veri kesimi '+esc(D.ust.veri_kesim)+' · yazdırma '+new Date().toLocaleDateString('tr-TR')+'</div>';
-  document.title=P[1]+' · İnciroğlu Otomotiv';
+  document.title=UYG?P[1]:P[1]+' · İnciroğlu Otomotiv';   // uygulama penceresinde ad zaten başta yazar
   const AK=[st.page,st.brands,st.months,st.hkat,st.ekKat,st.hmet,st.kpis,st.ek.tab,st.ek.cp,st.ek.brand,st.ek.kal].join('|'), still=matchMedia('(prefers-reduced-motion: reduce)').matches;
   sutunSik();
   document.body.classList.toggle('pg-perf',st.page==='perf');mdpYenile();
@@ -2245,6 +2246,7 @@ $('pfy').textContent=YEAR;
 render();
 </script>
 <script>
+try{if(matchMedia('(display-mode: standalone)').matches||navigator.standalone===true)document.title='Giriş';}catch(e){}
 /* ---------- açılış: giriş, şifre işlemleri, veri çözme, karşılama ----------
    İki kip:
    · PANEL.api doluysa  → kişiye özel giriş (Google Apps Script servisi), veri şifreli yayınlanır,
