@@ -25,6 +25,10 @@ jobs:
           if [ -f index.html ]; then cp index.html site/index.html;
           elif [ -f dashboard.html ]; then cp dashboard.html site/index.html;
           else echo "index.html yok"; exit 1; fi
+          # uygulama olarak yükleme dosyaları (simge, manifest, servis çalışanı)
+          [ -f manifest.webmanifest ] && cp manifest.webmanifest site/ || true
+          [ -f sw.js ] && cp sw.js site/ || true
+          [ -d uygulama ] && cp -r uygulama site/ || true
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
