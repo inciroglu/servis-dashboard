@@ -1647,12 +1647,13 @@ function pDurum(){
     ['Yedek parça stok','haftalık · '+bu.w+'. hafta',b=>[sonGiris('yps',b,H)]],
     ['YP ay kapanışı','zorunlu · '+(CUT>1?MONTHS[CUT-2]:'–'),b=>CUT>1?[sonGiris('yps',b,ayk(CUT-1))]:[null,'–'],1],
     ['Stok devir · dönem stoğu','aylık · '+MONTHS[CUT-1],b=>[sonGiris('sd',b,A)]]];
+  const DB=KUL&&KUL.markalar&&KUL.markalar.length?BR.filter(b=>KUL.markalar.includes(b)):BR;   // markası tanımlı yönetici yalnız kendi markalarını görür
   const say=C.map(()=>0), eks=C.map(()=>0);
-  const rows=BR.map(b=>'<tr><td class="kn"><b>'+esc(lab(b))+'</b></td>'+C.map((c,i)=>{const [o,yok]=c[2](b);if(yok)eks[i]++;else if(o&&(c[3]||now-new Date(o.z)<=7*864e5))say[i]++;return hc(o,yok);}).join('')+'</tr>').join('');
+  const rows=DB.map(b=>'<tr><td class="kn"><b>'+esc(lab(b))+'</b></td>'+C.map((c,i)=>{const [o,yok]=c[2](b);if(yok)eks[i]++;else if(o&&(c[3]||now-new Date(o.z)<=7*864e5))say[i]++;return hc(o,yok);}).join('')+'</tr>').join('');
   const hd='<tr><th class="kn">Marka</th>'+C.map(c=>'<th class="sep">'+c[0]+'<small>'+c[1]+'</small></th>').join('')+'</tr>';
-  const tot='<tr class="main tot"><td class="kn"><b>Güncel (son 7 gün)</b><small class="ktn">ay kapanışında: girilen</small></td>'+C.map((c,i)=>'<td class="dz"><b>'+say[i]+' / '+(BR.length-eks[i])+'</b><small>marka</small></td>').join('')+'</tr>';
+  const tot='<tr class="main tot"><td class="kn"><b>Güncel (son 7 gün)</b><small class="ktn">ay kapanışında: girilen</small></td>'+C.map((c,i)=>'<td class="dz"><b>'+say[i]+' / '+(DB.length-eks[i])+'</b><small>marka</small></td>').join('')+'</tr>';
   const lj='<div class="dzl"><span class="d1">son 7 gün</span><span class="d2">8–14 gün</span><span class="d3">14 günden eski</span><span class="d0">hiç girilmedi</span></div>';
-  return head('Servis Performans Yönetimi','Veri giriş durumu','Markaların panelden yaptığı girişler · son güncelleme ve giren kişi')+
+  return head('Servis Performans Yönetimi','Veri giriş durumu',(DB.length<BR.length?'Sorumlu olduğunuz markalar: '+DB.map(lab).join(', ')+' · ':'')+'Markaların panelden yaptığı girişler · son güncelleme ve giren kişi')+
     box2('dense garg dzt','Giriş takibi','Hücrenin üzerine gelince tam zaman ve giren kişinin e-postası görünür',lj+tbl(hd,rows,tot).replace(/min-width:\d+px/,'min-width:900px;width:100%'))+
     '<p class="note">Bu ekranı yalnız yöneticiler görür. Garanti girişi BMW & MINI, BMW Motorrad ve Tesla için servis verisinden geldiği için takip edilmez.</p>';
 }
@@ -2029,8 +2030,9 @@ async function fgKaydet(){
 const PAGES=[['ozet','Yönetici Özeti',pOzet,'S'],['perf','Servis Performansı',pPerf,'S'],['homer','HOMER · Hasar',pHomer,'S'],['carcare','Car Care',pCar,'S'],['ek','Ek Satış',pEk,'S'],...(KUL?[['kt','Kapanış Tahmini',pKT,'S'],['aie','Açık İş Emri',pAIE,'S'],['yp','Yedek Parça',pYP,'S']]:[]),['veri','Veri & hesap kontrolü',pVeri,'F']];
 if(KUL&&KUL.rol!=='izleyici')PAGES.splice(PAGES.length-1,0,['giris','Haftalık veri girişi',()=>pGiris('w'),'G'],['kapanis','Ay kapanışı girişi',()=>pGiris('a'),'G']);
 if(KUL&&KUL.rol==='yonetici')PAGES.splice(PAGES.length-1,0,['garanti','Garanti araç girişi',pGar,'G']);
-st.months=[CUT];{const h=location.hash.slice(1);st.page=h&&PAGES.some(p=>p[0]===h)?h:(KUL&&KUL.rol==='giris'?'perf':'ozet');}   // her açılışta: veri kesim ayı · müdürler Servis Performansı ile başlar
 if(KUL&&KUL.rol==='yonetici')PAGES.splice(PAGES.length-1,0,['durum','Veri giriş durumu',pDurum,'G']);
+st.months=[CUT];{const h=location.hash.slice(1);st.page=h&&PAGES.some(p=>p[0]===h)?h:(KUL&&KUL.rol==='giris'?'perf':'ozet');}   // her açılışta: veri kesim ayı · müdürler Servis Performansı ile başlar
+window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(h&&h!==st.page&&PAGES.some(p=>p[0]===h)){st.page=h;render();window.scrollTo(0,0);}});
 
 /* ---------- açılır seçiciler ---------- */
 function ddInit(id,build,apply){
@@ -2479,7 +2481,7 @@ function gwShow(ad){
   let i=0;
   const step=()=>{i++;const p=Math.min(100,i*25);$('gwp').style.width=p+'%';$('gwpc').textContent='%'+p;$('gwpt').textContent=S[i];
     if(p<100){gwTimer=setTimeout(step,still?0:700);return;}
-    gwTimer=setTimeout(()=>{gwOpen(['#giris','#kapanis'].includes(location.hash)&&PAGES.some(p=>'#'+p[0]===location.hash)?location.hash.slice(1):gwIlk());$('gw').classList.add('out');setTimeout(()=>{$('gw').hidden=true;$('gw').classList.remove('out');},still?0:1000);},still?0:700);};
+    gwTimer=setTimeout(()=>{gwOpen(['#giris','#kapanis','#durum'].includes(location.hash)&&PAGES.some(p=>'#'+p[0]===location.hash)?location.hash.slice(1):gwIlk());$('gw').classList.add('out');setTimeout(()=>{$('gw').hidden=true;$('gw').classList.remove('out');},still?0:1000);},still?0:700);};
   gwTimer=setTimeout(step,still?0:1500);
 }
 
