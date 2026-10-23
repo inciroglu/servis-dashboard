@@ -656,15 +656,15 @@ td.kn small.tz{display:block;font-size:9.5px;font-weight:600;color:#8a97a8;margi
 #mdp h3{margin:3px 0 2px;font-size:20px;color:var(--navy)}#mdp .mds{font-size:12px;color:var(--muted)}
 #mdp .mdx{border:1px solid #d5dee8;background:#fff;border-radius:8px;width:32px;height:32px;cursor:pointer;color:var(--navy);font-size:14px}#mdp .mdx:hover{background:#f2f5f9}
 #mdp .mdb{padding:14px 22px 22px;overflow:auto;flex:1;overscroll-behavior:contain}
-#mdp .mdt{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;margin-bottom:12px}
+#mdp .mdt{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;margin-bottom:12px}#mdp .seg.mda{order:3;width:100%;justify-content:flex-start;background:#fff}#mdp .seg.mda button{font-size:12.5px;padding:5px 12px}
 #mdp .mdk{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:12px}
-#mdp .mdk>div{background:#f6f8fb;border:1px solid #e6ecf2;border-radius:8px;padding:8px 10px}#mdp .mdk span{display:block;font-size:10.5px;color:var(--muted)}#mdp .mdk b{font-size:14.5px;color:var(--navy)}
+#mdp .mdk>div{background:#f6f8fb;border:1px solid #e6ecf2;border-radius:8px;padding:8px 10px}#mdp .mdk span{display:block;font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#mdp .mdk>div{min-width:0}#mdp .mdk b{font-size:14.5px;color:var(--navy)}
 #mdp .mdc{border:1px solid #e6ecf2;border-radius:8px;padding:8px 10px 6px;margin-bottom:12px}#mdp .mdc svg{width:100%;height:auto;display:block}
 #mdp .mdl{font-size:10.5px;color:var(--muted);display:flex;gap:6px;align-items:center;margin-top:2px}#mdp .mdl i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-left:6px}#mdp .mdl .lb{background:#cfdae7;margin-left:0}#mdp .mdl .lf{background:#122f59}#mdp .mdl .ls{background:#b78d4c}
 #mdp table.mdtb{width:100%;border-collapse:collapse;font-size:12.5px}#mdp table.mdtb th,#mdp table.mdtb td{padding:6px 8px;text-align:right;border-bottom:1px solid #edf1f5;white-space:nowrap}
 #mdp table.mdtb .kn{text-align:left}#mdp table.mdtb thead th{position:sticky;top:-14px;background:#fff;color:var(--muted);font-weight:600;font-size:11px}
 #mdp tr.mpl td{color:#9aa8b8}#mdp tr.mcur td.kn{color:#8a601e;font-weight:600}#mdp td.kn small{font-size:10px;color:var(--muted);font-weight:400}#mdp tr.tot td{border-top:2px solid #cfd9e5;font-weight:700}
-#mdp .note{margin-top:10px}#mdp .mdw{overflow-x:auto}#mdp .mdk b.g{color:#0b6b5c}#mdp .mdk b.r{color:#a8423f}#mdp .mdk{grid-template-columns:repeat(4,1fr)}@media (max-width:560px){#mdp .mdk{grid-template-columns:1fr 1fr}#mdp table.mdtb thead th{top:0}}
+#mdp .note{margin-top:10px}#mdp .mdw{overflow-x:auto}#mdp .mdk b.g{color:#0b6b5c}#mdp .mdk b.r{color:#a8423f}#mdp .mdk{grid-template-columns:repeat(4,1fr)}#mdp .mdk.n3{grid-template-columns:repeat(3,1fr)}@media (max-width:560px){#mdp .mdk{grid-template-columns:1fr 1fr}#mdp table.mdtb thead th{top:0}}
 body.pg-perf #app td.bn[data-tip]{cursor:pointer}
 body.pg-perf #app td.bn[data-tip]>b::after{content:'›';margin-left:7px;color:#b78d4c;font-weight:700;opacity:0;transition:opacity .15s}
 body.pg-perf #app td.bn[data-tip]:hover>b::after{opacity:1}
@@ -1391,7 +1391,7 @@ function kpiBlock(b){
 function pPerf(){
   const one=st.brands.length===1, bs=rowsOf();
   return head('Servis Performans Yönetimi','Servis performansı',(one?esc(lab(st.brands[0]))+' · kırılım bazında':'Marka karşılaştırması')+' · '+PL())+
-    (one?kirilimTablo(st.brands)+kirilimTablo(st.brands,'ab'):markaTablo(bs,'ciro','mt_c')+markaTablo(bs,'ab','mt_a'))+seyir(SEL())+gunlukTablo(bs,'gn_pf')+pulse()+notes();
+    (one?kirilimTablo(st.brands)+kirilimTablo(st.brands,'ab'):markaTablo(bs,'ciro','mt_c')+markaTablo(bs,'ab','mt_a'))+seyir(SEL())+gunlukTablo(bs,'gn_pf')+notes();
 }
 /* ---------- 03 · Haftalık Gidişat ---------- */
 const BLK=['1. hafta (1–7)','2. hafta (8–14)','3. hafta (15–21)','4. hafta (22–28)','29 – ay sonu'];
@@ -1828,7 +1828,7 @@ function pVeri(){
   const t=box('Konsolide = markalar toplamı mı?','Her ay için toplam ciro, fiili ve bütçe',tbl('<tr class="per"><th></th><th colspan="3" class="sep">İş günü</th><th colspan="3" class="sep">Fiili ciro</th><th colspan="4" class="sep">Bütçe ciro</th></tr><tr><th>Ay</th><th class="sep">Toplam</th><th>Geçen</th><th>Kalan</th><th class="sep">Konsolide</th><th>Markalar Σ</th><th>Fark</th><th class="sep">Konsolide</th><th>Markalar Σ</th><th>Fark</th><th>Durum</th></tr>',rows));
   const info=[['Veri kesimi',D.ust.veri_kesim+' · Fatura Listesi’ndeki son fatura tarihi'],['Ek satış kesimi',(EK?EK.meta.veriTarihi+' · '+EK.meta.donem+' · ek_satis.xlsx (Konsolide Hedef)'+(EK.meta.veriTarihi!==D.ust.veri_kesim?' · servis raporuyla aynı gün değil':' · servis raporuyla aynı gün'):'ek satış verisi yok')],['Marka sırası',BR.map(lab).join(' · ')],
     ['Standart sütunlar','Bütçe · Fiili · Bütçe % (fiili ÷ bütçe) · 2025 Fiili · 25/26 Δ (fiili ÷ 2025 − 1)'],['Kapsam','Üstten “Seçili dönem” ya da “YTD”; çoklu marka ve ay seçimi toplanır, oranlar toplamlardan hesaplanır'],
-    ['Devam eden ay','Bütçe ayın tamamı; 2025 fiili × geçen iş günü oranı ('+gun(CUT).gecen+'/'+gun(CUT).donem+'). Araç başı (AB) gibi oranlarda düzeltme yapılmaz.'],['Bu hafta','Servis Performansı · Fatura Listesi tarihleri; içinde bulunulan hafta 2025’in aynı günleriyle kıyaslanır'],
+    ['Devam eden ay','Bütçe ayın tamamı; 2025 fiili × geçen iş günü oranı ('+gun(CUT).gecen+'/'+gun(CUT).donem+'). Araç başı (AB) gibi oranlarda düzeltme yapılmaz.'],
     ['Ek satış','ek_satis.xlsx · Konsolide Hedef sayfası · Excel’deki formüllerle aynı kural'],
     ['Garanti araç girişi','Fiili: markaların panel girişi (BMW & MINI, BMW Motorrad, Tesla servis verisinden) · bütçe ve 2025 servis verisinden, girilen ay önce gelir'],
     ['Kapanış tahmini','Markalar her hafta Mekanik · Banko · Garanti · Hasar × işçilik, YP, araç adedi girer · gidişat = fiili ÷ geçen iş günü × ayın iş günü · ±%15 sapma işaretlenir'],
@@ -2068,9 +2068,9 @@ function scopeRender(){
 /* ---------- ipucu (hover) ---------- */
 const TIP=$('tip');
 document.addEventListener('click',e=>{
-  if(MDP&&e.target.closest('#mdp')){const t=e.target.closest('[data-mdk],[data-mdx]');if(!t)return;if(t.dataset.mdx!==undefined)return mdpKapat();MDP.k=t.dataset.mdk;$('mdp').innerHTML=mdpHtml();return;}
+  if(MDP&&e.target.closest('#mdp')){const t=e.target.closest('[data-mdk],[data-mda],[data-mdx]');if(!t)return;if(t.dataset.mdx!==undefined)return mdpKapat();if(t.dataset.mda)MDP.ab=t.dataset.mda;else MDP.k=t.dataset.mdk;$('mdp').innerHTML=mdpHtml();return;}
   const c=st.page==='perf'&&e.target.closest('#app td.bn[data-tip]');
-  if(c&&!c.closest('tr.br')){const [b,k,kat]=c.dataset.tip.split('|');if(b&&!b.includes(',')&&b!==KON){const km=/ab/i.test(k)||c.closest('.krab')?'abT':k==='adet'||k==='gunAdet'?'adet':'toplam';mdpAc(b,km,kat||'');return;}}
+  if(c&&!c.closest('tr.br')){const [b,k,kat]=c.dataset.tip.split('|');if(b&&!b.includes(',')&&b!==KON){const km=/ab/i.test(k)||c.closest('.krab')?'ab':k==='adet'||k==='gunAdet'?'adet':'toplam';mdpAc(b,km,kat||'');return;}}
   if(MDP&&!e.target.closest('#mdp'))mdpKapat();
 });
 document.addEventListener('change',e=>{if(MDP&&e.target.matches('#mdp [data-mdkat]')){MDP.kat=e.target.value;$('mdp').innerHTML=mdpHtml();}});
@@ -2218,29 +2218,30 @@ function sutunSik(){
 window.addEventListener('resize',()=>{clearTimeout(window.__ss);window.__ss=setTimeout(()=>{document.querySelectorAll('#app .box .scroll>table thead th[style*="width"]').forEach(x=>x.style.width='');sutunSik();},150);});
 /* ---------- marka detay paneli (Servis Performansı · marka adına tıklayınca) ---------- */
 let MDP=null;
-const MDM=[['toplam','Toplam ciro','mn'],['adet','İş emri adedi','ad'],['abT','Araç başı (AB)','a1']];
+const MDM=[['toplam','Toplam ciro','mn'],['adet','İş emri adedi','ad'],['ab','Araç başı (AB)','a1']], MDA=[['abI','İşçilik'],['abY','Yedek parça'],['abT','Toplam']];   // AB: işçilik · yedek parça · toplam
 function mdpHtml(){
   const {b}=MDP, kat=MDP.kat, NA=['Car Care','Aksesuar','Lastik'].includes(kat);
   if(NA&&MDP.k!=='toplam')MDP.k='toplam';
-  const M=MDM.find(x=>x[0]===MDP.k)||MDM[0], k=M[0], f=M[2], km=k==='adet'&&!kat?'adet':k;
-  const katL=kat||'Toplam (tüm kırılımlar)', mL=k==='adet'&&!kat?'Araç girişi (mekanik)':k==='abT'?'Araç başı · '+(kat||'Mekanik'):M[1];
+  const M=MDM.find(x=>x[0]===MDP.k)||MDM[0], AB=M[0]==='ab', A=MDA.find(x=>x[0]===MDP.ab)||MDA[0], k=AB?A[0]:M[0], f=M[2], km=k==='adet'&&!kat?'adet':k;
+  const katL=AB?(kat||'Mekanik'):kat||'Toplam (tüm kırılımlar)', mL=k==='adet'&&!kat?'Araç girişi (mekanik)':AB?'AB '+A[1].toLocaleLowerCase('tr-TR'):M[1];
   const vs=Array.from({length:12},(_,i)=>val([b],[i+1],km,kat));
   const rows=vs.map((v,i)=>{const m=i+1,pl=v.plan;
     return '<tr class="'+(pl?'mpl':'')+(m===CUT?' mcur':'')+'"><td class="kn">'+MONTHS[i]+(m===CUT?' <small>devam</small>':pl?' <small>plan</small>':'')+'</td>'+std(v.x,f,pl)+'</tr>';}).join('');
   const ym=YM(), y=val([b],ym,km,kat), yl='YTD · Oca–'+MONTHS[Math.max(...ym)-1].slice(0,3);
-  const yil=k==='abT'?null:vs.reduce((a,v)=>a+(v.x.butce||0),0);
-  const segs=MDM.filter(x=>!NA||x[0]==='toplam').map(x=>'<button type="button" class="'+(x[0]===k?'on':'')+'" data-mdk="'+x[0]+'">'+x[1]+'</button>').join('');
+  const yil=AB?null:vs.reduce((a,v)=>a+(v.x.butce||0),0);
+  const segs=MDM.filter(x=>!NA||x[0]==='toplam').map(x=>'<button type="button" class="'+(x[0]===M[0]?'on':'')+'" data-mdk="'+x[0]+'">'+x[1]+'</button>').join('');
+  const segA=AB?'<div class="seg mda">'+MDA.map(x=>'<button type="button" class="'+(x[0]===A[0]?'on':'')+'" data-mda="'+x[0]+'">AB '+x[1].toLocaleLowerCase('tr-TR')+'</button>').join('')+'</div>':'';
   const ks='<select data-mdkat>'+PKAT.map(([v,t])=>'<option value="'+v+'"'+(v===kat?' selected':'')+'>'+t+'</option>').join('')+'</select>';
   const p=bud(y.x);
   return '<div class="mdh"><div><span class="mde">Marka detayı · '+YEAR+'</span><h3>'+esc(lab(b))+'</h3><span class="mds">'+esc(katL)+' · '+mL+'</span></div><button type="button" class="mdx" data-mdx aria-label="Kapat">✕</button></div>'+
-   '<div class="mdb"><div class="mdt"><div class="seg">'+segs+'</div><label class="srt">Kırılım '+ks+'</label></div>'+
-   '<div class="mdk"><div><span>'+yl+' fiili</span><b>'+(ok(y.x.fiili)?fmt(y.x.fiili,f):'–')+'</b></div><div><span>Bütçe gerçekleşmesi</span><b class="'+(y.plan?'':cls(p))+'">'+(y.plan||!ok(p)?'–':fmt(p,'p'))+'</b></div><div><span>25/26 Δ</span><b class="'+(y.plan||!ok(del(y.x))?'':del(y.x)>=0?'g':'r')+'">'+(y.plan||!ok(del(y.x))?'–':FM.d(del(y.x)))+'</b></div>'+(yil?'<div><span>Yıllık bütçe</span><b>'+fmt(yil,f)+'</b></div>':'')+'</div>'+
+   '<div class="mdb"><div class="mdt"><div class="seg">'+segs+'</div>'+segA+'<label class="srt">Kırılım '+ks+'</label></div>'+
+   '<div class="mdk'+(yil?'':' n3')+'"><div><span>'+yl+' fiili</span><b>'+(ok(y.x.fiili)?fmt(y.x.fiili,f):'–')+'</b></div><div><span title="Bütçe gerçekleşmesi">Bütçe gerç. %</span><b class="'+(y.plan?'':cls(p))+'">'+(y.plan||!ok(p)?'–':fmt(p,'p'))+'</b></div><div><span>25/26 Δ</span><b class="'+(y.plan||!ok(del(y.x))?'':del(y.x)>=0?'g':'r')+'">'+(y.plan||!ok(del(y.x))?'–':FM.d(del(y.x)))+'</b></div>'+(yil?'<div><span>Yıllık bütçe</span><b>'+fmt(yil,f)+'</b></div>':'')+'</div>'+
    '<div class="mdc">'+bars2(vs.map(v=>v.x.butce),vs.map(v=>v.plan?null:v.x.fiili),'tall','bütçe',f)+'<div class="mdl"><i class="lb"></i>Bütçe <i class="lf"></i>Fiili <i class="ls"></i>Seçili ay</div></div>'+
    '<div class="mdw"><table class="mini mdtb"><thead><tr><th class="kn">Ay</th><th class="sep">Bütçe</th><th>Fiili</th><th>Gerç. %</th><th>2025</th><th>Δ %</th></tr></thead><tbody>'+rows+
    '<tr class="main tot"><td class="kn"><b>'+yl+'</b></td>'+std(y.x,f,y.plan)+'</tr></tbody></table></div>'+
    '<p class="note">'+(ym.includes(CUT)?MONTHS[CUT-1]+' devam ediyor: bütçe ayın tamamı, 2025 fiili geçen iş günü oranında. ':'')+'Plan aylarında yalnız bütçe gösterilir. Esc ya da ✕ ile kapanır.</p></div>';
 }
-function mdpAc(b,k,kat){MDP={b,k,kat};const P=$('mdp');P.innerHTML=mdpHtml();P.hidden=false;$('mdpS').hidden=false;TIP.hidden=true;requestAnimationFrame(()=>P.classList.add('in'));P.querySelector('[data-mdx]').focus({preventScroll:true});}
+function mdpAc(b,k,kat){MDP={b,k:/^ab/.test(k)?'ab':k,ab:/^ab[IYT]$/.test(k)?k:'abI',kat};const P=$('mdp');P.innerHTML=mdpHtml();P.hidden=false;$('mdpS').hidden=false;TIP.hidden=true;requestAnimationFrame(()=>P.classList.add('in'));P.querySelector('[data-mdx]').focus({preventScroll:true});}
 function mdpKapat(){if(!MDP)return;MDP=null;const P=$('mdp');P.classList.remove('in');$('mdpS').hidden=true;setTimeout(()=>{if(!MDP)P.hidden=true;},260);}
 function mdpYenile(){if(!MDP)return;if(st.page!=='perf'||!rowsOf().includes(MDP.b))return mdpKapat();$('mdp').innerHTML=mdpHtml();}
 let UYG=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true, SAYFA_AD='';   // yüklü uygulama olarak mı açıldı
