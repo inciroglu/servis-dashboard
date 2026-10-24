@@ -1570,13 +1570,13 @@ function sdSatis(b,m){const ks=KIR.map(k=>k[0]);
   if(m===CUT){let t=null;for(const k of ks){const h=ktHucre(b,m,k,'yp');if(h.tahmin!=null)t=(t||0)+h.tahmin;}
     if(t!=null)return {v:t,src:'tahmin'};const G=gun(m),f=ks.reduce((a,k)=>a+ktHucre(b,m,k,'yp').fiili,0);return {v:G.gecen?f/G.gecen*G.donem:null,src:'gidişat'};}
   return {v:ks.reduce((a,k)=>a+ktHucre(b,m,k,'yp').fiili,0),src:'fiili'};}
-function sdHesap(b,m){const A=ayk(m),s=sdSatis(b,m),mal=s.v==null?null:s.v*ypOran(b);
+function sdHesap(b,m){const A=ayk(m),s=sdSatis(b,m),smm=m<CUT?vV('yps',b,A,'smm'):null,mal=smm!=null?smm:s.v==null?null:s.v*ypOran(b);   // kapanan ayda müdürün girdiği fiili SMM, yoksa oran
   let bas=vV('sd',b,A,'bas'),oto=false;   // dönem başı: manuel › önceki ay kapanışı › önceki ayın dönem sonu
   if(bas==null&&m>1){const pk=vV('yps',b,ayk(m-1),'stok');bas=pk!=null?pk:vV('sd',b,ayk(m-1),'son');oto=bas!=null?(pk!=null?MONTHS[m-2]+' kapanışı':'önceki ay'):false;}
   let son=vV('sd',b,A,'son'),sOto=false;   // dönem sonu: manuel › bu ay kapanışı › (devam eden ay) son haftalık stok
   if(son==null){const k=vV('yps',b,A,'stok');if(k!=null){son=k;sOto='ay kapanışı';}else if(m===CUT){const w=ypSonHafta(b,m);if(w){son=w.v;sOto=w.w+'. hafta stoğu';}}}
   const ort=bas!=null&&son!=null?(bas+son)/2:null,dv=mal!=null&&ort?mal/ort:null;
-  return {s,mal,bas,oto,sOto,son,ort,dv,bek:m<CUT&&son==null&&vV('yps',b,A,'stok')==null,yil:dv!=null?dv*12:null,gun:dv?365/(dv*12):null};}
+  return {s,mal,smm,gOran:smm!=null&&s.v?smm/s.v:null,bas,oto,sOto,son,ort,dv,bek:m<CUT&&son==null&&vV('yps',b,A,'stok')==null,yil:dv!=null?dv*12:null,gun:dv?365/(dv*12):null};}
 function sdBolum(){
   const m=+st.sort.sdAy&&+st.sort.sdAy<=CUT?+st.sort.sdAy:CUT, A=ayk(m), ed=!!st.sdEdit&&KUL&&KUL.yp;
   if(!D.sd)return box('Stok devir hızı','','<div class="empty">Stok devir verisi yüklenemedi.</div>');
@@ -1584,17 +1584,17 @@ function sdBolum(){
   const row=(b,ri)=>{const h=sdHesap(b,m),p=m>1?sdHesap(b,m-1):null,dg=h.gun!=null&&p&&p.gun!=null?h.gun-p.gun:null;
     const kay={tahmin:'kapanış tahmini',gidişat:'gidişat (tahmin girilmedi)',fiili:'gerçekleşen'}[h.s.src];
     const inp=(an,ci,ph)=>vInp('sd',b,A,an,ri,ci,ph);
-    return '<tr><td class="kn"><b>'+YPBL[b]+'</b>'+(m===CUT?tazelik(vZ('sd',b,A)):'')+'</td><td title="'+kay+'"'+(h.s.src==='gidişat'?' class="ktg"':'')+'>'+f2(h.s.v)+'</td><td>'+nf2.format(ypOran(b))+'</td><td><b>'+f2(h.mal)+'</b></td>'+
+    return '<tr><td class="kn"><b>'+YPBL[b]+'</b>'+(m===CUT?tazelik(vZ('sd',b,A)):'')+'</td><td title="'+kay+'"'+(h.s.src==='gidişat'?' class="ktg"':'')+'>'+f2(h.s.v)+'</td>'+(h.smm!=null?'<td title="Gerçekleşen oran = SMM ÷ YP satışı · varsayım '+nf2.format(ypOran(b))+'">'+(h.gOran!=null?nf2.format(h.gOran):'–')+'<small class="oto">gerçekleşen</small></td><td><b>'+f2(h.mal)+'</b><small class="oto">fiili SMM</small></td>':'<td>'+nf2.format(ypOran(b))+'</td><td><b>'+f2(h.mal)+'</b>'+(m<CUT?(YEAR*100+m>=202610?'<small class="oto bek">SMM bekleniyor · oranla</small>':'<small class="oto">oranla</small>'):'<small class="oto">tahmini</small>')+'</td>')+
       (ed&&vIzin('sd',b)?inp('bas',0,h.oto?nf.format(h.bas):null)+inp('son',1,h.sOto?nf.format(h.son):null):'<td class="sep">'+f2(h.bas)+(h.oto?'<small class="oto">'+h.oto+'</small>':'')+'</td><td>'+f2(h.son)+(h.sOto?'<small class="oto">'+h.sOto+'</small>':h.bek?'<small class="oto bek">ay kapanışı bekleniyor</small>':'')+'</td>')+
       '<td>'+f2(h.ort)+'</td><td class="sep"><b>'+d2(h.dv)+'</b></td><td>'+d2(h.yil)+'</td><td><b>'+(h.gun==null?'–':nf.format(h.gun)+' gün')+'</b></td>'+
       '<td class="'+(dg==null?'':dg<=0?'g':'r')+'">'+(dg==null?'–':(dg>0?'▲ ':'▼ ')+nf.format(Math.abs(dg))+' gün')+'</td></tr>';};
   const T=(()=>{let mal=0,ort=0,ok1=0;for(const b of YPB){const h=sdHesap(b,m);if(h.mal!=null&&h.ort){mal+=h.mal;ort+=h.ort;ok1++;}}const dv=ort?mal/ort:null;return {mal,ort,dv,ok1};})();
-  const hd='<tr class="per"><th></th><th colspan="3" class="cur sep">Satılacak maliyet</th><th colspan="3" class="cur sep">Stok (tüm stok grupları dahil)</th><th colspan="4" class="cur sep">Devir</th></tr>'+
+  const hd='<tr class="per"><th></th><th colspan="3" class="cur sep">Maliyet (SMM)</th><th colspan="3" class="cur sep">Stok (tüm stok grupları dahil)</th><th colspan="4" class="cur sep">Devir</th></tr>'+
     '<tr><th class="kn">Marka</th><th class="sep" title="YP satışı: devam eden ayda kapanış tahmini, kapanan ayda gerçekleşen (4 kırılım)">YP satışı</th><th>Oran</th><th>Maliyet</th><th class="sep">Dönem başı</th><th>Dönem sonu</th><th>Ortalama</th><th class="sep">Aylık</th><th>Yıllık</th><th title="365 ÷ yıllık devir">Stokta kalma</th><th title="Önceki aya göre stokta kalma süresi">Önceki aya göre</th></tr>';
   const tot='<tr class="main tot"><td class="kn"><b>Toplam</b>'+(T.ok1<YPB.length?'<small class="ktn">'+T.ok1+' marka hesaplandı</small>':'')+'</td><td></td><td></td><td><b>'+f2(T.ok1?T.mal:null)+'</b></td><td class="sep"></td><td></td><td>'+f2(T.ok1?T.ort:null)+'</td><td class="sep"><b>'+d2(T.dv)+'</b></td><td>'+d2(T.dv!=null?T.dv*12:null)+'</td><td><b>'+(T.dv?nf.format(365/(T.dv*12))+' gün':'–')+'</b></td><td></td></tr>';
   const ayS='<label class="srt">Ay <select data-sort="sdAy">'+Array.from({length:CUT},(_,i)=>i+1).map(x=>'<option value="'+x+'"'+(x===m?' selected':'')+'>'+MONTHS[x-1]+(x===CUT?' · devam':'')+'</option>').join('')+'</select></label>';
   const bar=vBar('sd',KUL&&KUL.yp,'Dönem başı ve dönem sonu stok tutarlarını girin · '+MONTHS[m-1]+(m===CUT?' (dönem sonu tahmini)':''));
-  return box2('dense garg ktt-box sdt','Stok devir hızı · '+MONTHS[m-1]+' '+YEAR,'Satılacak maliyet = YP satışı × marka oranı · aylık devir = maliyet ÷ ortalama stok · yıllık = aylık × 12',
+  return box2('dense garg ktt-box sdt','Stok devir hızı · '+MONTHS[m-1]+' '+YEAR,'Maliyet: devam eden ayda YP satışı × marka oranı (tahmini) · kapanan ayda müdürün girdiği fiili SMM · aylık devir = maliyet ÷ ortalama stok · yıllık = aylık × 12',
     bar+tbl(hd,YPB.map(row).join(''),tot).replace(/min-width:\d+px/,'min-width:'+(ed?1250:1000)+'px;width:100%'),ayS)+
     '<p class="note">'+(m===CUT?'Devam eden ayda YP satışı markanın kapanış tahminidir; tahmin girilmemişse bugünkü gidişat kullanılır (italik). ':'')+'Dönem başı boşsa önceki ayın kapanış stoğu, dönem sonu boşsa bu ayın kapanış stoğu (devam eden ayda son haftalık stok) otomatik alınır; kapanan ayda ay kapanışı girilmemişse devir hesaplanmaz ve "ay kapanışı bekleniyor" yazar; buraya yazılan değer önce gelir. Oranlar: BMW & MINI 0,75 · Honda 0,90 · O&J 0,60 · diğerleri 0,70.</p>';
 }
@@ -1654,7 +1654,7 @@ function pDurum(){
     ['Kapanış tahmini','haftalık · '+MONTHS[CUT-1],b=>[sonGiris('kt',b,A)]],
     ['Açık iş emri','haftalık · '+bu.w+'. hafta',b=>[sonGiris('aie',b,H)]],
     ['Yedek parça stok','haftalık · '+bu.w+'. hafta',b=>[sonGiris('yps',b,H)]],
-    ['YP ay kapanışı','zorunlu · '+(CUT>1?MONTHS[CUT-2]:'–'),b=>CUT>1?[sonGiris('yps',b,ayk(CUT-1))]:[null,'–'],1],
+    ['YP ay kapanışı','stok + SMM · '+(CUT>1?MONTHS[CUT-2]:'–'),b=>{if(CUT<2)return [null,'–'];const A=ayk(CUT-1),st_=vV('yps',b,A,'stok')!=null,sm=vV('yps',b,A,'smm')!=null;return st_&&sm?[sonGiris('yps',b,A)]:st_?[null,'SMM bekleniyor']:[null];},1],
     ['Stok devir · dönem stoğu','aylık · '+MONTHS[CUT-1],b=>[sonGiris('sd',b,A)]]];
   const DB=KUL&&KUL.markalar&&KUL.markalar.length?BR.filter(b=>KUL.markalar.includes(b)):BR;   // markası tanımlı yönetici yalnız kendi markalarını görür
   const say=C.map(()=>0), eks=C.map(()=>0);
@@ -1844,7 +1844,7 @@ function pVeri(){
     ['Kapanış tahmini','Markalar her hafta Mekanik · Banko · Garanti · Hasar × işçilik, YP, araç adedi girer · gidişat = fiili ÷ geçen iş günü × ayın iş günü · ±%15 sapma işaretlenir'],
     ['Açık iş emri','Markalar her hafta (ISO hafta) açık ve 45 gün üzeri adetleri girer · 45+ oranı = 45 gün üzeri ÷ açık'],
     ['Yedek parça stok','Haftalık güncel değerler ve ay kapanışı · ölü stok oranı = ölü stok 12 ay ÷ güncel toplam stok'],
-    ['Stok devir hızı','Satılacak maliyet = YP satışı × oran (BMW & MINI 0,75 · Honda 0,90 · O&J 0,60 · diğerleri 0,70) · aylık devir = maliyet ÷ ortalama stok · yıllık = aylık × 12 · stokta kalma = 365 ÷ yıllık']];
+    ['Stok devir hızı','Maliyet: devam eden ayda YP satışı × oran (BMW & MINI 0,75 · Honda 0,90 · O&J 0,60 · diğerleri 0,70); kapanan ayda ay kapanışında girilen fiili SMM (girilmediyse oran) · aylık devir = maliyet ÷ ortalama stok · yıllık = aylık × 12 · stokta kalma = 365 ÷ yıllık']];
   return head('Kontrol','Veri & hesap kontrolü','servis_rapor.xlsx · '+YEAR)+t+box('Kaynak ve hesap kuralları','',tbl('<tr><th>Konu</th><th style="text-align:left">Açıklama</th></tr>',info.map(x=>'<tr><td><b>'+x[0]+'</b></td><td style="text-align:left;white-space:normal">'+esc(x[1])+'</td></tr>').join('')));
 }
 
@@ -1881,7 +1881,7 @@ const fgDone={
 const fgPend=(s,b)=>Object.keys(FG).some(k=>k.startsWith(s+'|'+b+'|')&&FG[k]!=='');
 // ay kapanışı: ayın ilk 7 günü her zaman, sonrasında girilene kadar formda kalır
 function akDone(s,b,A){if(!A)return false;
-  if(s==='ypk')return !!fgSon('yps',b,A,'stok');
+  if(s==='ypk')return !!fgSon('yps',b,A,'stok')&&!!fgSon('yps',b,A,'smm');   // stok ve SMM birlikte
   if(s==='aiek')return fgKendi(D.aie&&D.aie[b]&&D.aie[b][A]);
   const z=D.garmz&&D.garmz[b]&&D.garmz[b][A],m=D.aylar.indexOf(A);return !!z&&new Date(z).getTime()>=new Date(YEAR,m+1,1).getTime();}   // garanti: ay bittikten sonra girildiyse kesin
 const FGAK=['gark','aiek','ypk'];   // ay kapanışı bölümleri: ayın ilk 7 günü her zaman, sonra girilene kadar
@@ -1945,7 +1945,7 @@ function pGiris(tip='w'){
   const ktAlt=ayAd+' sonu için beklenen kapanış · referans olarak bütçe, bugüne kadarki fiili ve gidişat';
   const gidBtn='<button type="button" class="fgk" data-fggid="1">Gidişatı yaz</button>';
   const aiGrid=(s,rows)=>'<div class="fgg fg2"><div></div><div class="fgh">Açık iş emri</div><div class="fgh">45 gün üzeri</div>'+rows.map(([b,k,ad])=>'<div class="fgr">'+ad+'</div>'+fgInp(s,b,k+'.acik',1)+fgInp(s,b,k+'.g45',1)).join('')+'</div>';
-  const ypGrid=(s,b)=>'<div class="fgg fg1">'+YPK.map(k=>'<div class="fgr">'+k[1]+(k[2]?' <small>('+k[2]+')</small>':'')+'</div>'+fgInp(s,b,k[0],0)).join('')+'</div>';
+  const ypGrid=(s,b)=>'<div class="fgg fg1">'+(s==='ypk'?[YPK[0],['smm','Satılan malın maliyeti (SMM)','ay toplamı'],...YPK.slice(1)]:YPK).map(k=>'<div class="fgr">'+k[1]+(k[2]?' <small>('+k[2]+')</small>':'')+'</div>'+fgInp(s,b,k[0],0)).join('')+'</div>';
   // sayfadaki bölümler ve tamamlanma (ay kapanışında seçili aya göre)
   const secsP=b=>A?FGAK.filter(s=>fgIzin[s](b)):fgSecs(b,'w'), tamP=b=>secsP(b).filter(s=>fgDn(s,b)).length;
   let no=0;const kartlar=[];let ust='',prog='';
