@@ -673,7 +673,7 @@ body.pg-perf #app td.bn[data-tip]:hover>b::after{opacity:1}
 
 @media print{table.band>thead{display:table-row-group;break-after:avoid}table.band>tbody.blk{break-inside:avoid;page-break-inside:avoid}table.band tr.mband,table.band tr.rh{break-after:avoid;page-break-after:avoid}table.band tr{break-inside:avoid}}
 
-.oto.bek{color:#a8423f!important;font-weight:600}.fgc[data-s="ypk"]:not(.ok){border-color:#e7c9a0}.fgc[data-s="ypk"] .fgd.w{background:#fbeee0;color:#8a4b12}
+.oto.bek{color:#a8423f!important;font-weight:600}.sdk{display:inline-block;margin-left:6px;font-size:10px;line-height:15px;padding:0 5px;border-radius:4px;background:#eef2f6;color:#6b7a8c;vertical-align:1px;font-weight:600}.sdk.g{background:#e6f4ee;color:#1a7f5a}.sdk.r{background:#fbeaea;color:#a8423f}.fgc[data-s="ypk"]:not(.ok){border-color:#e7c9a0}.fgc[data-s="ypk"] .fgd.w{background:#fbeee0;color:#8a4b12}
 
 .eks .bchip.psa{border-style:dashed}.eks .psat{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--navy);margin-left:12px;cursor:pointer}.eks .psat input{accent-color:#122f59}@media print{.eks .psat{display:none}}
 
@@ -1577,6 +1577,7 @@ function sdHesap(b,m){const A=ayk(m),s=sdSatis(b,m),smm=m<CUT?vV('yps',b,A,'smm'
   if(son==null){const k=vV('yps',b,A,'stok');if(k!=null){son=k;sOto='ay kapanışı';}else if(m===CUT){const w=ypSonHafta(b,m);if(w){son=w.v;sOto=w.w+'. hafta stoğu';}}}
   const ort=bas!=null&&son!=null?(bas+son)/2:null,dv=mal!=null&&ort?mal/ort:null;
   return {s,mal,smm,gOran:smm!=null&&s.v?smm/s.v:null,bas,oto,sOto,son,ort,dv,bek:m<CUT&&son==null&&vV('yps',b,A,'stok')==null,yil:dv!=null?dv*12:null,gun:dv?365/(dv*12):null};}
+const sdEt=t=>'<span class="sdk" title="'+esc(t)+'">'+esc(/hafta/.test(t)?t.replace(/\. hafta stoğu/,'. hf'):/kapanış/.test(t)?'kapanış':t)+'</span>';   // tek satır etiket; ayrıntı üzerine gelince
 function sdBolum(){
   const m=+st.sort.sdAy&&+st.sort.sdAy<=CUT?+st.sort.sdAy:CUT, A=ayk(m), ed=!!st.sdEdit&&KUL&&KUL.yp;
   if(!D.sd)return box('Stok devir hızı','','<div class="empty">Stok devir verisi yüklenemedi.</div>');
@@ -1584,8 +1585,8 @@ function sdBolum(){
   const row=(b,ri)=>{const h=sdHesap(b,m),p=m>1?sdHesap(b,m-1):null,dg=h.gun!=null&&p&&p.gun!=null?h.gun-p.gun:null;
     const kay={tahmin:'kapanış tahmini',gidişat:'gidişat (tahmin girilmedi)',fiili:'gerçekleşen'}[h.s.src];
     const inp=(an,ci,ph)=>vInp('sd',b,A,an,ri,ci,ph);
-    return '<tr><td class="kn"><b>'+YPBL[b]+'</b>'+(m===CUT?tazelik(vZ('sd',b,A)):'')+'</td><td title="'+kay+'"'+(h.s.src==='gidişat'?' class="ktg"':'')+'>'+f2(h.s.v)+'</td>'+(h.smm!=null?'<td title="Gerçekleşen oran = SMM ÷ YP satışı · varsayım '+nf2.format(ypOran(b))+'">'+(h.gOran!=null?nf2.format(h.gOran):'–')+'<small class="oto">gerçekleşen</small></td><td><b>'+f2(h.mal)+'</b><small class="oto">fiili SMM</small></td>':'<td>'+nf2.format(ypOran(b))+'</td><td><b>'+f2(h.mal)+'</b>'+(m<CUT?(YEAR*100+m>=202610?'<small class="oto bek">SMM bekleniyor · oranla</small>':'<small class="oto">oranla</small>'):'<small class="oto">tahmini</small>')+'</td>')+
-      (ed&&vIzin('sd',b)?inp('bas',0,h.oto?nf.format(h.bas):null)+inp('son',1,h.sOto?nf.format(h.son):null):'<td class="sep">'+f2(h.bas)+(h.oto?'<small class="oto">'+h.oto+'</small>':'')+'</td><td>'+f2(h.son)+(h.sOto?'<small class="oto">'+h.sOto+'</small>':h.bek?'<small class="oto bek">ay kapanışı bekleniyor</small>':'')+'</td>')+
+    return '<tr><td class="kn"><b>'+YPBL[b]+'</b>'+(m===CUT?tazelik(vZ('sd',b,A)):'')+'</td><td title="'+kay+'"'+(h.s.src==='gidişat'?' class="ktg"':'')+'>'+f2(h.s.v)+'</td>'+(h.smm!=null?'<td title="Gerçekleşen oran = SMM ÷ YP satışı · varsayım '+nf2.format(ypOran(b))+'">'+(h.gOran!=null?nf2.format(h.gOran):'–')+'</td><td><b>'+f2(h.mal)+'</b><span class="sdk g" title="Ay kapanışında girilen fiili satılan malın maliyeti">SMM</span></td>':'<td>'+nf2.format(ypOran(b))+'</td><td><b>'+f2(h.mal)+'</b>'+(m<CUT?(YEAR*100+m>=202610?'<span class="sdk r" title="SMM bekleniyor · oranla hesaplandı">oran</span>':'<span class="sdk" title="SMM girilmedi · oranla hesaplandı">oran</span>'):'')+'</td>')+
+      (ed&&vIzin('sd',b)?inp('bas',0,h.oto?nf.format(h.bas):null)+inp('son',1,h.sOto?nf.format(h.son):null):'<td class="sep">'+f2(h.bas)+(h.oto?sdEt(h.oto):'')+'</td><td>'+f2(h.son)+(h.sOto?sdEt(h.sOto):h.bek?'<span class="sdk r" title="Ay kapanış stoku bekleniyor">bekleniyor</span>':'')+'</td>')+
       '<td>'+f2(h.ort)+'</td><td class="sep"><b>'+d2(h.dv)+'</b></td><td>'+d2(h.yil)+'</td><td><b>'+(h.gun==null?'–':nf.format(h.gun)+' gün')+'</b></td>'+
       '<td class="'+(dg==null?'':dg<=0?'g':'r')+'">'+(dg==null?'–':(dg>0?'▲ ':'▼ ')+nf.format(Math.abs(dg))+' gün')+'</td></tr>';};
   const T=(()=>{let mal=0,ort=0,ok1=0;for(const b of YPB){const h=sdHesap(b,m);if(h.mal!=null&&h.ort){mal+=h.mal;ort+=h.ort;ok1++;}}const dv=ort?mal/ort:null;return {mal,ort,dv,ok1};})();
@@ -1594,7 +1595,7 @@ function sdBolum(){
   const tot='<tr class="main tot"><td class="kn"><b>Toplam</b>'+(T.ok1<YPB.length?'<small class="ktn">'+T.ok1+' marka hesaplandı</small>':'')+'</td><td></td><td></td><td><b>'+f2(T.ok1?T.mal:null)+'</b></td><td class="sep"></td><td></td><td>'+f2(T.ok1?T.ort:null)+'</td><td class="sep"><b>'+d2(T.dv)+'</b></td><td>'+d2(T.dv!=null?T.dv*12:null)+'</td><td><b>'+(T.dv?nf.format(365/(T.dv*12))+' gün':'–')+'</b></td><td></td></tr>';
   const ayS='<label class="srt">Ay <select data-sort="sdAy">'+Array.from({length:CUT},(_,i)=>i+1).map(x=>'<option value="'+x+'"'+(x===m?' selected':'')+'>'+MONTHS[x-1]+(x===CUT?' · devam':'')+'</option>').join('')+'</select></label>';
   const bar=vBar('sd',KUL&&KUL.yp,'Dönem başı ve dönem sonu stok tutarlarını girin · '+MONTHS[m-1]+(m===CUT?' (dönem sonu tahmini)':''));
-  return box2('dense garg ktt-box sdt','Stok devir hızı · '+MONTHS[m-1]+' '+YEAR,'Maliyet: devam eden ayda YP satışı × marka oranı (tahmini) · kapanan ayda müdürün girdiği fiili SMM · aylık devir = maliyet ÷ ortalama stok · yıllık = aylık × 12',
+  return box2('dense garg ktt-box sdt','Stok devir hızı · '+MONTHS[m-1]+' '+YEAR,'Maliyet: devam eden ayda YP satışı × oran · kapanan ayda fiili SMM · devir = maliyet ÷ ortalama stok',
     bar+tbl(hd,YPB.map(row).join(''),tot).replace(/min-width:\d+px/,'min-width:'+(ed?1250:1000)+'px;width:100%'),ayS)+
     '<p class="note">'+(m===CUT?'Devam eden ayda YP satışı markanın kapanış tahminidir; tahmin girilmemişse bugünkü gidişat kullanılır (italik). ':'')+'Dönem başı boşsa önceki ayın kapanış stoğu, dönem sonu boşsa bu ayın kapanış stoğu (devam eden ayda son haftalık stok) otomatik alınır; kapanan ayda ay kapanışı girilmemişse devir hesaplanmaz ve "ay kapanışı bekleniyor" yazar; buraya yazılan değer önce gelir. Oranlar: BMW & MINI 0,75 · Honda 0,90 · O&J 0,60 · diğerleri 0,70.</p>';
 }
