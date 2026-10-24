@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>İnciroğlu Otomotiv CEO Ofis - Performans Yönetim Platformu - Giriş</title>
+<title>Performans Yönetim Platformu - Giriş</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" sizes="192x192" href="uygulama/ikon-192.png?v=2"><link rel="shortcut icon" href="uygulama/ikon-192.png?v=2">
@@ -15,7 +15,7 @@
 <meta name="theme-color" content="#122f59">
 <link rel="apple-touch-icon" href="uygulama/apple-touch-icon.png?v=2">
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="CEO Ofis"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Performans"><meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js" defer></script>
 <style>
 :root{--navy:#122f59;--navy2:#183e6d;--blue:#254d7b;--ink:#192c44;--muted:#64758a;--line:#e1e7ed;--bg:#f4f6f9;--green:#087565;--red:#b44948;--gold:#b78d4c;--soft:#eaf0f7;--amber:#8a601e;--beige:#f7f2e8}
@@ -2259,7 +2259,7 @@ function mdpAc(b,k,kat){MDP={b,k:/^ab/.test(k)?'ab':k,ab:/^ab[IYT]$/.test(k)?k:'
 function mdpKapat(){if(!MDP)return;MDP=null;const P=$('mdp');P.classList.remove('in');$('mdpS').hidden=true;setTimeout(()=>{if(!MDP)P.hidden=true;},260);}
 function mdpYenile(){if(!MDP)return;if(st.page!=='perf'||!rowsOf().includes(MDP.b))return mdpKapat();$('mdp').innerHTML=mdpHtml();}
 let UYG=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true, SAYFA_AD='';   // yüklü uygulama olarak mı açıldı
-const baslikYaz=()=>{if(SAYFA_AD)document.title=window.__yazdir?SAYFA_AD+' · İnciroğlu Otomotiv':'İnciroğlu Otomotiv CEO Ofis - Performans Yönetim Platformu - '+SAYFA_AD;};   // PDF dosya adı kısa kalsın   // uygulama adıyla başlar: Chrome uygulama penceresinde adı tekrar eklemez
+const baslikYaz=()=>{if(SAYFA_AD)document.title=window.__yazdir?SAYFA_AD+' · İnciroğlu Otomotiv':'Performans Yönetim Platformu - '+SAYFA_AD;};   // PDF dosya adı kısa kalsın   // uygulama adıyla başlar: Chrome uygulama penceresinde adı tekrar eklemez
 try{matchMedia('(display-mode: standalone)').addEventListener('change',e=>{UYG=e.matches;baslikYaz();});}catch(e){}   // yükledikten hemen sonra pencereye geçince de düzelsin
 function render(){
   const P=PAGES.find(p=>p[0]===st.page)||PAGES[0];st.page=P[0];ls.set('inc_panel_v5',st);
@@ -2301,7 +2301,7 @@ $('pfy').textContent=YEAR;
 render();
 </script>
 <script>
-document.title='İnciroğlu Otomotiv CEO Ofis - Performans Yönetim Platformu - Giriş';   // uygulama adıyla başlar: Chrome uygulama penceresinde adı tekrar eklemez
+document.title='Performans Yönetim Platformu - Giriş';   // uygulama adıyla başlar: Chrome uygulama penceresinde adı tekrar eklemez
 /* ---------- açılış: giriş, şifre işlemleri, veri çözme, karşılama ----------
    İki kip:
    · PANEL.api doluysa  → kişiye özel giriş (Google Apps Script servisi), veri şifreli yayınlanır,
