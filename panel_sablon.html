@@ -1218,9 +1218,9 @@ function gunlukTablo0(bs,id,kats){
   if(!rows0.length)return '';
   const srt=st.sort[id]||'';
   const gt=k=>k===TOP?' gtop':'';
-  const hd='<tr class="per"><th class="kd"></th><th></th>'+G.map(k=>'<th colspan="6" class="cur sep'+gt(k)+'" style="white-space:nowrap">'+KL[k]+'</th>').join('')+'</tr>'+
-    '<tr class="gsub"><th class="kd"></th><th></th>'+G.map(k=>'<th colspan="3" class="sep'+gt(k)+'">Dönem toplamı</th><th colspan="3" class="gs2'+gt(k)+'">Günlük ortalama</th>').join('')+'</tr>'+
-    '<tr><th class="kd"></th><th class="kn">Marka</th>'+G.map(k=>'<th class="sep'+gt(k)+'" title="'+(YEAR-1)+' aynı dönem toplamı">'+(YEAR-1)+'</th><th class="'+gt(k).trim()+'" title="'+YEAR+' dönem toplamı">'+YEAR+'</th><th class="'+gt(k).trim()+'" title="'+(YEAR-1)+'\'e göre değişim">Δ %</th><th class="gs2'+gt(k)+'" title="Günlük bütçe: ay bütçesi ÷ ayın iş günü">Bütçe</th><th class="'+gt(k).trim()+'" title="Günlük fiili: fiili ÷ geçen iş günü">Fiili</th><th class="'+gt(k).trim()+'" title="Günlük fiili ÷ günlük bütçe">Gerç.</th>').join('')+'</tr>';
+  const hd='<tr class="per"><th class="kd"></th><th></th>'+G.map(k=>'<th colspan="'+(k===GK?4:6)+'" class="cur sep'+gt(k)+'" style="white-space:nowrap">'+KL[k]+'</th>').join('')+'</tr>'+
+    '<tr class="gsub"><th class="kd"></th><th></th>'+G.map(k=>'<th colspan="3" class="sep'+gt(k)+'">Dönem toplamı</th><th colspan="'+(k===GK?1:3)+'" class="gs2'+gt(k)+'">Günlük'+(k===GK?'':' ortalama')+'</th>').join('')+'</tr>'+
+    '<tr><th class="kd"></th><th class="kn">Marka</th>'+G.map(k=>'<th class="sep'+gt(k)+'" title="'+(YEAR-1)+' aynı dönem toplamı">'+(YEAR-1)+'</th><th class="'+gt(k).trim()+'" title="'+YEAR+' dönem toplamı">'+YEAR+'</th><th class="'+gt(k).trim()+'" title="'+(YEAR-1)+'\'e göre değişim">Δ %</th>'+(k===GK?'<th class="gs2" title="Günlük fiili: fiili ÷ geçen iş günü">Fiili</th>':'<th class="gs2'+gt(k)+'" title="Günlük bütçe: ay bütçesi ÷ ayın iş günü">Bütçe</th><th class="'+gt(k).trim()+'" title="Günlük fiili: fiili ÷ geçen iş günü">Fiili</th><th class="'+gt(k).trim()+'" title="Günlük fiili ÷ günlük bütçe">Gerç.</th>')).join('')+'</tr>';
   // bir kırılımın değerleri: t = dönem toplamı (2025 aynı dönem dahil), x = günlük
   // garanti 2025: yalnız Garanti araç girişi sayfasında girilen 2025 fiili (BMW & MINI, Motorrad, Tesla servis verisi) · eksikse karşılaştırma yapılmaz
   const g25=(b,ms)=>GVERI.includes(b)||ACT(ms).every(m=>{const c=((D.garm||{})[b]||{})[ayk(m)];return c&&c.g2025!=null;});
@@ -1229,7 +1229,9 @@ function gunlukTablo0(bs,id,kats){
   const topD=(B,ms)=>{const t={fiili:0,butce:0,g2025:0},x={fiili:0,butce:0};let any=0;
     for(const b of B)for(const k of kats){if(k===GK&&(!garVar([b],ms)||!g25(b,ms)))continue;const d=deg([b],ms,k);any=1;for(const f of ['fiili','butce','g2025'])t[f]+=d.t[f]||0;x.fiili+=d.x.fiili||0;x.butce+=d.x.butce||0;}
     return any?{t,x}:null;};
-  const cells=(B,ms,k,plan)=>{const c=k===TOP?' gtop':'';
+  // garanti: bütçe ve gerçekleşme sütunu yok (2025 · 2026 · Δ % · günlük fiili)
+  const cells=(B,ms,k,plan)=>{const h=cells6(B,ms,k,plan);if(k!==GK)return h;const p=h.split('</td>').filter(Boolean);return p[0]+'</td>'+p[1]+'</td>'+p[2]+'</td>'+p[4].replace('<td class="','<td class="gs2 ')+'</td>';};
+  const cells6=(B,ms,k,plan)=>{const c=k===TOP?' gtop':'';
     const d=k===TOP?topD(B,ms):deg(B,ms,k);
     if(!d||(k===GK&&!plan&&!garVar(B,ms)))return '<td class="sep na'+c+'">'+(d&&d.t.g2025!=null?FM.ad(d.t.g2025):'–')+'</td><td class="na'+c+'">–</td><td class="na'+c+'">–</td>'+(d?td(d.x.butce,'ad1','gs2'+c):'<td class="na'+c+'">–</td>')+'<td class="na'+c+'">–</td><td class="na'+c+'">–</td>';
     if(plan)return td(d.t.g2025,'ax','sep'+c)+'<td class="'+c+'">–</td><td class="'+c+'">–</td>'+td(d.x.butce,'ad1','gs2'+c)+'<td class="'+c+'">–</td><td class="'+c+'">–</td>';
