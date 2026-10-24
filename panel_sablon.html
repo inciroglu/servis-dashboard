@@ -183,7 +183,7 @@ td.mxc small.up{color:var(--green)}td.mxc small.dn{color:var(--red)}td.sh.dk sma
 .dk ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .dk li{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px;padding:5px 8px;border-radius:6px;background:#fafbfd}
 .dk li b{font-weight:600;color:var(--ink)}.dk li span{display:flex;gap:4px;align-items:center;white-space:nowrap}.dk li em{font-style:normal;color:var(--muted);font-size:11px;margin-left:6px}
-.dk li.ok{color:var(--green);background:#eef7f3}.dkw.dk4{grid-template-columns:repeat(4,1fr)}.dk4 .dk h3{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dk4 .dk>small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dkw.dk4 li .dm{flex-wrap:wrap;row-gap:1px;column-gap:8px;align-content:flex-start;line-height:1.35}.dk4 .dm span{display:inline;white-space:nowrap}@media (max-width:1150px){.dkw.dk4{grid-template-columns:1fr 1fr}.dkw.dk4 .dk:nth-child(3){border-left:0}}@media (max-width:900px){.dkw.dk4{grid-template-columns:1fr}}.dko{padding:10px 18px;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink);background:#fbfcfe}.dko b{color:var(--navy)}.dko.ok{color:var(--green)}.dky{margin:0;padding:8px 18px 10px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted)}.dk li[data-dgo]{cursor:pointer;transition:background .15s}.dk li[data-dgo]:hover{background:#eef3f9}.dk .chip{font-size:11px;padding:2px 6px}
+.dk li.ok{color:var(--green);background:#eef7f3}.dkw.dk4{grid-template-columns:repeat(4,1fr)}.dk4 .dk h3{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dk4 .dk>small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dkw.dk4 li .dm{flex-wrap:wrap;row-gap:1px;column-gap:8px;align-content:flex-start;line-height:1.35}.dk4 .dm span{display:inline;white-space:nowrap}@media (max-width:1150px){.dkw.dk4{grid-template-columns:1fr 1fr}.dkw.dk4 .dk:nth-child(3){border-left:0}}@media (max-width:900px){.dkw.dk4{grid-template-columns:1fr}}.dk .dkac{display:block;background:none;border:0;padding:6px 8px 0;font:inherit;font-size:11.5px;color:#2f5d93;cursor:pointer;text-align:left}.dk .dkac:hover{text-decoration:underline}.dko{padding:10px 18px;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink);background:#fbfcfe}.dko b{color:var(--navy)}.dko.ok{color:var(--green)}.dky{margin:0;padding:8px 18px 10px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted)}.dk li[data-dgo]{cursor:pointer;transition:background .15s}.dk li[data-dgo]:hover{background:#eef3f9}.dk .chip{font-size:11px;padding:2px 6px}
 /* mobil: menü yatay, üst bar sarılır */
 @media (max-width:900px){
   nav{padding:10px 12px;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px}
@@ -1258,7 +1258,7 @@ function dikkat(ms){
   const T=alt('toplam'), MI=alt('iscilik','Mekanik'), AB=alt('abI'), AG=alt('adet');
   const none='<li class="ok">Bu başlıkta dikkat gerektiren kalem yok.</li>';
   const go=(b,k,kat)=>' data-dgo="'+b+'|'+k+'|'+(kat||'')+'" title="Marka detayını aç"';
-  const col=(t,s,items,n)=>'<div class="dk"><h3>'+t+'</h3><small>'+s+'</small><ul>'+(items.length?items.slice(0,6).join(''):none)+'</ul>'+(n>6?'<div class="dz">ve '+(n-6)+' marka daha</div>':'')+'</div>';
+  const col=(t,s,items)=>'<div class="dk"><h3>'+t+'</h3><small>'+s+'</small><ul>'+(items.length?(st.dkTum?items:items.slice(0,6)).join(''):none)+'</ul>'+(items.length>6?'<button type="button" class="dz dkac" data-dktum>'+(st.dkTum?'Daha az göster':'ve '+(items.length-6)+' marka daha · göster')+'</button>':'')+'</div>';   // ilk 6; tıklayınca tümü
   const mr=(ds,f)=>W.length>1?'<div class="dm">'+ds.map((x,i)=>'<span>'+MONTHS[W[i]-1].slice(0,3)+' <i class="'+(!ok(x)?'':f(x)?'g':'r')+'">'+(ok(x)?(f===bOk?fmt(x,'p'):FM.d(x)):'–')+'</i></span>').join('')+'</div>':'';
   function bOk(x){return x>=1;}
   const bli=(k,kat)=>([b,p,ps])=>'<li class="'+(W.length>1?'two':'')+'"'+go(b,k,kat)+'><b>'+nm(b)+'</b><span>'+chip(p)+'</span>'+mr(ps,bOk)+'</li>';   // dönem toplamı + ay ay
@@ -2113,6 +2113,7 @@ $('app').addEventListener('click',e=>{
   const h=e.target.closest('#hkat button');if(h){st.hkat=h.dataset.k;render();}
   const q=e.target.closest('#ekkat button');if(q){st.ekKat=q.dataset.k;render();}
   const hm2=e.target.closest('#hmet button');if(hm2){st.hmet=hm2.dataset.k;render();}
+  if(e.target.closest('[data-dktum]')){st.dkTum=!st.dkTum;render();return;}
   const dg=e.target.closest('[data-dgo]');if(dg){const [b,k,kat]=dg.dataset.dgo.split('|');st.page='perf';st.brands=[];render();window.scrollTo(0,0);setTimeout(()=>mdpAc(b,k,kat),0);return;}
   const gb=e.target.closest('[data-gobrand]');if(gb){st.page='perf';st.brands=[gb.dataset.gobrand];render();window.scrollTo(0,0);return;}
   const gk=e.target.closest('[data-gokpi]');if(gk){const k=gk.dataset.gokpi;st.page='perf';if(!st.kpis.includes(k))st.kpis=[k,...st.kpis];st.sort['perf_'+k]='fiili';render();
