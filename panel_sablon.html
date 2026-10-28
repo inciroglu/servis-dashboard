@@ -379,6 +379,7 @@ tr.mband+tr td,tr.mband+tr.rh th{border-top:0}
 .card.hgc.hsel{box-shadow:0 0 0 2px var(--gold),0 10px 24px -16px rgba(18,47,89,.4)}.card.hgc .t small{font-weight:600;letter-spacing:0;text-transform:none;color:#8a97a8;margin-left:4px}
 .card.hgc .hgsec{display:block;margin-top:8px;font-style:normal;font-size:11.5px;font-weight:700;color:#2f5d93}.card.hgc.hsel .hgsec{color:#9a6f2e}
 @media (max-width:900px){.hgcards{grid-template-columns:1fr!important}}@media print{.card.hgc .hgsec{display:none}}
+table.shon thead tr:last-child>*{box-shadow:inset 0 -1px 0 var(--line),0 6px 8px -6px rgba(18,47,89,.18)}@media print{.box .scroll>table thead tr>*{transform:none!important}}
 @media screen{
   .box .scroll.uzun{max-height:calc(100vh - 170px);overflow:auto;overscroll-behavior:contain}.box .scroll{overflow-x:auto}   /* her tablo kendi kutusunda kayar */
   .box .scroll>table.dar{border-right:1px solid var(--line)}
@@ -564,7 +565,7 @@ ul.yorum .yg{color:var(--green);font-weight:650}ul.yorum .yr{color:var(--red);fo
 .eks td.pp.r{color:var(--red);background:#f9ebea}
 .eks td.qq{background:#f7f9fb}
 .eks tfoot td{font-weight:700;border-top:2px solid var(--navy);background:#fafbfc;color:var(--navy)}
-.eks tfoot td.pp{background:none}
+.eks tfoot td.pp{background:none}.eks tr.ekx td.na{color:#8a97a8;font-size:11px}.eks small.ekxn{font-weight:500;color:#8a97a8;font-size:10.5px;margin-left:6px;cursor:help}
 .eks .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px}
 .eks .note{font-size:12px;color:var(--muted);margin:2px 2px 0;line-height:1.7}
 .eks .note .chip{font-size:11px;padding:1px 7px;margin:0 2px}
@@ -1850,16 +1851,22 @@ let EKPRINT=false;
 const EKX=(()=>{if(!EK)return null;
   const M=EK.months;
   const sumMonths=lists=>M.map((_,i)=>{let p=0,f=null;lists.forEach(l=>{p+=l[i].p;if(l[i].f!=null)f=(f||0)+l[i].f;});return {p,f};});
-  const B=EK.brands.map(b=>({ad:b.ad,items:b.items,m:sumMonths(b.items.map(i=>i.m))}));
+  // hedefi olmayan kalem: fiili varsa "hedef yok" olarak ayrı gösterilir (toplama ve gerçekleşmeye girmez); fiili de yoksa gizlenir
+  const GIZ={HONDA:['Far Ayarı'],BMW:['Far Ayarı']}, plu=i=>i.m.some(x=>x.p), fvar=i=>i.m.some(x=>x.f);
+  const yer=L=>{const x=L.filter(i=>i.ext);if(!x.length)return L;const r=L.filter(i=>!i.ext),a=r.findIndex(i=>i.k==='Aksesuar');if(a<0)return r.concat(x);r.splice(a+1,0,...x);return r;};   // hedefsiz kalemler Aksesuar'ın hemen altında
+  const EB=EK.brands.map(b=>{const g=GIZ[String(b.key||'').toUpperCase()]||[],it=b.items.filter(i=>!g.includes(i.k));
+    return {key:b.key,ad:b.ad,items:yer(it.filter(i=>plu(i)||fvar(i)).map(i=>plu(i)?i:{k:i.k,m:i.m,ext:1}))};});
+  const mOf=items=>sumMonths(items.filter(i=>!i.ext).map(i=>i.m));
+  const B=EB.map(b=>({ad:b.ad,items:b.items,m:mOf(b.items)}));
   const T=sumMonths(B.map(b=>b.m));
-  const names=[];EK.brands.forEach(b=>b.items.forEach(i=>{if(!names.includes(i.k))names.push(i.k);}));
-  const K=names.map(k=>({k,m:sumMonths(EK.brands.flatMap(b=>b.items.filter(i=>i.k===k).map(i=>i.m)))}));
+  const kal=bs=>{const n=[];bs.forEach(b=>b.items.forEach(i=>{if(!n.includes(i.k))n.push(i.k);}));
+    return yer(n.map(k=>{const its=bs.flatMap(b=>b.items.filter(i=>i.k===k));return {k,m:sumMonths(its.map(i=>i.m)),ext:its.every(i=>i.ext)?1:0};}));};
+  const K=kal(EB);
   let focus=M.findIndex(m=>m.durum==='devam');if(focus<0)focus=M.map(m=>m.durum).lastIndexOf('kapandi');if(focus<0)focus=0;
   // PSA = Peugeot + Citroën + Opel (kalem kalem toplanır)
-  const PK=['PEUGEOT','CITROEN','OPEL'], pb=EK.brands.filter(b=>PK.includes(String(b.key||'').toUpperCase()));
-  let PSA=null;if(pb.length>=2){const pn=[];pb.forEach(b=>b.items.forEach(i=>{if(!pn.includes(i.k))pn.push(i.k);}));
-    const items=pn.map(k=>({k,m:sumMonths(pb.flatMap(b=>b.items.filter(i=>i.k===k).map(i=>i.m)))}));
-    PSA={ad:'PSA',alt:pb.map(b=>b.ad).join(' · '),items,m:sumMonths(items.map(i=>i.m)),idx:pb.map(b=>EK.brands.indexOf(b))};}
+  const PK=['PEUGEOT','CITROEN','OPEL'], pb=EB.filter(b=>PK.includes(String(b.key||'').toUpperCase()));
+  let PSA=null;if(pb.length>=2){const items=kal(pb);
+    PSA={ad:'PSA',alt:pb.map(b=>b.ad).join(' · '),items,m:mOf(items),idx:pb.map(b=>EB.indexOf(b))};}
   return {M,B,T,K,focus,PSA};})();
 const eFN=v=>v==null?'—':TLH(v);
 const eFP=v=>v==null?'—':'%'+(v*100).toLocaleString('tr-TR',{minimumFractionDigits:1,maximumFractionDigits:1});
@@ -1885,32 +1892,34 @@ function eTable(rows,head,totLabel,totM){const {M}=EKX;
   h1+='<th colspan="3" class="ytd">'+EK.meta.donem+' Toplam</th></tr>';h2+='<th>Plan</th><th>Fiili</th><th>Gerç. %</th></tr>';
   const cells=(m,foot)=>{let b='';m.forEach(x=>{const g=x.f==null||!x.p?null:x.f/x.p;b+=etd(x.p,'tl','sep')+etd(x.f,'tl')+(g==null?'<td class="na">—</td>':'<td class="'+(foot?'':'pp '+ecc(g))+'" data-v="'+g+'" data-f="p">'+eFP(g)+'</td>');});
     const q=eper(m,'q');return b+etd(q.p,'tl','sep qq')+etd(q.f,'tl','qq')+(q.gr==null?'<td class="qq na">—</td>':'<td class="qq '+(foot?'':'pp '+ecc(q.gr))+'" data-v="'+q.gr+'" data-f="p">'+eFP(q.gr)+'</td>');};
-  const body=rows.map((r,i)=>'<tr style="animation-delay:'+i*45+'ms"><td>'+esc(r.label)+'</td>'+cells(r.m,false)+'</tr>').join('');
+  const exr=r=>{let b='';r.m.forEach(x=>{b+='<td class="sep na">—</td>'+etd(x.f,'tl')+'<td class="na">—</td>';});const q=eper(r.m,'q');
+    return '<td title="Hedefi olmadığı için marka toplamına ve gerçekleşmeye dahil edilmez">'+esc(r.label)+'</td>'+b+'<td class="sep qq na">—</td>'+etd(q.f,'tl','qq')+'<td class="qq na">—</td>';};
+  const body=rows.map((r,i)=>'<tr'+(r.ext?' class="ekx"':'')+' style="animation-delay:'+i*45+'ms">'+(r.ext?exr(r):'<td>'+esc(r.label)+'</td>'+cells(r.m,false))+'</tr>').join('');
   return '<div class="scroll"><table><thead>'+h1+h2+'</thead><tbody>'+body+'</tbody><tfoot><tr><td>'+esc(totLabel)+'</td>'+cells(totM,true)+'</tr></tfoot></table></div>';}
 const ebox=(title,sub,html,tools='')=>'<section class="box"><div class="boxhead"><h2>'+title+'</h2><span class="s">'+sub+'</span>'+tools+'</div>'+html+'</section>';
 
-function eDetay(bi){const {B,T,K,focus,PSA}=EKX;if(bi===-2&&!PSA)bi=-1;const all=bi===-1, psa=bi===-2, b=all?{ad:'Tüm Markalar Toplam',m:T,items:K.map(k=>({k:k.k,m:k.m}))}:psa?{ad:'PSA · '+PSA.alt,m:PSA.m,items:PSA.items}:B[bi];
+function eDetay(bi){const {B,T,K,focus,PSA}=EKX;if(bi===-2&&!PSA)bi=-1;const all=bi===-1, psa=bi===-2, b=all?{ad:'Tüm Markalar Toplam',m:T,items:K.map(k=>({k:k.k,m:k.m,ext:k.ext}))}:psa?{ad:'PSA · '+PSA.alt,m:PSA.m,items:PSA.items}:B[bi];
   const chip=(i,ad,m)=>{const v=eper(m,focus);return '<button class="bchip '+(i===bi?'on':'')+'" data-eb="'+i+'">'+esc(ad)+'<small>'+(v.gr==null?'fiili yok':eFP(v.gr))+'</small></button>';};
   const chips='<div class="bchips">'+chip(-1,'Tüm Markalar Toplam',T)+(PSA?chip(-2,'PSA',PSA.m).replace('class="bchip','title="'+esc(PSA.alt)+' toplamı" class="bchip psa'):'')+B.map((x,i)=>chip(i,x.ad,x.m)).join('')+'</div>';
-  return chips+ebox(esc(b.ad)+' · kalem kırılımı',psa?'Peugeot, Citroën ve Opel kalem kalem toplanır · üç aylık plan, fiili ve gerçekleşme':'Üç aylık plan, fiili ve gerçekleşme',eTable(b.items.map(i=>({label:i.k,m:i.m})),'Kalem',all?'İNCİROĞLU TOPLAM':psa?'PSA TOPLAM':b.ad+' TOPLAM',b.m));}
+  return chips+ebox(esc(b.ad)+' · kalem kırılımı',psa?'Peugeot, Citroën ve Opel kalem kalem toplanır · üç aylık plan, fiili ve gerçekleşme':'Üç aylık plan, fiili ve gerçekleşme',eTable(b.items.map(i=>({label:i.k,m:i.m,ext:i.ext})),'Kalem',all?'İNCİROĞLU TOPLAM':psa?'PSA TOPLAM':b.ad+' TOPLAM',b.m));}
 const ESORTS=[['gr','Gerçekleşme %'],['f','Fiili'],['p','Plan'],['kalan','Kalan Hedef']];
 function eKars(kal,cp,sort,flip){const {B,T,K,M,focus}=EKX, all=kal<0, kn=all?'Tüm Kalemler':K[kal].k, totM=all?T:K[kal].m;
   const bm=b=>all?b.m:((b.items.find(i=>i.k===kn)||{}).m||M.map(()=>({p:0,f:null})));
   const {PSA}=EKX, birl=!!(PSA&&st.ek.psa);
   const rows=(birl?[{ad:'PSA',m:PSA.m,items:PSA.items},...B.filter((_,i)=>!PSA.idx.includes(i))]:B).map(b=>({n:b.ad,v:eper(bm(b),cp)}));
-  const noF=rows.every(r=>r.v.f==null), key=noF?'p':sort, val=r=>key==='gr'?r.v.gr:key==='f'?r.v.f:key==='p'?r.v.p:r.v.kalan;
+  const ext=!all&&K[kal].ext, noF=rows.every(r=>r.v.f==null), key=ext?'f':noF?'p':sort, val=r=>key==='gr'?r.v.gr:key==='f'?r.v.f:key==='p'?r.v.p:r.v.kalan;
   rows.sort((a,b)=>(val(b)??-1)-(val(a)??-1));
   const tv=eper(totM,cp), tc=ecc(tv.gr);
-  const kchip=(i,ad,m)=>{const v=eper(m,focus);return '<button class="bchip '+(i===kal?'on':'')+'" data-ekal="'+i+'">'+esc(ad)+'<small>'+(v.gr==null?'fiili yok':eFP(v.gr))+'</small></button>';};
-  const chips='<div class="bchips">'+kchip(-1,'Tüm Kalemler',T)+K.map((k,i)=>kchip(i,k.k,k.m)).join('')+'</div>';
+  const kchip=(i,ad,m,x)=>{const v=eper(m,focus);return '<button class="bchip '+(i===kal?'on':'')+'" data-ekal="'+i+'">'+esc(ad)+'<small>'+(x?'—':v.gr==null?'fiili yok':eFP(v.gr))+'</small></button>';};
+  const chips='<div class="bchips">'+kchip(-1,'Tüm Kalemler',T)+K.map((k,i)=>kchip(i,k.k,k.m,k.ext)).join('')+'</div>';
   const list=rows.map((r,i)=>{const v=r.v,c=ecc(v.gr),rk=i+1;
     return '<div class="rkrow '+(flip?'':'in')+' '+(rk===1&&v.gr!=null?'first':'')+'" data-k="'+esc(r.n)+'" style="animation-delay:'+i*60+'ms"><div><span class="rb '+(rk<=3?'r'+rk:'')+'">'+rk+'</span></div><div class="nm">'+esc(r.n)+'</div>'+
-      '<div>'+eFN(v.p)+'</div><div class="'+(v.f==null?'na':'')+'">'+eFN(v.f)+'</div><div>'+(v.gr==null?'<span class="chip n">'+(v.p?'—':'plan yok')+'</span>':'<span class="chip '+c+'">'+eFP(v.gr)+'</span>')+'</div><div>'+(v.f==null?'—':eFN(v.kalan))+'</div></div>';}).join('');
+      '<div>'+(ext?'—':eFN(v.p))+'</div><div class="'+(v.f==null?'na':'')+'">'+eFN(v.f)+'</div><div>'+(v.gr==null?'<span class="chip n">'+'—'+'</span>':'<span class="chip '+c+'">'+eFP(v.gr)+'</span>')+'</div><div>'+(v.f==null||!v.p?'—':eFN(v.kalan))+'</div></div>';}).join('');
   const sortBtns='<div class="tb"><span>Sıralama ölçütü</span><div class="sg">'+ESORTS.map(x=>'<button class="'+(key===x[0]?'on':'')+'" data-esort="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>'+(PSA?'<label class="psat"><input type="checkbox" data-epsa'+(birl?' checked':'')+'> PSA tek satır (Peugeot + Citroën + Opel)</label>':'')+(noF?'<span>Bu dönem için fiili veri girilmedi; plana göre sıralanıyor.</span>':'')+'</div>';
   const xo='<table class="xonly"><thead><tr><th>Sıra</th><th>Marka</th><th>Plan</th><th>Fiili</th><th>Gerç. %</th><th>Kalan hedef</th></tr></thead><tbody>'+rows.map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(r.n)+'</td>'+etd(r.v.p,'tl')+etd(r.v.f,'tl')+etd(r.v.gr,'p')+etd(r.v.f==null?null:r.v.kalan,'tl')+'</tr>').join('')+'<tr><td></td><td>İNCİROĞLU TOPLAM</td>'+etd(tv.p,'tl')+etd(tv.f,'tl')+etd(tv.gr,'p')+etd(tv.f==null?null:tv.kalan,'tl')+'</tr></tbody></table>';
   return chips+'<section class="box"><div class="boxhead"><h2>Marka karşılaştırma · '+esc(kn)+' · '+elabel(cp)+'</h2><span class="s">Markalar aynı kalemde yan yana, seçilen ölçüte göre sıralı</span>'+eSeg()+'</div>'+xo+sortBtns+
     '<div class="scroll"><div class="rkw"><div class="rkrow rkhead"><div>Sıra</div><div>Marka</div><div>Plan</div><div>Fiili</div><div>Gerç. %</div><div>Kalan Hedef</div></div><div class="rklist">'+list+'</div>'+
-    '<div class="rkrow tot"><div></div><div class="nm">İNCİROĞLU TOPLAM</div><div>'+eFN(tv.p)+'</div><div>'+eFN(tv.f)+'</div><div>'+(tv.gr==null?'—':'<span class="chip '+tc+'">'+eFP(tv.gr)+'</span>')+'</div><div>'+(tv.f==null?'—':eFN(tv.kalan))+'</div></div></div></div></section>';}
+    '<div class="rkrow tot"><div></div><div class="nm">İNCİROĞLU TOPLAM</div><div>'+(ext?'—':eFN(tv.p))+'</div><div>'+eFN(tv.f)+'</div><div>'+(tv.gr==null?'—':'<span class="chip '+tc+'">'+eFP(tv.gr)+'</span>')+'</div><div>'+(tv.f==null||!tv.p?'—':eFN(tv.kalan))+'</div></div></div></div></section>';}
 
 function pEk(){
   const kick='Servis Performans Yönetimi · Ek Satış';
@@ -1919,7 +1928,7 @@ function pEk(){
   const right=cm?hwHtml(cm.ad,cm.gecenGun,cm.toplamGun,EK.meta.donem+' · ek satış verisi',dd,mm,yy):hwHtml('',0,0,'',dd,mm,yy,true);
   const hd='<div class="head"><div><div class="kick">'+kick+'</div><h1>Ek Satış Takip Paneli · '+esc(EK.meta.donem)+'</h1><div class="sub">Plan ve gerçekleşme · Tutarlar ₺ (ciro) · Kaynak: ek_satis.xlsx “Konsolide Hedef”</div></div>'+right+
     '<div class="dline">'+(cm?cm.ad+' iş günü <b>'+cm.gecenGun+'/'+cm.toplamGun+'</b> · ':'')+'Güncellenme <b>'+esc(EK.meta.veriTarihi)+'</b></div></div>';
-  const note='<p class="note">Gerç. % = Fiili ÷ Plan. Renkler: <span class="chip g">%100 ve üzeri</span><span class="chip r">%100 altı</span> · Fiili girilmemiş aylar “—” gösterilir · Kaynak: ek_satis.xlsx “Konsolide Hedef” sayfası · Güncelleme: '+esc(EK.meta.uretim)+'</p>';
+  const note='<p class="note">Gerç. % = Fiili ÷ Plan. Renkler: <span class="chip g">%100 ve üzeri</span><span class="chip r">%100 altı</span> · Fiili girilmemiş aylar “—” gösterilir · Hedefi olmayan kalemler (ör. Antifriz; plan “—”) marka toplamına ve gerçekleşmeye dahil edilmez · Kaynak: ek_satis.xlsx “Konsolide Hedef” sayfası · Güncelleme: '+esc(EK.meta.uretim)+'</p>';
   if(EKPRINT){   // PDF: tüm markaların detayı + karşılaştırma, her biri ayrı sayfa
     const page=(t,body)=>'<div class="pv"><h1 class="ptitle">'+t+'</h1><p class="psub">'+esc(EK.meta.donem)+' Ek Satış Takip · Veri tarihi '+esc(EK.meta.veriTarihi)+'</p>'+eCards()+body+'</div>';
     let h=page('Marka Detayı · Tüm Markalar Toplam',eDetay(-1))+(EKX.PSA?page('Marka Detayı · PSA (Peugeot · Citroën · Opel)',eDetay(-2)):'');EKX.B.forEach((b,i)=>{h+=page('Marka Detayı · '+esc(b.ad),eDetay(i));});
@@ -2436,6 +2445,14 @@ function sutunSik(){
     ths.forEach((c,i)=>c.style.width=Math.floor(W[i])+'px');
     t.style.width=ek>4?Math.floor(w-ek)+'px':'100%';t.classList.toggle('dar',ek>4);});
 }
+/* yapışkan tablo başlığı: sayfa (ya da uzun tablonun kendi kutusu) aşağı kayınca başlık satırları tablonun üstünde kalır */
+function basYapis(){if(window.__yazdir)return;const tp=document.querySelector('.top'),T=tp?Math.max(0,tp.getBoundingClientRect().bottom):0;
+  document.querySelectorAll('#app .box .scroll>table').forEach(t=>{const h=t.tHead;if(!h)return;const cs=h.querySelectorAll('tr>*');if(!cs.length)return;
+    if(!t.__shd){t.__shd=1;cs.forEach(c=>{const b=getComputedStyle(c).backgroundColor;const m=b.match(/rgba\([^)]*,\s*([\d.]+)\)/);if(b==='transparent'||(m&&+m[1]===0))c.style.backgroundColor='#fff';else if(m&&+m[1]<1)c.style.background='linear-gradient('+b+','+b+'),#fff';if(getComputedStyle(c).position==='static')c.style.position='relative';c.style.zIndex=Math.max(+getComputedStyle(c).zIndex||0,4);});}
+    const sc=t.parentNode,hh=h.offsetHeight,mx=Math.max(0,t.offsetHeight-hh-36);let o;
+    o=Math.max(T,sc.getBoundingClientRect().top)-t.getBoundingClientRect().top;
+    o=Math.min(mx,Math.max(0,Math.round(o)));if(o===t.__o)return;t.__o=o;t.classList.toggle('shon',o>0);cs.forEach(c=>c.style.transform=o?'translateY('+o+'px)':'');});}
+let __by=0;document.addEventListener('scroll',()=>{if(__by)return;__by=requestAnimationFrame(()=>{__by=0;basYapis();});},{capture:true,passive:true});
 window.addEventListener('resize',()=>{clearTimeout(window.__ss);window.__ss=setTimeout(()=>{document.querySelectorAll('#app .box .scroll>table thead th[style*="width"]').forEach(x=>x.style.width='');sutunSik();},150);});
 /* ---------- marka detay paneli (Servis Performansı · marka adına tıklayınca) ---------- */
 let MDP=null;
@@ -2488,7 +2505,7 @@ function render(){
   $('app').innerHTML='<table class="pw"><thead><tr><td><div class="phead"><div class="plogo">'+LOGO+'</div><div class="ptx"><b>'+P[1]+'</b><span>'+(st.page==='ek'&&EK?esc(EK.meta.donem)+' · ek satış planı ve gerçekleşme':esc(brandLabel())+' · '+PL()+(TWO()?' ve '+ytdLabel():''))+'</span></div><div class="pk">'+(st.page==='ek'&&EK?'Güncellenme <b>'+esc(EK.meta.veriTarihi)+'</b>':'Veri kesimi <b>'+esc(D.ust.veri_kesim)+'</b>')+'<br>Servis Performans Yönetimi</div></div></td></tr></thead><tbody><tr><td>'+P[2]()+'</td></tr></tbody></table><div class="prt">İnciroğlu Otomotiv · Hazırlayan: CEO Ofis · İş Geliştirme ve Strateji · '+P[1]+' · '+esc(brandLabel())+' · '+PL()+' · veri kesimi '+esc(D.ust.veri_kesim)+' · yazdırma '+new Date().toLocaleDateString('tr-TR')+'</div>';
   SAYFA_AD=P[1];baslikYaz();
   const AK=[st.page,st.brands,st.months,st.hkat,st.ekKat,st.hmet,st.kpis,st.ek.tab,st.ek.cp,st.ek.brand,st.ek.kal].join('|'), still=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  sutunSik();
+  sutunSik();basYapis();
   document.body.classList.toggle('pg-perf',st.page==='perf');mdpYenile();
   document.querySelectorAll('#app .hmb tbody tr').forEach((tr,r)=>[...tr.cells].forEach((c,ci)=>{c.style.setProperty('--c',ci);c.style.setProperty('--r',r);}));
   const anim=AK!==window.__ak&&!still;window.__ak=AK;$('app').classList.toggle('anim',anim);
