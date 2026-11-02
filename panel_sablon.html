@@ -640,7 +640,7 @@ td.kn small.tz{display:block;font-size:9.5px;font-weight:600;color:#8a97a8;margi
 .dzt td.d0{color:#b44948;font-size:11.5px;font-weight:600;background:#fafbfd}.dzt td.na{color:#8a97a8;font-size:11px;font-style:italic;background:#fafbfd}
 .dzl{display:flex;gap:16px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:11.5px;color:#5b6b7f}.dzl span::before{content:'';display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 .dzl .d1::before{background:#bfe5d8}.dzl .d2::before{background:#f6dca3}.dzl .d3::before{background:#f1c0bd}.dzl .d0::before{background:#fafbfd;border:1px solid #e3b0ae}
-.ypt small.ypd{display:block;font-size:9.5px;color:#8a97a8;font-weight:500}
+.ypt tr.ypin td.kn{padding-left:26px!important}.ypt tr.ypin td.kn b{font-weight:600}.ypt span.ypic{font-size:9.5px;font-weight:500;color:#8a97a8;margin-right:6px;text-transform:lowercase}.ypt tr.ypr.ypin td.kn{padding-left:26px!important}.ypt small.ypd{display:block;font-size:9.5px;color:#8a97a8;font-weight:500}
 .pko{font-size:.85em;color:#8a97a8}.sbo{display:block;margin-top:10px;font-size:10.5px;color:#9aa7b7}
 .pfoot{display:none}
 @media print{.pfoot{display:block;position:fixed;right:0;bottom:0;font-size:7.5px;letter-spacing:.03em;color:#8a97a8;padding-top:3px;border-top:.6px solid #c9b48c}
@@ -1711,11 +1711,11 @@ function sdSatis(b,m){const ks=KIR.map(k=>k[0]);
   return {v:ks.reduce((a,k)=>a+ktHucre(b,m,k,'yp').fiili,0),src:'fiili'};}
 function sdHesap(b,m){const A=ayk(m),s=sdSatis(b,m),smm=m<CUT?vV('yps',b,A,'smm'):null,mal=smm!=null?smm:s.v==null?null:s.v*ypOran(b);   // kapanan ayda müdürün girdiği fiili SMM, yoksa oran
   let bas=vV('sd',b,A,'bas'),oto=false;   // dönem başı: manuel › önceki ay kapanışı › önceki ayın dönem sonu
-  if(bas==null&&m>1){const pk=ypGT(b,ayk(m-1));bas=pk!=null?pk:vV('sd',b,ayk(m-1),'son');oto=bas!=null?(pk!=null?MONTHS[m-2]+' kapanışı':'önceki ay'):false;}
+  if(bas==null&&m>1){const pk=vV('yps',b,ayk(m-1),'stok');bas=pk!=null?pk:vV('sd',b,ayk(m-1),'son');oto=bas!=null?(pk!=null?MONTHS[m-2]+' kapanışı':'önceki ay'):false;}
   let son=vV('sd',b,A,'son'),sOto=false;   // dönem sonu: manuel › bu ay kapanışı › (devam eden ay) son haftalık stok
-  if(son==null){const k=ypGT(b,A);if(k!=null){son=k;sOto='ay kapanışı';}else if(m===CUT){const w=ypSonHafta(b,m);if(w){son=w.v;sOto=w.w+'. hafta stoğu';}}}
+  if(son==null){const k=vV('yps',b,A,'stok');if(k!=null){son=k;sOto='ay kapanışı';}else if(m===CUT){const w=ypSonHafta(b,m);if(w){son=w.v;sOto=w.w+'. hafta stoğu';}}}
   const ort=bas!=null&&son!=null?(bas+son)/2:null,dv=mal!=null&&ort?mal/ort:null;
-  return {s,mal,smm,gOran:smm!=null&&s.v?smm/s.v:null,bas,oto,sOto,son,ort,dv,bek:m<CUT&&son==null&&ypGT(b,A)==null,yil:dv!=null?dv*12:null,gun:dv?365/(dv*12):null};}
+  return {s,mal,smm,gOran:smm!=null&&s.v?smm/s.v:null,bas,oto,sOto,son,ort,dv,bek:m<CUT&&son==null&&vV('yps',b,A,'stok')==null,yil:dv!=null?dv*12:null,gun:dv?365/(dv*12):null};}
 const sdEt=t=>'<span class="sdk" title="'+esc(t)+'">'+esc(/hafta/.test(t)?t.replace(/\. hafta stoğu/,'. hf'):/kapanış/.test(t)?'kapanış':t)+'</span>';   // tek satır etiket; ayrıntı üzerine gelince
 function sdBolum(){
   const m=+st.sort.sdAy&&+st.sort.sdAy<=CUT?+st.sort.sdAy:CUT, A=ayk(m), ed=!!st.sdEdit&&KUL&&KUL.yp;
@@ -1729,14 +1729,14 @@ function sdBolum(){
       '<td>'+f2(h.ort)+'</td><td class="sep"><b>'+d2(h.dv)+'</b></td><td>'+d2(h.yil)+'</td><td><b>'+(h.gun==null?'–':nf.format(h.gun)+' gün')+'</b></td>'+
       '<td class="'+(dg==null?'':dg<=0?'g':'r')+'">'+(dg==null?'–':(dg>0?'▲ ':'▼ ')+nf.format(Math.abs(dg))+' gün')+'</td></tr>';};
   const T=(()=>{let mal=0,ort=0,ok1=0;for(const b of YPB){const h=sdHesap(b,m);if(h.mal!=null&&h.ort){mal+=h.mal;ort+=h.ort;ok1++;}}const dv=ort?mal/ort:null;return {mal,ort,dv,ok1};})();
-  const hd='<tr class="per"><th></th><th colspan="3" class="cur sep">Maliyet (SMM)</th><th colspan="3" class="cur sep" title="Yedek Parça tablosundaki Genel toplam: güncel toplam stok + stoktaki iş emri üzeri">Stok (genel toplam)</th><th colspan="4" class="cur sep">Devir</th></tr>'+
+  const hd='<tr class="per"><th></th><th colspan="3" class="cur sep">Maliyet (SMM)</th><th colspan="3" class="cur sep" title="Güncel toplam stok: iş emri üzerindeki parçalar dahil">Stok (güncel toplam stok)</th><th colspan="4" class="cur sep">Devir</th></tr>'+
     '<tr><th class="kn">Marka</th><th class="sep" title="YP satışı: devam eden ayda kapanış tahmini, kapanan ayda gerçekleşen (4 kırılım)">YP satışı</th><th>Oran</th><th>Maliyet</th><th class="sep">Dönem başı</th><th>Dönem sonu</th><th>Ortalama</th><th class="sep">Aylık</th><th>Yıllık</th><th title="365 ÷ yıllık devir">Stokta kalma</th><th title="Önceki aya göre stokta kalma süresi">Önceki aya göre</th></tr>';
   const tot='<tr class="main tot"><td class="kn"><b>Toplam</b>'+(T.ok1<YPB.length?'<small class="ktn">'+T.ok1+' marka hesaplandı</small>':'')+'</td><td></td><td></td><td><b>'+f2(T.ok1?T.mal:null)+'</b></td><td class="sep"></td><td></td><td>'+f2(T.ok1?T.ort:null)+'</td><td class="sep"><b>'+d2(T.dv)+'</b></td><td>'+d2(T.dv!=null?T.dv*12:null)+'</td><td><b>'+(T.dv?nf.format(365/(T.dv*12))+' gün':'–')+'</b></td><td></td></tr>';
   const ayS='<label class="srt">Ay <select data-sort="sdAy">'+Array.from({length:CUT},(_,i)=>i+1).map(x=>'<option value="'+x+'"'+(x===m?' selected':'')+'>'+MONTHS[x-1]+(x===CUT?' · devam':'')+'</option>').join('')+'</select></label>';
   const bar=vBar('sd',KUL&&KUL.yp,'Dönem başı ve dönem sonu stok tutarlarını girin · '+MONTHS[m-1]+(m===CUT?' (dönem sonu tahmini)':''));
   return box2('dense garg ktt-box sdt','Stok devir hızı · '+MONTHS[m-1]+' '+YEAR,'Maliyet: devam eden ayda YP satışı × oran · kapanan ayda fiili SMM · devir = maliyet ÷ ortalama stok',
     bar+tbl(hd,YPB.map(row).join(''),tot).replace(/min-width:\d+px/,'min-width:'+(ed?1250:1000)+'px;width:100%'),ayS)+
-    '<p class="note">'+(m===CUT?'Devam eden ayda YP satışı markanın kapanış tahminidir; tahmin girilmemişse bugünkü gidişat kullanılır (italik). ':'')+'Stok = Yedek Parça tablosundaki Genel toplam (güncel toplam stok + stoktaki iş emri üzeri). Dönem başı boşsa önceki ayın kapanış stoğu, dönem sonu boşsa bu ayın kapanış stoğu (devam eden ayda son haftalık stok) otomatik alınır; kapanan ayda ay kapanışı girilmemişse devir hesaplanmaz ve "ay kapanışı bekleniyor" yazar; buraya yazılan değer önce gelir. Oranlar: BMW & MINI 0,75 · Honda 0,90 · O&J 0,60 · diğerleri 0,70.</p>';
+    '<p class="note">'+(m===CUT?'Devam eden ayda YP satışı markanın kapanış tahminidir; tahmin girilmemişse bugünkü gidişat kullanılır (italik). ':'')+'Stok = güncel toplam stok (iş emri üzerindeki parçalar dahil). Dönem başı boşsa önceki ayın kapanış stoğu, dönem sonu boşsa bu ayın kapanış stoğu (devam eden ayda son haftalık stok) otomatik alınır; kapanan ayda ay kapanışı girilmemişse devir hesaplanmaz ve "ay kapanışı bekleniyor" yazar; buraya yazılan değer önce gelir. Oranlar: BMW & MINI 0,75 · Honda 0,90 · O&J 0,60 · diğerleri 0,70.</p>';
 }
 /* ---------- Açık İş Emri · markalar her hafta girer (ISO hafta) ---------- */
 const AIK=[['mek','Mekanik','Mekanik'],['hasar','Hasar','Kaporta Boya'],['gar','Garanti','Garanti']];
@@ -1816,7 +1816,7 @@ function pDurum(){
 /* ---------- Yedek Parça · stok değerleri: haftalık güncelleme + ay kapanışı (yetkililer girer → Google E-Tablo) ---------- */
 const YPB=['Peugeot','Citroen','Opel','Honda','Fiat','Arj','Bmw','Motorrad','Tesla','Jaecoo'];
 const YPBL={Peugeot:'Peugeot',Citroen:'Citroën',Opel:'Opel',Honda:'Honda',Fiat:'Fiat',Arj:'ARJ',Bmw:'BMW & MINI',Motorrad:'BMW Motorrad',Tesla:'Tesla',Jaecoo:'O&J'};
-const YPK=[['stok','Güncel toplam stok','her şey dahil'],['olu','Ölü stok 12 ay',''],['aks','Aksesuar',''],['yag','Motor yağı',''],['lastik','Lastik',''],
+const YPK=[['stok','Güncel toplam stok','İE üzeri dahil'],['olu','Ölü stok 12 ay',''],['aks','Aksesuar',''],['yag','Motor yağı',''],['lastik','Lastik',''],
   ['sip','Siparişteki iş emri üzeri','parça'],['stokis','Stoktaki iş emri üzeri','parça']];
 VED.yps={};
 const tl0=v=>v==null?'–':TLH(v);
@@ -1825,11 +1825,9 @@ const ypAd=P=>P[0]==='H'?hEtiket(isoH(new Date()).y,+P.slice(1)):MONTHS[D.aylar.
 const ypV=(P,b,k)=>P?vV('yps',b,P,k):undefined;
 const ypTop=(P,k)=>YPB.reduce((a,b)=>{const v=ypV(P,b,k);return v==null?a:(a||0)+v;},null);
 const ypFark=(P,Q,k)=>{let d=null;for(const b of YPB){const v=ypV(P,b,k),p=ypV(Q,b,k);if(v!=null&&p!=null)d=(d||0)+v-p;}return d;};   // yalnız iki dönemde de girilen markalar
-// genel toplam = güncel toplam stok + stoktaki iş emri üzeri (Yedek Parça tablosunun dip toplamı) · stok devir hızında kullanılır
-const ypGT=(b,P)=>{const a=vV('yps',b,P,'stok'),c=vV('yps',b,P,'stokis');return a==null&&c==null?null:(a||0)+(c||0);};
-function ypSonHafta(b,m){   // ay içindeki en son haftalık genel toplam
+function ypSonHafta(b,m){   // ay içindeki en son haftalık stok
   let best=null;const B=(D.yps||{})[b]||{};for(const P in B){if(P[0]!=='H'||!B[P].stok)continue;const w=+P.slice(1),j=new Date(Date.UTC(isoH(new Date()).y,0,4));j.setUTCDate(j.getUTCDate()-((j.getUTCDay()||7)-1)+(w-1)*7);
-    if(j.getUTCMonth()+1===m&&(!best||w>best.w))best={w,v:B[P].stok.v+(B[P].stokis&&B[P].stokis.v!=null?+B[P].stokis.v:0)};}return best;}
+    if(j.getUTCMonth()+1===m&&(!best||w>best.w))best={w,v:B[P].stok.v};}return best;}
 function pYP(){
   if(!D.yps)return head('Servis Performans Yönetimi','Yedek Parça','Stok değerleri')+'<div class="empty">Yedek parça verisi yüklenemedi. Sayfayı yenileyin; sorun sürerse yöneticiye bildirin.</div>';
   const bu=isoH(new Date()), P=st.sort.ypD||('H'+bu.w), Pp=ypOnce(P), hafta=P[0]==='H', ed=!!st.ypsEdit&&KUL&&KUL.yp;
@@ -1850,16 +1848,18 @@ function pYP(){
     return v==null?'<td class="na">–</td>':'<td data-v="'+v+'" data-f="tl"'+yTip(v,p,k,b)+'>'+dOk(v,p,yPol(k))+tl0(v)+'</td>';};
   const row=(k,l,sub,ri,c='')=>'<tr class="'+c+'"><td class="kn"><b>'+l+'</b>'+(sub?' <small>('+sub+')</small>':'')+'</td>'+YPB.map((b,ci)=>cell(b,k,ri,ci)).join('')+'<td class="sep"'+(ypFark(P,Pp,k)!=null?yTip(ypTop(P,k),ypTop(P,k)-ypFark(P,Pp,k),k,''):'')+'>'+(ypFark(P,Pp,k)?'<i class="dka '+((ypFark(P,Pp,k)>0)===(yPol(k)==='g')?'g':'r')+'">'+(ypFark(P,Pp,k)>0?'▲':'▼')+'</i>':'')+'<b>'+tl0(ypTop(P,k))+'</b></td></tr>';
   const pct=(l,a,b)=>'<tr class="ypr"><td class="kn">'+l+'</td>'+YPB.map(x=>{const r=oran(ypV(P,x,a),ypV(P,x,b));return '<td>'+(r==null?'–':'%'+nf1.format(r*100))+'</td>';}).join('')+'<td class="sep">'+(oran(ypTop(P,a),ypTop(P,b))==null?'–':'%'+nf1.format(oran(ypTop(P,a),ypTop(P,b))*100))+'</td></tr>';
-  let body='';YPK.forEach(([k,l,sub],ri)=>{if(k==='sip')body+='<tr class="ypsep"><td colspan="'+(YPB.length+2)+'"></td></tr>';body+=row(k,l,sub,ri,ri===0?'main':'');if(k==='olu')body+=pct('Ölü stok oranı','olu','stok');});
+  // güncel toplam stok ana satır; altındaki kalemler onun içinden (iş emri üzeri dahil) · siparişteki iş emri üzeri stok dışı, ayrı
+  let body='';['stok','olu','aks','yag','lastik','stokis','sip'].forEach(k=>{const ri=YPK.findIndex(x=>x[0]===k),[,l,sub]=YPK[ri];
+    if(k==='sip')body+='<tr class="ypsep"><td colspan="'+(YPB.length+2)+'"></td></tr>';
+    body+=row(k,l,k==='sip'?'stok dışı':k==='stokis'?'':sub,ri,k==='stok'?'main':k==='sip'?'':'ypin');if(k==='olu')body+=pct('Ölü stok oranı','olu','stok').replace('class="ypr"','class="ypr ypin"');});
   const gt=(Q,b)=>{const a=ypV(Q,b,'stok'),c=ypV(Q,b,'stokis');return a==null&&c==null?null:(a||0)+(c||0);};
   const gtT=Q=>YPB.reduce((a,b)=>gt(Q,b)==null?a:(a||0)+gt(Q,b),null);
-  const foot='<tr class="main tot"><td class="kn"><b>Genel toplam</b> <small title="stok + stoktaki iş emri üzeri">stok + İE üzeri</small></td>'+YPB.map(b=>'<td'+yTip(gt(P,b),gt(Pp,b),'gt',b)+'>'+dOk(gt(P,b),gt(Pp,b),'g')+'<b>'+tl0(gt(P,b))+'</b></td>').join('')+(()=>{let d=null;for(const b of YPB){const v=gt(P,b),p=gt(Pp,b);if(v!=null&&p!=null)d=(d||0)+v-p;}return '<td class="sep"'+(d!=null?yTip(gtT(P),gtT(P)-d,'gt',''):'')+'>'+(d?'<i class="dka '+(d>0?'g':'r')+'">'+(d>0?'▲':'▼')+'</i>':'')+'<b>'+tl0(gtT(P))+'</b>';})()+'</td></tr>'+
-    '<tr class="ypz"><td class="kn">Son güncelleme</td>'+YPB.map(b=>{const z=vZ('yps',b,P);return '<td>'+(z?new Date(z).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric'}):'–')+'</td>';}).join('')+'<td class="sep"></td></tr>';
+  const foot='<tr class="ypz"><td class="kn">Son güncelleme</td>'+YPB.map(b=>{const z=vZ('yps',b,P);return '<td>'+(z?new Date(z).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric'}):'–')+'</td>';}).join('')+'<td class="sep"></td></tr>';
   let bar=vBar('yps',KUL&&KUL.yp,(KUL&&KUL.markalar&&KUL.markalar.length?'Giriş yetkiniz: '+KUL.markalar.map(b=>YPBL[b]||b).join(', '):'Tüm markalar için giriş yetkiniz var')+' · '+ypAd(P));
   if(ed&&Pp)bar=bar.replace('<button type="button" class="gbtn ghost" data-vvaz="yps">','<button type="button" class="gbtn ghost" id="ypkop" title="Boş hücreleri önceki dönemin değerleriyle doldurur">Önceki dönemden kopyala</button><button type="button" class="gbtn ghost" data-vvaz="yps">');
   return head('Servis Performans Yönetimi','Yedek Parça',ypAd(P)+' · '+(hafta?'markalar her hafta günceller':'ay sonu kesin değerler'))+cards+
-    box2('garg ypt',(hafta?'Haftalık stok değerleri':'Ay kapanışı')+' · '+ypAd(P),'Tutarlar ₺ · ▲▼ önceki '+(hafta?'haftaya':'ay kapanışına')+' göre (artış yeşil; ölü stokta azalış yeşil) · üzerine gelince önceki değer ve fark görünür',bar+tbl(hd,body,foot).replace(/min-width:\d+px/,'min-width:'+(ed?1250:1020)+'px;width:100%;table-layout:fixed').replace('<thead>','<colgroup><col style="width:'+(ed?190:200)+'px">'+'<col>'.repeat(YPB.length+1)+'</colgroup><thead>'),sel)+
-    '<p class="note">Her hafta güncel değerler, ay sonunda "Ay kapanışı" dönemi seçilerek kesin değerler girilir. Ay kapanışındaki Genel toplam, stok devir hızında dönem sonu stoğu olarak kullanılır. Ölü stok oranı = ölü stok 12 ay ÷ güncel toplam stok.</p>'+'<div class="pb"></div>'+sdBolum();
+    box2('garg ypt',(hafta?'Haftalık stok değerleri':'Ay kapanışı')+' · '+ypAd(P),'Tutarlar ₺ · alt kalemler güncel toplam stoğun içindedir · ▲▼ önceki '+(hafta?'haftaya':'ay kapanışına')+' göre (artış yeşil; ölü stokta azalış yeşil) · üzerine gelince önceki değer ve fark görünür',bar+tbl(hd,body,foot).replace(/min-width:\d+px/,'min-width:'+(ed?1250:1020)+'px;width:100%;table-layout:fixed').replace('<thead>','<colgroup><col style="width:'+(ed?190:200)+'px">'+'<col>'.repeat(YPB.length+1)+'</colgroup><thead>'),sel)+
+    '<p class="note">Her hafta güncel değerler, ay sonunda "Ay kapanışı" dönemi seçilerek kesin değerler girilir. Ay kapanışındaki güncel toplam stok, stok devir hızında dönem sonu stoğu olarak kullanılır. Ölü stok oranı = ölü stok 12 ay ÷ güncel toplam stok.</p>'+'<div class="pb"></div>'+sdBolum();
 }
 /* ---------- 05 · Car Care ---------- */
 // Car Care · marka × ay ısı haritası (Oca → içinde bulunulan ay + YTD)
