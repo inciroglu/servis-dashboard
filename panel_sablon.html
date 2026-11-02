@@ -491,7 +491,7 @@ ul.yorum .yg{color:var(--green);font-weight:650}ul.yorum .yr{color:var(--red);fo
 .hwr::before{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(8,117,101,.35);animation:hwring 2.6s ease-out infinite}
 @keyframes hwring{0%{transform:scale(.94);opacity:.9}100%{transform:scale(1.18);opacity:0}}
 .hwr small{color:#fff!important;font-size:8px;font-weight:700;letter-spacing:.1em;opacity:.88;line-height:1.25;text-transform:uppercase}
-.hwr b{font-size:30px;font-weight:700;letter-spacing:-.03em;margin:2px 0 1px}.hwr span{font-size:11.5px;font-weight:600;opacity:.95}
+.hwr.hws b{font-size:27px;margin:1px 0 0}.hwr.hws span{font-size:10.5px}.hwr i{font-style:normal;font-size:10px;font-weight:600;opacity:.8;margin-top:3px;padding-top:3px;border-top:1px solid rgba(255,255,255,.35);letter-spacing:.04em}.hwr b{font-size:30px;font-weight:700;letter-spacing:-.03em;margin:2px 0 1px}.hwr span{font-size:11.5px;font-weight:600;opacity:.95}
 .anim .hwb i{animation:grow 1.4s cubic-bezier(.2,.8,.2,1) both,hwstr 1.2s linear infinite}.anim .hwb em{animation:hwin 1.4s cubic-bezier(.2,.8,.2,1) both}
 @keyframes hwin{from{left:0}}
 #app:not(.anim) .hwb i{animation:hwstr 1.2s linear infinite!important}#app .hwb em::after{animation:hwping 1.8s ease-out infinite!important}#app .hwr::before{animation:hwring 2.6s ease-out infinite!important}
@@ -1067,12 +1067,16 @@ function bandTxt(t){
   const mi=i+1,G=gun(mi);
   return '<b>'+MONTHS[i]+' '+YEAR+'</b><em>'+(mi<CUT?'kapandı · '+G.donem+' iş günü':mi===CUT?'devam ediyor · '+G.gecen+' / '+G.donem+' iş günü':'plan')+'</em>';}
 /* üst sağ: içinde bulunulan ayın iş günü ilerlemesi (imleçli) + güncellenme tarihi rozeti — ek satış panelindeki gibi */
-function hwHtml(lab,g,dn,extra,dd,mm,yy,noBar){
+// güncellenme saati: sitedeki sayfanın sunucuya yüklendiği an (GUNCELLE → GitHub yayını) · sunucu bilgi vermezse gösterilmez
+const GSAAT=(()=>{try{const t=new Date(document.lastModified);if(isNaN(t)||Math.abs(Date.now()-t)<5000)return null;return t;}catch(e){return null;}})();
+const gSaat=(dd,mm,yy)=>{if(!GSAAT)return '';const hm=GSAAT.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+  return GSAAT.getDate()===dd&&GSAAT.getMonth()+1===mm&&GSAAT.getFullYear()===yy?hm:GSAAT.getDate()+' '+MONTHS[GSAAT.getMonth()].slice(0,3)+' · '+hm;};
+function hwHtml(lab,g,dn,extra,dd,mm,yy,noBar,saat){if(saat===undefined)saat=gSaat(dd,mm,yy);
   const p=dn?Math.min(100,g/dn*100):0;
   return '<div class="hw">'+(noBar?'':'<div class="hwp"><div class="hwt"><span>'+lab+' iş günü</span><span><b class="ctr" data-to="'+g+'">'+g+'</b> / '+dn+' · %'+nf1.format(p)+'</span></div>'+
     '<div class="hwb"><i style="width:'+p.toFixed(1)+'%"></i><em style="left:'+p.toFixed(1)+'%"><span>'+g+'. gün</span></em></div>'+
     '<div class="hwl"><span>1</span><span>'+dn+'. iş günü</span></div>'+(extra?'<div class="hwy">'+extra+'</div>':'')+'</div>')+
-    '<div class="hwr"><small>Güncellenme<br>tarihi</small><b>'+dd+'</b><span>'+MONTHS[mm-1].slice(0,3)+' '+yy+'</span></div></div>';
+    '<div class="hwr'+(saat?' hws':'')+'"'+(GSAAT?' title="Site son güncelleme: '+GSAAT.toLocaleString('tr-TR')+'"':'')+'><small>Güncellenme<br>tarihi</small><b>'+dd+'</b><span>'+MONTHS[mm-1].slice(0,3)+' '+yy+'</span>'+(saat?'<i>'+esc(saat)+'</i>':'')+'</div></div>';
 }
 function hw(y){const G=gun(CUT), [kg,ka,ky]=D.ust.veri_kesim.split('.').map(Number), pm=PMS();
   const t=pm.reduce((a,m)=>({d:a.d+gun(m).donem,g:a.g+(m<=CUT?gun(m).gecen:0)}),{d:0,g:0});
@@ -1538,7 +1542,7 @@ function pGar(){
     return '<tr><td class="kn"><b>'+esc(lab(b))+'</b></td>'+tds+'<td class="sep"><b>'+(any?FM.ad(t):'–')+'</b></td></tr>';}).join('');
   const bar='<div class="garbar">'+seg+'<span class="garn" id="garn">'+(n?n+' hücre değişti · kaydedilmedi':'Değişiklik yok')+'</span>'+
     '<button type="button" class="gbtn ghost" id="garvaz"'+(n?'':' disabled')+'>Vazgeç</button><button type="button" class="gbtn" id="garkay"'+(n?'':' disabled')+'>Kaydet</button></div>';
-  return head('Servis Performans Yönetimi','Garanti araç girişi','Orijinal garanti araç girişleri · manuel giriş · '+YEAR)+
+  return head('Servis Performans Yönetimi','Garanti araç girişi','Fiili garanti araç girişleri · manuel giriş · '+YEAR)+
     box2('garg','Marka × ay · '+GAL.find(x=>x[0]===al)[1],(al==='fiili'?'Hücreye adet yazın; Excel\'den kopyalayıp yapıştırabilirsiniz. Kaydet\'e basınca herkes için güncellenir.':'Gri rakamlar servis verisinden gelir (garanti iş emri '+(al==='butce'?'bütçesi':'fiili')+'); yalnız farklı olması gereken aylara yazın, yazılan değer veriden önce gelir.')+(KUL&&KUL.markalar&&KUL.markalar.length?' · yetkiniz: '+bs.map(lab).join(', '):''),
       bar+tbl(hd,rows).replace(/min-width:\d+px/,'min-width:980px'))+
     '<p class="note">Boş bırakılan ay panelde "–" görünür. Kayıtlar Google E-Tablo\'da tutulur; kimin neyi ne zaman girdiği kayıt altındadır. Excel dosyası (garanti_arac_girisi.xlsx) varsa, panelden girilen ay onun yerine geçer. BMW & MINI, BMW Motorrad ve Tesla listede yok: garanti araç girişleri servis verisinden gelir.</p>';
@@ -1651,10 +1655,10 @@ function pKT0(){
     // ay bitti (iş günleri doldu ya da kapandı) → F/B; ay içinde T/B, fiili tahmini geçtiyse fiili üzerinden (kapanış gerçekleşenin altında olamaz)
     const tb=BITTI?(x.butce?x.fiili/x.butce:null):(x.tahmin!=null&&bb?Math.max(x.tahmin,ff)/bb:null);
     if(gec&&t.includes('class="ktt'))t=t.replace('</b>','</b><sup class="kfg" title="Fiili ('+f(ff).replace(/<[^>]+>/g,'')+') tahmini geçti · oran fiili üzerinden">F</sup>');
-    let ek='';if(top){if(cur){const g=run(x);ek='<td class="ktg">'+f(g)+'</td>';}else{const is=x.tahmin!=null&&ff?1-Math.abs(x.tahmin-ff)/ff:null;ek='<td>'+(is==null?'–':'%'+nf1.format(Math.max(0,is)*100))+'</td>';}}
+    let ek='';if(top&&cur){const g=run(x);ek='<td class="ktg">'+f(g)+'</td>';}
     return td(x.butce,adet?'ax':'m2','sep'+(EKK.some(y=>y[0]===kir)||kir==='ek'?' ktekc':''))+td(x.fiili,adet?'ax':'m2',EKK.some(y=>y[0]===kir)||kir==='ek'?'ktekc':'')+t.replace('class="ktt',(EKK.some(y=>y[0]===kir)||kir==='ek'?'class="ktekc ktt':'class="ktt'))+(uc(kir)?'':td(tb,'p').replace(/pp [gnr]"/,'pp '+kcls(tb)+'"'))+ek;};
-  const H=top=>'<th class="sep">Bütçe</th><th>Fiili</th><th>Tahmin</th>'+(BITTI?'<th title="Fiili ÷ bütçe">F/B</th>':'<th class="th2" title="Tahmin ÷ bütçe · fiili tahmini geçtiyse fiili ÷ bütçe">Tahmin<br>/Bütçe</th>')+(top?(cur?'<th title="Bugünkü gidişat: fiili ÷ geçen iş günü × ayın iş günü">Gidişat</th>':'<th title="Son tahminin gerçekleşene yakınlığı">İsabet</th>'):'');
-  const hd='<tr class="per"><th></th><th colspan="5" class="cur sep">Toplam</th>'+KC.map(k=>'<th colspan="'+(uc(k[0])?3:4)+'" class="cur sep'+(k[0]==='ek'||EKK.some(x=>x[0]===k[0])?' ktek':'')+'">'+k[1]+'</th>').join('')+'</tr><tr><th class="kn">Marka</th>'+H(1)+KC.map(k=>uc(k[0])?H(0).replace(/<th title="Tahmin ÷ bütçe">T\/B<\/th>/,''):H(0)).join('')+'</tr>';
+  const H=top=>'<th class="sep">Bütçe</th><th>Fiili</th><th>Tahmin</th>'+(BITTI?'<th title="Fiili ÷ bütçe">F/B</th>':'<th class="th2" title="Tahmin ÷ bütçe · fiili tahmini geçtiyse fiili ÷ bütçe">Tahmin<br>/Bütçe</th>')+(top&&cur?'<th title="Bugünkü gidişat: fiili ÷ geçen iş günü × ayın iş günü">Gidişat</th>':'');
+  const hd='<tr class="per"><th></th><th colspan="'+(cur?5:4)+'" class="cur sep">Toplam</th>'+KC.map(k=>'<th colspan="'+(uc(k[0])?3:4)+'" class="cur sep'+(k[0]==='ek'||EKK.some(x=>x[0]===k[0])?' ktek':'')+'">'+k[1]+'</th>').join('')+'</tr><tr><th class="kn">Marka</th>'+H(1)+KC.map(k=>uc(k[0])?H(0).replace(/<th title="Tahmin ÷ bütçe">T\/B<\/th>/,''):H(0)).join('')+'</tr>';
   const row=(b,ri)=>'<tr><td class="kn"><b>'+esc(lab(b))+'</b>'+(cur?tazelik(vZ('kt',b,A)):'')+'</td>'+grp(ktTop([b],m,met,kirs),b,'',ri,-1,1)+KC.map((k,ci)=>EKK.some(x=>x[0]===k[0])&&!ekkBek(b).includes(k[0])?'<td class="sep na ktekc">–</td><td class="na ktekc">–</td><td class="na ktekc">–</td>'+(uc(k[0])?'':'<td class="na ktekc">–</td>'):grp(ktHucre(b,m,k[0],met),b,k[0],ri,ci,0)).join('')+'</tr>';
   const tot='<tr class="main tot"><td class="kn"><b>Toplam</b></td>'+grp(ktTop(bs,m,met,kirs),'','',0,0,1)+KC.map(k=>grp(ktTop(bs,m,met,k[0]==='ek'?EKK.map(x=>x[0]):[k[0]]),'','',0,0,0)).join('')+'</tr>';
   // ek kalemler tablosu: Car Care, Aksesuar, Lastik · markanın müdürleri girer · toplam sütununa dahil
@@ -1670,7 +1674,7 @@ function pKT0(){
   const ayS='<label class="srt">Ay <select data-sort="ktAy">'+Array.from({length:CUT},(_,i)=>i+1).map(x=>'<option value="'+x+'"'+(x===m?' selected':'')+'>'+MONTHS[x-1]+(x===CUT?' · devam':'')+'</option>').join('')+'</select></label>';
   const izin=KUL&&KUL.rol==='yonetici';
   const bar=!izin?fgYon():(met==='top'&&!st.ktEdit?'<div class="garbar"><span class="garn">Tahmin girmek için İşçilik, Yedek parça ya da Araç girişi sekmesini seçin.</span></div>':vBar('kt',true,(gecmisH?'<b>'+hw.w+'. hafta</b> düzeltmesi · kayıt o haftanın son günü tarihiyle yazılır, bu haftanın tahminleri değişmez':(KUL.markalar&&KUL.markalar.length?'Giriş yetkiniz: '+KUL.markalar.map(lab).join(', '):'Tüm markalar için giriş yetkiniz var'))+' · '+KTM.find(x=>x[0]===met)[1]+' tahmini'));
-  const nt=(BITTI?'F/B = fiili ÷ bütçe (ayın iş günleri '+(cur?'doldu':'bitti')+'). ':'Tahmin/Bütçe = tahmin ÷ bütçe; fiili tahmini geçtiyse (F işareti) fiili ÷ bütçe. ')+'%100 ve üstü yeşil, %95–100 sarı, altı kırmızı. '+(cur?'Gidişat = fiili ÷ geçen iş günü ('+G.gecen+') × ayın iş günü ('+G.donem+'). Tahminin üzerine gelince geçen haftaki tahmin, değişim ve bugünkü gidişat görünür. Marka adının yanındaki tarih son güncellemedir: 7 günü geçince sarı, 14 günü geçince kırmızı.':'Kapanmış ay: İsabet = 1 − |son tahmin − gerçekleşen| ÷ gerçekleşen.');
+  const nt=(BITTI?'F/B = fiili ÷ bütçe (ayın iş günleri '+(cur?'doldu':'bitti')+'). ':'Tahmin/Bütçe = tahmin ÷ bütçe; fiili tahmini geçtiyse (F işareti) fiili ÷ bütçe. ')+'%100 ve üstü yeşil, %95–100 sarı, altı kırmızı. '+(cur?'Gidişat = fiili ÷ geçen iş günü ('+G.gecen+') × ayın iş günü ('+G.donem+'). Tahminin üzerine gelince geçen haftaki tahmin, değişim ve bugünkü gidişat görünür. Marka adının yanındaki tarih son güncellemedir: 7 günü geçince sarı, 14 günü geçince kırmızı.':'Kapanmış ay: tahminin üzerine gelince gerçekleşen tutar, fiili ÷ tahmin ve isabet görünür (isabet = 1 − |tahmin − gerçekleşen| ÷ gerçekleşen).');
   const segG='<div class="seg" id="ktg">'+[['kir','Marka kırılımı'],['mar','Marka karşılaştırması']].map(([k,t])=>'<button type="button" data-k="'+k+'" class="'+(k===gor?'on':'')+'">'+t+'</button>').join('')+'</div>';
   const hdr=head('Servis Performans Yönetimi','Kapanış Tahmini',MONTHS[m-1]+' '+YEAR+(cur?' · ay devam ediyor':' · kapandı')+' · '+(SB?esc(brandLabel()):'tüm markalar')+' · markalar her hafta günceller');
   if(gor==='kir'&&!st.ktEdit){   // seçili markaların her biri: Toplam ciro · İşçilik · YP · Araç girişi × kırılımlar
@@ -1695,7 +1699,7 @@ function pKT0(){
     '<div class="ktbar">'+segG+segM+ayS+hwS+'</div>'+
     box2('dense garg ktt-box'+(!ed?' kmp ktfix':''),KTM.find(x=>x[0]===met)[1]+' · bütçe, fiili ve kapanış tahmini',(adet?'Adet':'Tutarlar ₺ · Mln / Bin · Toplam, Car Care, Aksesuar ve Lastik dahil')+' · bütçe ve fiili servis verisinden, tahmin markalardan'+(ed?' · tahminleri ₺ olarak tam sayı girin':''),bar+ktLej2+(()=>{const t=tbl(hd,bs.map(row).join(''),tot).replace(/min-width:\d+px/,'min-width:'+(ed?1480:1120)+'px;width:100%');
       // tüm sekmelerde aynı sütun düzeni: marka 112 · her sütun 50 (Toplam ciro sekmesindeki gibi)
-      return ed?t:t.replace('<thead>','<colgroup><col style="width:112px">'+'<col style="width:52px">'.repeat(3)+'<col style="width:46px"><col style="width:52px">'+KC.map(()=>'<col style="width:48px">'.repeat(3)+'<col style="width:46px">').join('')+'</colgroup><thead>');})())+
+      return ed?t:t.replace('<thead>','<colgroup><col style="width:112px">'+'<col style="width:52px">'.repeat(3)+'<col style="width:46px">'+(cur?'<col style="width:52px">':'')+KC.map(()=>'<col style="width:48px">'.repeat(3)+'<col style="width:46px">').join('')+'</colgroup><thead>');})())+
     ekTablo+
     '<p class="note">'+nt+'</p>';
 }
@@ -1707,11 +1711,11 @@ function sdSatis(b,m){const ks=KIR.map(k=>k[0]);
   return {v:ks.reduce((a,k)=>a+ktHucre(b,m,k,'yp').fiili,0),src:'fiili'};}
 function sdHesap(b,m){const A=ayk(m),s=sdSatis(b,m),smm=m<CUT?vV('yps',b,A,'smm'):null,mal=smm!=null?smm:s.v==null?null:s.v*ypOran(b);   // kapanan ayda müdürün girdiği fiili SMM, yoksa oran
   let bas=vV('sd',b,A,'bas'),oto=false;   // dönem başı: manuel › önceki ay kapanışı › önceki ayın dönem sonu
-  if(bas==null&&m>1){const pk=vV('yps',b,ayk(m-1),'stok');bas=pk!=null?pk:vV('sd',b,ayk(m-1),'son');oto=bas!=null?(pk!=null?MONTHS[m-2]+' kapanışı':'önceki ay'):false;}
+  if(bas==null&&m>1){const pk=ypGT(b,ayk(m-1));bas=pk!=null?pk:vV('sd',b,ayk(m-1),'son');oto=bas!=null?(pk!=null?MONTHS[m-2]+' kapanışı':'önceki ay'):false;}
   let son=vV('sd',b,A,'son'),sOto=false;   // dönem sonu: manuel › bu ay kapanışı › (devam eden ay) son haftalık stok
-  if(son==null){const k=vV('yps',b,A,'stok');if(k!=null){son=k;sOto='ay kapanışı';}else if(m===CUT){const w=ypSonHafta(b,m);if(w){son=w.v;sOto=w.w+'. hafta stoğu';}}}
+  if(son==null){const k=ypGT(b,A);if(k!=null){son=k;sOto='ay kapanışı';}else if(m===CUT){const w=ypSonHafta(b,m);if(w){son=w.v;sOto=w.w+'. hafta stoğu';}}}
   const ort=bas!=null&&son!=null?(bas+son)/2:null,dv=mal!=null&&ort?mal/ort:null;
-  return {s,mal,smm,gOran:smm!=null&&s.v?smm/s.v:null,bas,oto,sOto,son,ort,dv,bek:m<CUT&&son==null&&vV('yps',b,A,'stok')==null,yil:dv!=null?dv*12:null,gun:dv?365/(dv*12):null};}
+  return {s,mal,smm,gOran:smm!=null&&s.v?smm/s.v:null,bas,oto,sOto,son,ort,dv,bek:m<CUT&&son==null&&ypGT(b,A)==null,yil:dv!=null?dv*12:null,gun:dv?365/(dv*12):null};}
 const sdEt=t=>'<span class="sdk" title="'+esc(t)+'">'+esc(/hafta/.test(t)?t.replace(/\. hafta stoğu/,'. hf'):/kapanış/.test(t)?'kapanış':t)+'</span>';   // tek satır etiket; ayrıntı üzerine gelince
 function sdBolum(){
   const m=+st.sort.sdAy&&+st.sort.sdAy<=CUT?+st.sort.sdAy:CUT, A=ayk(m), ed=!!st.sdEdit&&KUL&&KUL.yp;
@@ -1725,14 +1729,14 @@ function sdBolum(){
       '<td>'+f2(h.ort)+'</td><td class="sep"><b>'+d2(h.dv)+'</b></td><td>'+d2(h.yil)+'</td><td><b>'+(h.gun==null?'–':nf.format(h.gun)+' gün')+'</b></td>'+
       '<td class="'+(dg==null?'':dg<=0?'g':'r')+'">'+(dg==null?'–':(dg>0?'▲ ':'▼ ')+nf.format(Math.abs(dg))+' gün')+'</td></tr>';};
   const T=(()=>{let mal=0,ort=0,ok1=0;for(const b of YPB){const h=sdHesap(b,m);if(h.mal!=null&&h.ort){mal+=h.mal;ort+=h.ort;ok1++;}}const dv=ort?mal/ort:null;return {mal,ort,dv,ok1};})();
-  const hd='<tr class="per"><th></th><th colspan="3" class="cur sep">Maliyet (SMM)</th><th colspan="3" class="cur sep">Stok (tüm stok grupları dahil)</th><th colspan="4" class="cur sep">Devir</th></tr>'+
+  const hd='<tr class="per"><th></th><th colspan="3" class="cur sep">Maliyet (SMM)</th><th colspan="3" class="cur sep" title="Yedek Parça tablosundaki Genel toplam: güncel toplam stok + stoktaki iş emri üzeri">Stok (genel toplam)</th><th colspan="4" class="cur sep">Devir</th></tr>'+
     '<tr><th class="kn">Marka</th><th class="sep" title="YP satışı: devam eden ayda kapanış tahmini, kapanan ayda gerçekleşen (4 kırılım)">YP satışı</th><th>Oran</th><th>Maliyet</th><th class="sep">Dönem başı</th><th>Dönem sonu</th><th>Ortalama</th><th class="sep">Aylık</th><th>Yıllık</th><th title="365 ÷ yıllık devir">Stokta kalma</th><th title="Önceki aya göre stokta kalma süresi">Önceki aya göre</th></tr>';
   const tot='<tr class="main tot"><td class="kn"><b>Toplam</b>'+(T.ok1<YPB.length?'<small class="ktn">'+T.ok1+' marka hesaplandı</small>':'')+'</td><td></td><td></td><td><b>'+f2(T.ok1?T.mal:null)+'</b></td><td class="sep"></td><td></td><td>'+f2(T.ok1?T.ort:null)+'</td><td class="sep"><b>'+d2(T.dv)+'</b></td><td>'+d2(T.dv!=null?T.dv*12:null)+'</td><td><b>'+(T.dv?nf.format(365/(T.dv*12))+' gün':'–')+'</b></td><td></td></tr>';
   const ayS='<label class="srt">Ay <select data-sort="sdAy">'+Array.from({length:CUT},(_,i)=>i+1).map(x=>'<option value="'+x+'"'+(x===m?' selected':'')+'>'+MONTHS[x-1]+(x===CUT?' · devam':'')+'</option>').join('')+'</select></label>';
   const bar=vBar('sd',KUL&&KUL.yp,'Dönem başı ve dönem sonu stok tutarlarını girin · '+MONTHS[m-1]+(m===CUT?' (dönem sonu tahmini)':''));
   return box2('dense garg ktt-box sdt','Stok devir hızı · '+MONTHS[m-1]+' '+YEAR,'Maliyet: devam eden ayda YP satışı × oran · kapanan ayda fiili SMM · devir = maliyet ÷ ortalama stok',
     bar+tbl(hd,YPB.map(row).join(''),tot).replace(/min-width:\d+px/,'min-width:'+(ed?1250:1000)+'px;width:100%'),ayS)+
-    '<p class="note">'+(m===CUT?'Devam eden ayda YP satışı markanın kapanış tahminidir; tahmin girilmemişse bugünkü gidişat kullanılır (italik). ':'')+'Dönem başı boşsa önceki ayın kapanış stoğu, dönem sonu boşsa bu ayın kapanış stoğu (devam eden ayda son haftalık stok) otomatik alınır; kapanan ayda ay kapanışı girilmemişse devir hesaplanmaz ve "ay kapanışı bekleniyor" yazar; buraya yazılan değer önce gelir. Oranlar: BMW & MINI 0,75 · Honda 0,90 · O&J 0,60 · diğerleri 0,70.</p>';
+    '<p class="note">'+(m===CUT?'Devam eden ayda YP satışı markanın kapanış tahminidir; tahmin girilmemişse bugünkü gidişat kullanılır (italik). ':'')+'Stok = Yedek Parça tablosundaki Genel toplam (güncel toplam stok + stoktaki iş emri üzeri). Dönem başı boşsa önceki ayın kapanış stoğu, dönem sonu boşsa bu ayın kapanış stoğu (devam eden ayda son haftalık stok) otomatik alınır; kapanan ayda ay kapanışı girilmemişse devir hesaplanmaz ve "ay kapanışı bekleniyor" yazar; buraya yazılan değer önce gelir. Oranlar: BMW & MINI 0,75 · Honda 0,90 · O&J 0,60 · diğerleri 0,70.</p>';
 }
 /* ---------- Açık İş Emri · markalar her hafta girer (ISO hafta) ---------- */
 const AIK=[['mek','Mekanik','Mekanik'],['hasar','Hasar','Kaporta Boya'],['gar','Garanti','Garanti']];
@@ -1821,9 +1825,11 @@ const ypAd=P=>P[0]==='H'?hEtiket(isoH(new Date()).y,+P.slice(1)):MONTHS[D.aylar.
 const ypV=(P,b,k)=>P?vV('yps',b,P,k):undefined;
 const ypTop=(P,k)=>YPB.reduce((a,b)=>{const v=ypV(P,b,k);return v==null?a:(a||0)+v;},null);
 const ypFark=(P,Q,k)=>{let d=null;for(const b of YPB){const v=ypV(P,b,k),p=ypV(Q,b,k);if(v!=null&&p!=null)d=(d||0)+v-p;}return d;};   // yalnız iki dönemde de girilen markalar
-function ypSonHafta(b,m){   // ay içindeki en son haftalık stok
+// genel toplam = güncel toplam stok + stoktaki iş emri üzeri (Yedek Parça tablosunun dip toplamı) · stok devir hızında kullanılır
+const ypGT=(b,P)=>{const a=vV('yps',b,P,'stok'),c=vV('yps',b,P,'stokis');return a==null&&c==null?null:(a||0)+(c||0);};
+function ypSonHafta(b,m){   // ay içindeki en son haftalık genel toplam
   let best=null;const B=(D.yps||{})[b]||{};for(const P in B){if(P[0]!=='H'||!B[P].stok)continue;const w=+P.slice(1),j=new Date(Date.UTC(isoH(new Date()).y,0,4));j.setUTCDate(j.getUTCDate()-((j.getUTCDay()||7)-1)+(w-1)*7);
-    if(j.getUTCMonth()+1===m&&(!best||w>best.w))best={w,v:B[P].stok.v};}return best;}
+    if(j.getUTCMonth()+1===m&&(!best||w>best.w))best={w,v:B[P].stok.v+(B[P].stokis&&B[P].stokis.v!=null?+B[P].stokis.v:0)};}return best;}
 function pYP(){
   if(!D.yps)return head('Servis Performans Yönetimi','Yedek Parça','Stok değerleri')+'<div class="empty">Yedek parça verisi yüklenemedi. Sayfayı yenileyin; sorun sürerse yöneticiye bildirin.</div>';
   const bu=isoH(new Date()), P=st.sort.ypD||('H'+bu.w), Pp=ypOnce(P), hafta=P[0]==='H', ed=!!st.ypsEdit&&KUL&&KUL.yp;
@@ -1853,7 +1859,7 @@ function pYP(){
   if(ed&&Pp)bar=bar.replace('<button type="button" class="gbtn ghost" data-vvaz="yps">','<button type="button" class="gbtn ghost" id="ypkop" title="Boş hücreleri önceki dönemin değerleriyle doldurur">Önceki dönemden kopyala</button><button type="button" class="gbtn ghost" data-vvaz="yps">');
   return head('Servis Performans Yönetimi','Yedek Parça',ypAd(P)+' · '+(hafta?'markalar her hafta günceller':'ay sonu kesin değerler'))+cards+
     box2('garg ypt',(hafta?'Haftalık stok değerleri':'Ay kapanışı')+' · '+ypAd(P),'Tutarlar ₺ · ▲▼ önceki '+(hafta?'haftaya':'ay kapanışına')+' göre (artış yeşil; ölü stokta azalış yeşil) · üzerine gelince önceki değer ve fark görünür',bar+tbl(hd,body,foot).replace(/min-width:\d+px/,'min-width:'+(ed?1250:1020)+'px;width:100%;table-layout:fixed').replace('<thead>','<colgroup><col style="width:'+(ed?190:200)+'px">'+'<col>'.repeat(YPB.length+1)+'</colgroup><thead>'),sel)+
-    '<p class="note">Her hafta güncel değerler, ay sonunda "Ay kapanışı" dönemi seçilerek kesin değerler girilir. Ay kapanışındaki güncel toplam stok, stok devir hızında dönem sonu stoğu olarak kullanılır. Ölü stok oranı = ölü stok 12 ay ÷ güncel toplam stok.</p>'+'<div class="pb"></div>'+sdBolum();
+    '<p class="note">Her hafta güncel değerler, ay sonunda "Ay kapanışı" dönemi seçilerek kesin değerler girilir. Ay kapanışındaki Genel toplam, stok devir hızında dönem sonu stoğu olarak kullanılır. Ölü stok oranı = ölü stok 12 ay ÷ güncel toplam stok.</p>'+'<div class="pb"></div>'+sdBolum();
 }
 /* ---------- 05 · Car Care ---------- */
 // Car Care · marka × ay ısı haritası (Oca → içinde bulunulan ay + YTD)
@@ -2125,7 +2131,7 @@ function pGiris(tip='w'){
     const tot=bs.reduce((a,b)=>a+secsP(b).length,0), tam=bs.reduce((a,b)=>a+tamP(b),0);
     prog='<div class="fgp"><div><b>'+esc(kad)+'</b> · '+bs.length+' marka · '+esc(donem)+'</div><div class="fgpb"><i style="width:'+(tot?tam/tot*100:0)+'%"></i></div><span>'+tam+' / '+tot+' giriş tamam</span></div>';
     if(A){const gaK=bs.filter(b=>fgIzin.gark(b)), aiK=bs.filter(b=>fgIzin.aiek(b)&&AIK.some(x=>x[0]===k));
-      if(gaK.length)kartlar.push(fgKart(++no,'gark',gaK,'Garanti araç girişi · '+pAd+' toplamı',pAd+' ayının kesin orijinal garanti araç girişi · adet','<div class="fgg fg1">'+gaK.map(b=>'<div class="fgr">'+esc(lab(b))+'</div>'+fgInp('gark',b,'fiili',1)).join('')+'</div>'));
+      if(gaK.length)kartlar.push(fgKart(++no,'gark',gaK,'Garanti araç girişi · '+pAd+' toplamı',pAd+' ayının kesin fiili garanti araç girişi · adet','<div class="fgg fg1">'+gaK.map(b=>'<div class="fgr">'+esc(lab(b))+'</div>'+fgInp('gark',b,'fiili',1)).join('')+'</div>'));
       if(aiK.length)kartlar.push(fgKart(++no,'aiek',aiK,'Açık iş emri · '+pAd+' sonu · '+kad,pAd+' ayının son iş günündeki değerler · adet',aiGrid('aiek',aiK.map(b=>[b,k,esc(lab(b))]))));}
     else{const ktB=bs.filter(b=>fgIzin.kt(b)), aiB=bs.filter(b=>fgIzin.aie(b)&&AIK.some(x=>x[0]===k));
       if(ktB.length)kartlar.push(fgKart(++no,'kt',ktB,'Kapanış tahmini · '+kad,ktAlt,fgKtTablo(ktB.map(b=>({b,kir:k,ad:lab(b)}))),gidBtn));
@@ -2137,7 +2143,7 @@ function pGiris(tip='w'){
     prog='<div class="fgp"><div><b>'+esc(lab(b))+'</b> · '+esc(donem)+'</div><div class="fgpb"><i style="width:'+(secs.length?tam/secs.length*100:0)+'%"></i></div><span>'+tam+' / '+secs.length+' bölüm tamam</span></div>';
     const kirs=KIR.filter(k=>kirOk(k[0])), aiks=AIK.filter(k=>kirOkAie(k[0]));
     if(A){
-      if(secs.includes('gark'))kartlar.push(fgKart(++no,'gark',[b],'Garanti araç girişi · '+pAd+' toplamı',pAd+' ayının kesin orijinal garanti araç girişi · adet','<div class="fgg fg1"><div class="fgr">'+pAd+' toplamı</div>'+fgInp('gark',b,'fiili',1)+'</div>'));
+      if(secs.includes('gark'))kartlar.push(fgKart(++no,'gark',[b],'Garanti araç girişi · '+pAd+' toplamı',pAd+' ayının kesin fiili garanti araç girişi · adet','<div class="fgg fg1"><div class="fgr">'+pAd+' toplamı</div>'+fgInp('gark',b,'fiili',1)+'</div>'));
       if(secs.includes('aiek'))kartlar.push(fgKart(++no,'aiek',[b],'Açık iş emri · '+pAd+' sonu',pAd+' ayının son iş günündeki değerler · adet',aiGrid('aiek',aiks.map(k=>[b,k[0],k[1]]))));
       if(secs.includes('ypk'))kartlar.push(fgKart(++no,'ypk',[b],'Yedek parça · '+pAd+' kapanışı',pAd+' ayının kesin kapanış değerleri · ₺ · stok devir hızı için',ypGrid('ypk',b)));
     }else{
@@ -2185,7 +2191,7 @@ function akSayfa(bs,mod){
     ust=bs.length>1?'<div class="fgt">'+bs.map(x=>{const sx=FGAK.filter(s=>fgIzin[s](x)),t=sx.filter(s=>akDone(s,x,FGPA)).length,ok=t===sx.length;return '<button type="button" data-fgb="'+x+'" class="'+(x===b?'on':'')+(ok?' ok':'')+'">'+esc(lab(x))+'<small>'+(ok?'✓ '+sonAd+' tamam':t+'/'+sx.length+' · '+sonAd)+'</small></button>';}).join('')+'</div>':'';
     segs=secs.map(s=>[s,AKSEC[s]]);
     const sg=secs.includes(st.akSeg)?st.akSeg:secs[0];st.akSeg=sg;
-    if(sg==='gark'){rows=[['gark',b,'fiili','Orijinal garanti araç girişi <small>adet</small>']];baslikB=lab(b)+' · Garanti araç girişi · ay toplamı';}
+    if(sg==='gark'){rows=[['gark',b,'fiili','Fiili garanti araç girişi <small>adet</small>']];baslikB=lab(b)+' · Garanti araç girişi · ay toplamı';}
     else if(sg==='aiek'){rows=AIK.filter(k=>kirOkAie(k[0])).flatMap(k=>[['aiek',b,k[0]+'.acik',k[1]+' <small>açık iş emri</small>'],['aiek',b,k[0]+'.g45',k[1]+' <small>45 gün üzeri</small>']]);baslikB=lab(b)+' · Açık iş emri · ay sonu adedi';}
     else{rows=YPR.map(k=>['ypk',b,k[0],k[1]+' <small>'+(k[0]==='sip'||k[0]==='stokis'?'parça':'₺')+'</small>']);baslikB=lab(b)+' · Yedek parça · ay sonu';}
   }
@@ -2330,7 +2336,7 @@ function showTip(el,ev){
     y.forEach((v,i)=>{const x=i*bw;if(v)s+='<rect x="'+(x+bw*.2)+'" y="'+yy(v)+'" width="'+bw*.6+'" height="'+(H-14-yy(v))+'" rx="1.5" fill="'+(PMS().includes(i+1)?'#b78d4c':'#122f59')+'"/>';s+='<text x="'+(x+bw/2)+'" y="'+(H-2)+'" text-anchor="middle" font-size="8.5" fill="#64758a">'+MONTHS[i][0]+'</text>';});
     const T=y.reduce((a,v)=>a+v,0);html='<div class="tt">'+esc(n)+'</div><div class="ts">'+BLN[bl]+' · aylık ek satış '+YEAR+(kk?' · '+kk:'')+'</div>'+s+'</svg><div class="tg"><span>Yıl toplamı</span><b>'+FM.mn(T)+'</b></div>';}
   else if(el.dataset.tipkt){const [o,t,ad,pl,ti,cl,pol,gd,fi]=el.dataset.tipkt.split('|'),F=v=>v===''||v==null?'–':ad==='1'?FM.ad(+v):TLT(+v),dg=o===''?null:+t-+o,iy=pol==='g'?1:pol==='r'?-1:0;
-    html='<div class="tt">'+esc(ti)+'</div><div class="tg"><span>'+esc(pl)+'</span><b>'+(o===''?'girilmemiş':F(o))+'</b><span>'+esc(cl)+'</span><b>'+F(t)+'</b><span>Değişim</span><b class="'+(dg==null||!dg||!iy?'':dg*iy>0?'g':'r')+'">'+(dg==null?'ilk kez girildi':dg===0?'değişmedi':(dg>0?'▲ +':'▼ −')+F(Math.abs(dg))+(+o?' · %'+nf1.format(Math.abs(dg/+o)*100):''))+'</b></div>'+(fi!==''&&fi!=null?(()=>{const r=+t?+fi/+t:null;return '<div class="tg" style="border-top:1px solid var(--line);margin-top:7px;padding-top:7px"><span>Gerçekleşen</span><b>'+F(fi)+'</b><span>Fiili ÷ tahmin</span><b class="'+(r==null?'':r>=1?'g':'r')+'">'+(r==null?'–':'%'+nf1.format(r*100))+'</b></div>';})():'')+(gd!==''&&gd!=null?'<div class="tg" style="border-top:1px solid var(--line);margin-top:7px;padding-top:7px"><span>Bugünkü gidişat</span><b>'+F(gd)+'</b></div><div class="ts" style="margin-top:3px">Bugünkü tempoyla ay sonu</div>':'');
+    html='<div class="tt">'+esc(ti)+'</div><div class="tg"><span>'+esc(pl)+'</span><b>'+(o===''?'girilmemiş':F(o))+'</b><span>'+esc(cl)+'</span><b>'+F(t)+'</b><span>Değişim</span><b class="'+(dg==null||!dg||!iy?'':dg*iy>0?'g':'r')+'">'+(dg==null?'ilk kez girildi':dg===0?'değişmedi':(dg>0?'▲ +':'▼ −')+F(Math.abs(dg))+(+o?' · %'+nf1.format(Math.abs(dg/+o)*100):''))+'</b></div>'+(fi!==''&&fi!=null?(()=>{const r=+t?+fi/+t:null;return '<div class="tg" style="border-top:1px solid var(--line);margin-top:7px;padding-top:7px"><span>Gerçekleşen</span><b>'+F(fi)+'</b><span>Fiili ÷ tahmin</span><b class="'+(r==null?'':r>=1?'g':'r')+'">'+(r==null?'–':'%'+nf1.format(r*100))+'</b><span title="1 − |tahmin − gerçekleşen| ÷ gerçekleşen">İsabet</span><b>'+(+fi?'%'+nf1.format(Math.max(0,1-Math.abs(+t-+fi)/+fi)*100):'–')+'</b></div>';})():'')+(gd!==''&&gd!=null?'<div class="tg" style="border-top:1px solid var(--line);margin-top:7px;padding-top:7px"><span>Bugünkü gidişat</span><b>'+F(gd)+'</b></div><div class="ts" style="margin-top:3px">Bugünkü tempoyla ay sonu</div>':'');
     TIP.innerHTML=html;TIP.classList.remove('in');void TIP.offsetWidth;TIP.classList.add('in');TIP.hidden=false;moveTip(ev);return;}
   if(!html)return;TIP.innerHTML=html+(el.dataset.tipek?'':'<div class="lg2 sm"><span><i style="background:#cfdae7"></i>Bütçe</span><span><i style="background:#122f59"></i>Fiili</span><span><i style="background:#b78d4c"></i>Seçili dönem</span></div>');TIP.classList.remove('in');void TIP.offsetWidth;TIP.classList.add('in');TIP.hidden=false;moveTip(ev);
 }
