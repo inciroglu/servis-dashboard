@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment2.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - name: Site klasörü hazırla
@@ -30,8 +30,19 @@ jobs:
           [ -f sw.js ] && cp sw.js site/ || true
           [ -d uygulama ] && cp -r uygulama site/ || true
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: site
+      # GitHub bazen yüklenen paketi birkaç saniye geç görüyor ("No artifacts named github-pages").
+      # Bu yüzden yayın önce kısa bir beklemeden sonra deneniyor; olmazsa 30 sn sonra bir kez daha.
+      - name: Paketin görünmesini bekle
+        run: sleep 10
       - id: deployment
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+      - name: Yayın tekrar denemesi için bekle
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 30
+      - id: deployment2
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v4
